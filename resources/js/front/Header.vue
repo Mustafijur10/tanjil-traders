@@ -13,9 +13,6 @@
  
             </template>
 
-            <template>
-                
-            </template>
         </v-menu>
 
         <v-spacer />
@@ -60,6 +57,265 @@
         </v-menu>
     </v-toolbar>
 
+    <v-toolbar class="v-trz-toolbar-header-2 bg-primary header-front">
+
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Camera </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Desktop </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in desktopCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Laptop </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in laptopCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Component </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Monitor </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> UPS </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Phone </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Tablet </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Office Equipment </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Security </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Networking </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Software </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Server & Storage </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Accessories </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Gadget </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Gaming </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> TV </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+            <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Appliance </router-link>
+                </template>                
+                <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                        <v-list-item-title class="d-flex align-center">
+                            <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
+                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                            </router-link>
+                        </v-list-item-title>
+                    </v-list-item>            
+                </v-list>
+            </v-menu>
+
+
+    </v-toolbar>
+
 </template>
 
 <script setup>
@@ -95,6 +351,43 @@
                 menutheme: "",
                 isOnMobile: false,
                 showForm: false,
+
+                cameraCategories: [
+                    { name: "Action Camera", slug: "action-camera" },
+                    { name: "Camera Lenses", slug: "camera-lenses" },
+                    { name: "Digital Camera", slug: "digital-camera" },
+                    { name: "DSLR", slug: "dslr" },
+                    { name: "Handycam", slug: "handycam" },
+                    { name: "Mirrorless Camera", slug: "mirrorless-camera" },
+                    { name: "Dash Camera", slug: "dash-camera" },
+                    { name: "Video Camera", slug: "video-camera" },
+                    { name: "Instant Camera", slug: "instant-camera" },
+                    { name: "Camera Accessories", slug: "camera-accessories" },
+                    { name: "Camera Tripod", slug: "camera-tripod" },
+                    { name: "Show all Camera", slug: "all-cameras" }
+                ],
+
+                desktopCategories: [
+                    { name: "Desktop Offer", slug: "special-pc" },
+                    { name: "Star PC", slug: "star-pc" },
+                    { name: "Gaming PC", slug: "gaming-pc" },
+                    { name: "Brand PC", slug: "brand-pc" },
+                    { name: "All-in-One-PC", slug: "all-in-one-pc" },
+                    { name: "Apple MAC Mini", slug: "apple-mac-mini" },
+                    { name: "Apple iMac", slug: "apple-imac" },
+                    { name: "Apple Mac Studio", slug: "apple-mac-studio" },
+                    { name: "Apple Mac Pro", slug: "apple-mac-pro" },
+                    { name: "Show All Desktop", slug: "show-all-desktop" },                   
+                ],
+
+                laptopCategories: [
+                    { name: "All Laptop", slug: "all-laptop" },
+                    { name: "Gaming Laptop", slug: "gaming-laptop" },
+                    { name: "Premium Ultrabook", slug: "premium-ultrabook" },
+                    { name: "Laptop Bag", slug: "laptop-bag" },
+                    { name: "Laptop Accessories", slug: "laptop-accessories" },
+                    { name: "Show All Laptop", slug: "show-all-laptop" },                                  
+                ],
             };
         },
         methods: {

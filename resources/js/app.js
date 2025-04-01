@@ -39,7 +39,7 @@ const vuetify = createVuetify({
                     // primary: "rgba(255, 110, 44, 1)",
                     primary: "#050c2e",
                     primary_lite: "rgba(255, 236, 227, 1)",
-                    secondary: "rgba(51, 69, 122, 1)",
+                    secondary: "#E25311",
                     secondary_lite: "rgba(248, 249, 255, 1)",
                     white: "#ffffff",
                     grey: "rgb(245, 245, 245)",
@@ -54,8 +54,6 @@ const vuetify = createVuetify({
                     customer_btn: '#AAC7FE',
                     purple: 'rgba(170, 178, 254, 1)',
                     purple_lite: '#F8F9FF',
-
-                    header_blue: "#050c2e",
                     
                 },
                 variations: {

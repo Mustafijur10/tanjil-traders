@@ -35,3 +35,16 @@
 .v-trz-toolbar-header .header-icon{
     font-size: 30px;
 }
+
+.v-trz-toolbar-header-2, .v-trz-toolbar-header-2 .v-toolbar__content{
+    height: 40px !important;
+}
+.toolbar-header .v-list-item{
+    min-height: 15px !important;
+}
+.toolbar-header.v-list{
+    border-top: 5px solid #E25311;
+}
+.v-trz-toolbar-header-2 .router-link-active.nav-item:hover{
+    color: #E25311 !important;
+}
