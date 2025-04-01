@@ -36,7 +36,7 @@
               <router-view></router-view>
           </v-container>
       </v-main>
-      <v-footer> </v-footer>
+      <Footer> </Footer>
   </v-app>
   {{ checkUrl }}
 </template>
