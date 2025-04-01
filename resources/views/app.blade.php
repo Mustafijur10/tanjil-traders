@@ -11,11 +11,11 @@
     <link rel="apple-touch-icon" href="/fav.png" />
     <meta name="msapplication-TileImage" content="/fav.png" />
    
-    <meta name="title" content="BuildMax">
-    <meta name="keywords" content="Building, Materials, Caribbean">
-    <meta name="description" content="One-Stop Supplier of Building Materials to Caribbean">
+    <meta name="title" content="Tanjil-Traders">
+    <meta name="keywords" content="Computer, Camera, Gadget, Accessories">
+    <meta name="description" content="Leading Computer, Laptop & Gadget Shop in Bangladesh">
 
-    <title>BuildMAX | One-Stop Supplier of Building Materials to Caribbean</title>
+    <title>Tanjil Traders - Leading Computer, Laptop & Gadget Shop in Bangladesh</title>
     
 
     <!-- Scripts -->

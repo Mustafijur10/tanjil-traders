@@ -1,6 +1,6 @@
 <template>
 
-<sidebar-menu
+<!-- <sidebar-menu
       :menu="menu"
       @update:collapsed="onToggleCollapse"
       v-model:collapsed="collapsed"
@@ -26,7 +26,7 @@
               </router-link>
           </v-container>
       </template>
-  </sidebar-menu>
+  </sidebar-menu> -->
   <v-app :theme="theme" id="main" :class="{ collapsed: collapsed }">
       <v-header>
           <Header></Header>
@@ -147,7 +147,7 @@
 </script>
 <style scoped>
 #main {
-    padding-left: 290px;
+    /* padding-left: 290px; */
     -webkit-transition: 0.3s ease;
     transition: 0.3s ease;
     background-color: rgb(245, 245, 245);

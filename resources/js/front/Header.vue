@@ -9,7 +9,7 @@
             transition="scale-transition"
         >
             <template v-slot:activator="{ attrs, on }">
-                <!-- <v-btn
+                <v-btn
                     @click="themeSwitch"
                     class="ml-2"
                     min-width="0"
@@ -20,10 +20,10 @@
                             >mdi-weather-sunny</template
                         ><template v-else>mdi-weather-night</template></v-icon
                     ></v-btn
-                > -->
+                >
             </template>
         </v-menu>
-         <!--  <v-menu open-on-hover>
+          <v-menu open-on-hover>
             <template v-slot:activator="{ props }">
                <v-btn color="primary" v-bind="props" class="ma-0">
                     <v-icon color="orange darken-2">mdi-account</v-icon>
@@ -42,7 +42,7 @@
                     title="Logout"
                 ></v-list-item>
             </v-list>
-        </v-menu> -->
+        </v-menu>
     </v-toolbar>
     <!-- <v-container height="75px">
         <v-toolbar class="v-trz-toolbar-header bg-grey">
