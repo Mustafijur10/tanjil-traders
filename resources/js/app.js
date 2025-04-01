@@ -54,6 +54,8 @@ const vuetify = createVuetify({
                     customer_btn: '#AAC7FE',
                     purple: 'rgba(170, 178, 254, 1)',
                     purple_lite: '#F8F9FF',
+
+                    ash: '#696973',
                     
                 },
                 variations: {
@@ -81,6 +83,10 @@ const vuetify = createVuetify({
 import Vue3EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 
+import MarqueeText from 'vue-marquee-text-component';
+
+
+
 import App from "@/app.vue";
 import router from "@/router";
 import store from "@/store";
@@ -93,6 +99,8 @@ app.use(store).use(router);
 app.use(VueSidebarMenu);
 app.use(VueSweetalert2);
 app.component('EasyDataTable', Vue3EasyDataTable);
+
+app.component('marquee-text', MarqueeText);
 
 app.mount("#app");
 

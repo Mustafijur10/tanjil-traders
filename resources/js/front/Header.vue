@@ -33,6 +33,20 @@
         </v-menu>
         <v-menu open-on-hover>
             <template v-slot:activator="{ props }">
+                <v-btn color="white" v-bind="props" class="ma-0 text-none text-left pl-1 pr-1 mr-2">
+                    <v-icon color="white darken-2 header-icon">mdi-gift-outline</v-icon>
+                    <span class="pl-2"> 
+                        <small style="font-size: 10px; color:#696973;">Offers</small>
+                        <br>
+                        <span style="font-size: 12px;">Latest Offers</span>
+                    </span>
+                    
+                </v-btn> 
+                
+            </template>            
+        </v-menu>
+        <v-menu open-on-hover>
+            <template v-slot:activator="{ props }">
                 <v-btn color="white" v-bind="props" class="ma-0 text-none text-left pl-1 pr-1 mr-2">                    
                     <v-icon color="white darken-2 header-icon">mdi-bell-badge-outline</v-icon>
                     <span class="pl-2"> 
@@ -57,6 +71,8 @@
         </v-menu>
     </v-toolbar>
 
+    <v-divider class="border-opacity-100" color="success"></v-divider>
+
     <v-toolbar class="v-trz-toolbar-header-2 bg-primary header-front">
 
             <v-menu open-on-hover>
@@ -67,7 +83,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -82,7 +98,7 @@
                     <v-list-item v-for="(category, index) in desktopCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -96,7 +112,7 @@
                     <v-list-item v-for="(category, index) in laptopCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -110,7 +126,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -124,7 +140,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -138,7 +154,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -152,7 +168,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -166,7 +182,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -180,7 +196,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -194,7 +210,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -208,7 +224,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -222,7 +238,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -236,7 +252,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -250,7 +266,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -264,7 +280,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -278,7 +294,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -292,7 +308,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            
@@ -306,7 +322,7 @@
                     <v-list-item v-for="(category, index) in cameraCategories" :key="index">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/camera/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
-                                {{ category.name }} <span class="mdi mdi-chevron-right text-right"></span>
+                                {{ category.name }} 
                             </router-link>
                         </v-list-item-title>
                     </v-list-item>            

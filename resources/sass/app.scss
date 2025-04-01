@@ -48,3 +48,12 @@
 .v-trz-toolbar-header-2 .router-link-active.nav-item:hover{
     color: #E25311 !important;
 }
+.v-trz-toolbar-header-2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensures it's above other elements */
+    background-color: white; /* Add background color if needed */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds shadow */
+}
