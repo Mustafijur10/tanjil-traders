@@ -13,11 +13,7 @@
       </v-col>
 
       <v-col cols="3">
-        <v-card
-          class="mx-auto bg-primary"
-          elevation="1"
-          max-width="500"
-        >
+        <v-card class="mx-auto bg-primary" elevation="1" max-width="500">
           <v-card-title class="pb-5 font-weight-black text-center">Compare Products</v-card-title>
 
           <v-card-text class="text-center">
@@ -34,14 +30,7 @@
               variant="outlined" single-line @click:append-inner="onClick">
             </v-text-field>
 
-            <v-btn
-              class="text-none"
-              
-              size="x-large"
-              variant="outlined"
-              density="compact"
-              block
-            >
+            <v-btn class="text-none" size="x-large" variant="outlined" density="compact" block>
               View Comparison
             </v-btn>
           </v-card-text>
@@ -54,11 +43,12 @@
 
     <div>
       <marquee-text :duration="15" :repeat="2">
-        Eid Mubarak! Due to the Eid Holiday, our online activities and some outlets are out of operation. For Eid holiday schedule please visit our contact page.
+        Eid Mubarak! Due to the Eid Holiday, our online activities and some outlets are out of operation. For Eid holiday schedule please visit our contact page. For more details please call. We will be open after vacation
       </marquee-text>
 </div>
   </div>
 </template>
+
 <script setup>
  
 </script>
@@ -73,12 +63,7 @@
             loading: false,
           }
       },
-        methods: {         
-          
-                
-          
-            
-        },
+        methods: { },
         watch: {
           loading (val) {
             if (!val) return
