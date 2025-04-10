@@ -20,7 +20,7 @@
         <v-menu open-on-hover>
             <template v-slot:activator="{ props }">
                 <v-btn color="white" v-bind="props" class="ma-0 text-none text-left pl-1 pr-1 mr-2">
-                    <v-icon color="white darken-2 header-icon">mdi-account-outline</v-icon>
+                    <v-icon color="white darken-2 header-icon">mdi-account-arrow-right-outline</v-icon>
                     <span class="pl-2"> 
                         <small style="font-size: 10px; color:#696973;">Welcome</small>
                         <br>
@@ -80,7 +80,7 @@
                     <router-link v-bind="props" to="/" class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"> Camera </router-link>
                 </template>                
                 <v-list class="rounded-l pa-2 bg-primary toolbar-header mt-2">
-                    <v-list-item v-for="(category, index) in cameraCategories" :key="index">
+                    <v-list-item v-for="(category, index) in cameraCategories" :key="index" class="hover-red">
                         <v-list-item-title class="d-flex align-center">
                             <router-link :to="`/${category.slug}`" class="ml-3 text-white text-subtitle-2 text-decoration-none">
                                 {{ category.name }} 
