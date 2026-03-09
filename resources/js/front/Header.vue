@@ -21,7 +21,7 @@
 
         <v-spacer />
 
-        <router-link to="/admin/login">
+        <router-link to="/admin/login" style="text-decoration: none;">
             <v-btn color="white" class="ma-0 text-none text-left pl-1 pr-1 mr-2">
                 <v-icon color="white darken-2 header-icon">mdi-account-arrow-right-outline</v-icon>
                 <span class="pl-2">
@@ -78,37 +78,48 @@
                 v-for="category in navCategories"
                 :key="category.id"
                 open-on-hover
+                :close-on-content-click="true"
+                location="bottom"
             >
+                <!-- Activator: plain span, not router-link, so v-menu works -->
                 <template v-slot:activator="{ props }">
-                    <router-link
+                    <span
                         v-bind="props"
-                        :to="`/category/${category.slug}`"
-                        class="ml-3 text-decoration-none text-white text-subtitle-2 nav-item"
+                        class="ml-3 text-white text-subtitle-2 nav-item cursor-pointer"
+                        @click="$router.push(`/category/${category.id}`)"
                     >
                         {{ category.title }}
-                    </router-link>
+                    </span>
                 </template>
 
                 <!-- Dropdown subcategories -->
                 <v-list
                     v-if="category.subcategories && category.subcategories.length"
-                    class="rounded-l pa-2 bg-primary toolbar-header mt-2"
+                    class="pa-1 bg-primary"
+                    min-width="180"
                 >
                     <v-list-item
                         v-for="sub in category.subcategories"
                         :key="sub.id"
-                        class="hover-red"
+                        :to="`/category/${category.id}/${sub.id}`"
+                        class="nav-sub-item"
+                        rounded="sm"
                     >
-                        <v-list-item-title class="d-flex align-center">
-                            <router-link
-                                :to="`/category/${category.slug}/${sub.slug || sub.id}`"
-                                class="ml-3 text-white text-subtitle-2 text-decoration-none"
-                            >
-                                {{ sub.title }}
-                            </router-link>
+                        <v-list-item-title class="text-white text-subtitle-2">
+                            {{ sub.title }}
                         </v-list-item-title>
                     </v-list-item>
                 </v-list>
+
+                <!-- No subcategories — still show empty menu so hover works -->
+                <v-list v-else class="pa-1 bg-primary" min-width="180">
+                    <v-list-item>
+                        <v-list-item-title class="text-white text-subtitle-2 text-medium-emphasis">
+                            No sub-categories
+                        </v-list-item-title>
+                    </v-list-item>
+                </v-list>
+
             </v-menu>
         </template>
 
@@ -122,32 +133,23 @@ export default {
             searchQuery: "",
             loading: false,
             loadingCategories: true,
-
-            // Nav categories loaded from API (attribute_id = 47, slug = 'category')
             navCategories: [],
         };
     },
 
     methods: {
 
-        // ─── SEARCH ──────────────────────────────────────────────────
         onSearch() {
             if (!this.searchQuery.trim()) return;
             this.loading = true;
-            // Navigate to search results page
             this.$router.push({ path: "/search", query: { q: this.searchQuery } })
                 .finally(() => { this.loading = false; });
         },
 
-        // ─── LOAD NAV CATEGORIES ─────────────────────────────────────
-        // Loads top-level categories (attribute_id = 47, parent_attribute_option_id = 0 or null)
-        // then loads subcategories for each
         async loadNavCategories() {
             this.loadingCategories = true;
             try {
-                // Fetch top-level category options (attribute slug = 'category')
                 const response = await this.axios.get("/api/nav-categories");
-
                 if (response.data.success) {
                     this.navCategories = response.data.data;
                 }
@@ -169,10 +171,22 @@ export default {
 .v-trz-toolbar-header .header-logo .v-img__img {
     position: relative !important;
 }
+
 .nav-item {
     white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s;
 }
+
 .nav-item:hover {
     color: #f0c040 !important;
+}
+
+.nav-sub-item:hover .v-list-item-title {
+    color: #f0c040 !important;
+}
+
+.nav-sub-item .v-list-item__content {
+    padding: 4px 8px;
 }
 </style>

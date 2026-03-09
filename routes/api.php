@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DemoOrderController;
+use App\Http\Controllers\AttributeOptionController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -33,10 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Route::resource('demo', DemoOrderController::class);
 
-    // Attribute options (used by all admin panels: Maker, Model, Year, Category, SubCategory, Parts)
-Route::get('/attribute-options',          [AttributeOptionController::class, 'index']);
-Route::get('/attribute/makers',           [AttributeOptionController::class, 'makers']);
-Route::post('/save-option',               [AttributeOptionController::class, 'store']);
-Route::put('/attribute-option-update',    [AttributeOptionController::class, 'update']);
-Route::post('/remove-option',             [AttributeOptionController::class, 'destroy']);
+   // ── Attribute options (admin) ─────────────────────────────────────────
+Route::get('/attribute-options',       [AttributeOptionController::class, 'index']);
+Route::get('/attribute/makers',        [AttributeOptionController::class, 'makers']);
+Route::get('/attribute/category',      [AttributeOptionController::class, 'categories']);
+Route::post('/save-option',            [AttributeOptionController::class, 'store']);
+Route::put('/attribute-option-update', [AttributeOptionController::class, 'update']);
+Route::post('/remove-option',          [AttributeOptionController::class, 'destroy']);
+
 });

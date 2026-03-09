@@ -109,9 +109,8 @@
 export default {
     props: [
         "attribute",
-        "attributeOptions",
         "title",
-        "categoryOptionId",
+        "categoryOptionId",  // parent category's row id in attribute_options
     ],
 
     emits: ["comeBack"],
@@ -124,7 +123,6 @@ export default {
             tabValue: "attribute",
 
             items: Array.isArray(this.attribute) ? this.attribute : [],
-            options: this.attributeOptions,
             component_title: this.title,
 
             fdata: {},
@@ -156,11 +154,13 @@ export default {
                 return;
             }
             this.saving = true;
-            this.fdata.slug = "parts";
-            this.fdata.parent_attribute_option_id = this.categoryOptionId;
             try {
                 if (this.fdata.id) {
-                    const response = await this.axios.put("/api/attribute-option-update", this.fdata);
+                    // Update — only id and title needed
+                    const response = await this.axios.put("/api/attribute-option-update", {
+                        id:    this.fdata.id,
+                        title: this.fdata.title,
+                    });
                     if (response.data.success !== false) {
                         this.items = response.data.options ?? this.items;
                         this.showSuccess("Updated successfully.");
@@ -169,7 +169,14 @@ export default {
                         this.showError(response.data.message || "Update failed.");
                     }
                 } else {
-                    const response = await this.axios.post("/api/save-option", this.fdata);
+                    // Create:
+                    // slug = "category"  → attribute_id = 47
+                    // parent_attribute_option_id = categoryOptionId (parent category row id)
+                    const response = await this.axios.post("/api/save-option", {
+                        title:                      this.fdata.title,
+                        slug:                       "category",
+                        parent_attribute_option_id: this.categoryOptionId,
+                    });
                     if (response.data.success !== false) {
                         this.items = response.data.data ?? this.items;
                         this.showSuccess("Saved successfully.");

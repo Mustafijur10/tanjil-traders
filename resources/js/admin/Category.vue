@@ -1,5 +1,5 @@
 <template> 
-    <div >
+    <div>
         <v-window v-model="tab">
             <v-window-item value="attribute" lazy>
                 <v-container class="ml-0 pa-0">
@@ -7,9 +7,15 @@
                         <v-container class="pa-0">
                             <v-row no-gutters>
                                 <v-col cols="3">
-                                    <v-text-field v-model="searchValue" label="Search.." clearable variant="outlined" 
-                                        class="mt-4 text-black opacity-0" density="compact" @click:clear="searchValue = ''">
-                                    </v-text-field>
+                                    <v-text-field
+                                        v-model="searchValue"
+                                        label="Search.."
+                                        clearable
+                                        variant="outlined"
+                                        class="mt-4"
+                                        density="compact"
+                                        @click:clear="searchValue = ''"
+                                    ></v-text-field>
                                 </v-col>
                                 <v-col cols="3" align="right" offset="6" class="mt-4">
                                     <v-btn class="backgrond-color-teal" @click="addNew">
@@ -37,7 +43,7 @@
                                     <div v-bind="props" v-if="isHovering">
                                         <span @click.prevent="editItem(item)" class="cursor-pointer">Edit</span>
                                         |
-                                        <span @click.prevent="viewModels(item)" class="cursor-pointer">View Models</span>
+                                        <span @click.prevent="viewSubCategories(item)" class="cursor-pointer">View Sub-Categories</span>
                                     </div>
                                 </template>
                             </v-hover>
@@ -53,12 +59,11 @@
                 </v-container>
             </v-window-item>
 
-            <v-window-item value="models" lazy>
+            <v-window-item value="sub_category" lazy>
                 <SubCategory
-                    :attribute="modelItems"
-                    :attributeOptions="options"
+                    :attribute="subCategoryItems"
                     :title="current_title"
-                    :parentId="parentId"
+                    :categoryOptionId="categoryOptionId"
                     @come-back="comeBack"
                     :key="key"
                 />
@@ -69,13 +74,13 @@
         <v-dialog v-model="showForm" width="700">
             <v-card>
                 <v-card-title class="headline black" primary-title>
-                    {{ fdata.id ? 'Edit Maker' : 'Add Maker' }}
+                    {{ fdata.id ? 'Edit Category' : 'Add Category' }}
                     <span class="mdi mdi-close float-right cursor-pointer" @click="closeModal()"></span>
                 </v-card-title>
                 <v-card-text class="pa-5">
                     <v-text-field
                         v-model="fdata.title"
-                        :label="fdata.id ? 'Edit Maker Name' : 'Enter Maker Name'"
+                        :label="fdata.id ? 'Edit Category Name' : 'Enter Category Name'"
                         variant="outlined"
                     ></v-text-field>
                 </v-card-text>
@@ -104,23 +109,19 @@
 </template>
 
 <script>
-import Auth from "@/auth.js";
-
 export default {
     data() {
         return {
-            
             tab: "attribute",
             showForm: false,
             saving: false,
             deleteDialog: false,
 
             items: [],
-            modelItems: [],
-            options: [],
+            subCategoryItems: [],
 
             current_title: "",
-            parentId: null,
+            categoryOptionId: null,
             key: 0,
 
             fdata: {},
@@ -136,9 +137,15 @@ export default {
 
     methods: {
 
+        // Load all top-level categories (parent_attribute_option_id = 0)
         allItem() {
-            this.axios.get("/api/attribute/makers").then((response) => {
-                this.items = response.data.data;
+            this.axios.get("/api/attribute/category").then((response) => {
+                if (response.data.success) {
+                    this.items = response.data.data;
+                }
+            }).catch((error) => {
+                console.error(error);
+                this.showError("Failed to load categories.");
             });
         },
 
@@ -154,14 +161,17 @@ export default {
 
         async saveForm() {
             if (!this.fdata.title || !this.fdata.title.trim()) {
-                this.showError("Maker name is required.");
+                this.showError("Category name is required.");
                 return;
             }
             this.saving = true;
-            this.fdata.slug = "maker";
             try {
                 if (this.fdata.id) {
-                    const response = await this.axios.put("/api/attribute-option-update", this.fdata);
+                    // Update — only send id and title
+                    const response = await this.axios.put("/api/attribute-option-update", {
+                        id:    this.fdata.id,
+                        title: this.fdata.title,
+                    });
                     if (response.data.success !== false) {
                         this.showSuccess("Updated successfully.");
                         this.showForm = false;
@@ -170,7 +180,14 @@ export default {
                         this.showError(response.data.message || "Update failed.");
                     }
                 } else {
-                    const response = await this.axios.post("/api/save-option", this.fdata);
+                    // Create — slug = "category", parent = 0 (top-level)
+                    const response = await this.axios.post("/api/save-option", {
+                        title:                      this.fdata.title,
+                        slug:                       "category",
+                        parent_attribute_option_id: 0,
+                    });
+                    this.showForm = false;
+                    this.allItem();
                     if (response.data.success !== false) {
                         this.showSuccess("Saved successfully.");
                         this.showForm = false;
@@ -185,31 +202,34 @@ export default {
             } finally {
                 this.saving = false;
             }
+
+            
         },
 
-        viewModels(item) {
+        // Drill into sub-categories of a category
+        viewSubCategories(item) {
             this.axios
                 .get(`/api/attribute-options?parent_attribute_option_id=${item.id}`)
                 .then((response) => {
                     if (response.data.success) {
-                        this.parentId = item.id;
-                        this.modelItems = response.data.data;
-                        this.current_title = "Models";
+                        this.categoryOptionId  = item.id;
+                        this.subCategoryItems  = response.data.data;
+                        this.current_title     = `Sub-Categories of "${item.title}"`;
                         this.key += 1;
-                        this.tab = "models";
+                        this.tab = "sub_category";
                     } else {
-                        this.showError(response.data.message || "Failed to load models.");
+                        this.showError(response.data.message || "Failed to load sub-categories.");
                     }
                 })
                 .catch((error) => {
                     console.error(error);
-                    this.showError("An error occurred while fetching models.");
+                    this.showError("An error occurred while fetching sub-categories.");
                 });
         },
 
         comeBack() {
             this.tab = "attribute";
-            this.parentId = null;
+            this.categoryOptionId = null;
             this.allItem();
         },
 
@@ -251,7 +271,6 @@ export default {
     created() {
         document.title = "Category";
         this.allItem();
-      
     },
 };
 </script>
