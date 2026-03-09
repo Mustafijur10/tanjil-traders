@@ -1,40 +1,18 @@
 <template>
-
-<!-- <sidebar-menu
-      :menu="menu"
-      @update:collapsed="onToggleCollapse"
-      v-model:collapsed="collapsed"
-      :theme="menutheme"
-      :show-one-child="true"
-  >
-      <template v-slot:header>
-          <v-container
-              class="align-self-center side-header"
-              color="white"
-              contain
-          >
-              <router-link
-                  to="/"
-                  tag="span"
-                  style="cursor: pointer; text-align: center"
-              >
-                  <v-img
-                      src="/images/logo.png"
-                      max-width="150"
-                      class="mx-auto"
-                  ></v-img>
-              </router-link>
-          </v-container>
-      </template>
-  </sidebar-menu> -->
   <v-app :theme="theme" id="main" :class="{ collapsed: collapsed }">
       <v-header>
           <Header></Header>
       </v-header>
       <v-main>
-          <v-container fluid>
-              <router-view></router-view>
-          </v-container>
+        <div class="bg-for_marquee text-subtitle-2">
+            <marquee-text :duration="15" :repeat="2">
+                Eid Mubarak! Due to the Eid Holiday, our online activities and some outlets are out of operation. For Eid holiday schedule please visit our contact page. For more details please call. We will be open after vacation.&nbsp;
+            </marquee-text>
+        </div>
+        <v-container fluid>
+        
+            <router-view></router-view>
+        </v-container>
       </v-main>
       <Footer> </Footer>
   </v-app>
@@ -56,68 +34,8 @@
       return {
         collapsed: false,
             menutheme: "white-theme",
-
             isOnMobile: false,
-
-            showsidebar: false,
-
-            menu: [
-                {
-                    hiddenOnCollapse: true,
-                },
-                {
-                    title: "Nav Item 1",
-                    icon: "fa fa-edit",
-                    child: [
-                        {
-                            href: "/dash-1",
-                            title: "Nav Sub-Item 1",
-                        },
-                        {
-                            href: "/dash-2",
-                            title: "List",
-                        },
-                        {
-                            href: "/dash-3",
-                            title: "List Form",
-                        },
-                  
-                    ],
-                },
-                {
-                    href: "/dash-4",
-                    title: "Nav Item 2",
-                    icon: "fa fa-clipboard",
-                },
-                {
-                    title: "Nav Item 3",
-                    icon: "fa fa-bar-chart",
-                    child: [
-                        {
-                            href: "/dash-5",
-                            title: "Nav Sub-Item 1",
-                        },
-                        
-                        
-                    ],
-                },
-                {
-                    title: "Nav Item 4",
-                    icon: "fa fa-file",
-                    href: "/dash-6",
-                },
-                {
-                    href: "/dash-7",
-                    title: "Nav Item 5",
-                    icon: "fa fa-calculator",
-                },
-                {
-                    href: "/dash-8",
-                    title: "Nav Item 6",
-                    icon: "fa fa-file",
-                }
-            
-            ],
+            showsidebar: false,           
       };
     },
     methods:{
@@ -134,14 +52,13 @@
             this.collapsed = collapsed;
         },
     },
-    created() {            
+    created() 
+    {            
       
-      
-
     },
-    computed: {
+    computed: 
+    {        
       
-
     }
   };
 </script>
@@ -152,8 +69,7 @@
     transition: 0.3s ease;
     background-color: rgb(245, 245, 245);
 }
-#main.collapsed,
-#main.onmobile {
+#main.collapsed, #main.onmobile {
     padding-left: 65px;
 }
 

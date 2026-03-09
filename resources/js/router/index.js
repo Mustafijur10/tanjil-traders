@@ -25,6 +25,8 @@ import CreateUser from "@/admin/auth/CreateUser.vue";
 import OrderList from "@/admin/Order.vue";
 import OrderForm from "@/admin/OrderForm.vue";
 import Settings from "@/admin/Settings.vue";
+import Category from "@/admin/Category.vue";
+import SubCategory from "@/admin/SubCategory.vue";
 
 // import Users from '@/admin/auth/Users.vue';
 
@@ -55,6 +57,7 @@ const routes = [
     { path: "/admin", name: "Dashboard", component: DashBoard, meta: { requiresAuth: true }, },
     { path: "/admin/order", name: "OrderForm", component: OrderForm, meta: { requiresAuth: true }, },
     { path: "/admin/sales-orders", name: "Order", component: OrderList, meta: { requiresAuth: true }, },
+    { path: "/admin/category", name: "Category", component: Category, meta: { requiresAuth: true }, },
 
     // /******************** */
 

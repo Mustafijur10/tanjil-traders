@@ -18,6 +18,11 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::resource('demo', DemoOrderController::class);
 Route::resource('settings/country', CountryController::class);
 
+Route::get('/nav-categories', [AttributeOptionController::class, 'navCategories']);
+
+
+
+
 Route::middleware('auth:sanctum')->group(function () {
     // Your protected routes here
 
@@ -27,4 +32,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::resource('settings/country', CountryController::class);
 
     // Route::resource('demo', DemoOrderController::class);
+
+    // Attribute options (used by all admin panels: Maker, Model, Year, Category, SubCategory, Parts)
+Route::get('/attribute-options',          [AttributeOptionController::class, 'index']);
+Route::get('/attribute/makers',           [AttributeOptionController::class, 'makers']);
+Route::post('/save-option',               [AttributeOptionController::class, 'store']);
+Route::put('/attribute-option-update',    [AttributeOptionController::class, 'update']);
+Route::post('/remove-option',             [AttributeOptionController::class, 'destroy']);
 });

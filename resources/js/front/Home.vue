@@ -1,5 +1,5 @@
 <template>
-  <div class="home-page">
+  <div class="home-page">    
 
   <v-row>
       <v-col cols="9">
@@ -37,19 +37,17 @@
         </v-card>
 
         <v-img src="/images/ac-ton-calculator.webp" class="header-logo mt-5"></v-img>
-        <!-- <v-img>ac-ton-calculator.webp</v-img> -->
+        
       </v-col>
     </v-row>
 
-    <div>
-      <marquee-text :duration="15" :repeat="2">
-        Eid Mubarak! Due to the Eid Holiday, our online activities and some outlets are out of operation. For Eid holiday schedule please visit our contact page. For more details please call. We will be open after vacation
-      </marquee-text>
-</div>
+    
   </div>
+  <Navbar></Navbar>
 </template>
 
 <script setup>
+// import Navbar from './Navbar.vue'
  
 </script>
 

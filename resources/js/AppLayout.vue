@@ -58,33 +58,27 @@ export default {
                 {
                     hiddenOnCollapse: true,
                 },
-                {
-                    title: "Create New",
-                    icon: "fa fa-edit",
-                    child: [
-                        {
-                            href: "/admin/order",
-                            title: "Order",
-                        },
+                // {
+                //     title: "Create New",
+                //     icon: "fa fa-edit",
+                //     child: [
+                //         {
+                //             href: "/admin/order",
+                //             title: "Order",
+                //         },
                         
-                    ],
-                },
+                //     ],
+                // },
                 {
                     href: "/admin",
                     title: "Dashboard",
                     icon: "fa fa-clipboard",
                 },
                 {
-                    title: "Sales",
-                    icon: "fa fa-bar-chart",
-                    child: [
-                        {
-                            href: "/admin/sales-orders",
-                            title: "Orders",
-                        },
-                        
-                    ],
-                },
+                    href: "/admin/category",
+                    title: "Categories",
+                    icon: "fa fa-bar-chart",                    
+                },                
                  
             ],
 

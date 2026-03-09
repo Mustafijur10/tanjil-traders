@@ -9,18 +9,12 @@
             transition="scale-transition"
         >
             <template v-slot:activator="{ attrs, on }">
-                <!-- <v-btn
-                    @click="themeSwitch"
-                    class="ml-2"
-                    min-width="0"
-                    color="primary"
-                    v-on="on"
-                    ><v-icon
-                        ><template v-if="theme === 'light'"
-                            >mdi-weather-sunny</template
-                        ><template v-else>mdi-weather-night</template></v-icon
-                    ></v-btn
-                > -->
+                <v-btn @click="themeSwitch" class="ml-2" min-width="0" color="primary" v-on="on">
+                    <v-icon>
+                        <template v-if="theme === 'light'">mdi-weather-sunny</template>
+                        <template v-else>mdi-weather-night</template>
+                    </v-icon>
+                </v-btn>
             </template>
         </v-menu>
         <v-menu open-on-hover>
@@ -30,17 +24,8 @@
                 </v-btn>
             </template>
             <v-list>
-                <v-list-item
-                    prepend-icon="mdi-account"
-                    title="Account Settings"
-                    link
-                    @click="$router.push('/admin/account/settings')"
-                ></v-list-item>
-                <v-list-item
-                    prepend-icon="mdi-logout"
-                    @click="logout"
-                    title="Logout"
-                ></v-list-item>
+                <v-list-item prepend-icon="mdi-account" title="Account Settings" link @click="$router.push('/admin/account/settings')"></v-list-item>
+                <v-list-item prepend-icon="mdi-logout" @click="logout" title="Logout"></v-list-item>
             </v-list>
         </v-menu>
     </v-toolbar>
