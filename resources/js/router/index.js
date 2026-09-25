@@ -6,9 +6,9 @@ import PageNotFound from "@/PageNotFound.vue";
 // /***** */
 
 import Home from "@/front/Home.vue";
-import List from "@/front/List.vue"; 
-import Order from "@/front/OrderList.vue";
-import FormOrder from "@/front/OrderListForm.vue"; 
+// import List from "@/front/List.vue"; 
+// import Order from "@/front/OrderList.vue";
+// import FormOrder from "@/front/OrderListForm.vue"; 
 
 // /***** */
 
@@ -22,8 +22,8 @@ import PasswordReset from "@/admin/auth/PasswordReset.vue";
 import Register from "@/admin/auth/Register.vue";
 import CreateUser from "@/admin/auth/CreateUser.vue";
 
-import OrderList from "@/admin/Order.vue";
-import OrderForm from "@/admin/OrderForm.vue";
+import Catalog from "@/admin/Catalog.vue";
+import Product from "@/admin/Product.vue";
 import Settings from "@/admin/Settings.vue";
 import Category from "@/admin/Category.vue";
 import SubCategory from "@/admin/SubCategory.vue";
@@ -36,9 +36,9 @@ const routes = [
     // /******** Front Routes */
 
     { path: "/", name: "home", component: Home, meta: { layout: "front" } },
-    { path: "/dash-1", name: "list", component: List, meta: { layout: "front" } },
-    { path: "/dash-2", name: "order", component: Order, meta: { layout: "front" } },
-    { path: "/dash-3", name: "formorder", component: FormOrder, meta: { layout: "front" } },
+    // { path: "/dash-1", name: "list", component: List, meta: { layout: "front" } },
+    // { path: "/dash-2", name: "order", component: Order, meta: { layout: "front" } },
+    // { path: "/dash-3", name: "formorder", component: FormOrder, meta: { layout: "front" } },
 
     // /******** Admin Routes */
 
@@ -55,9 +55,10 @@ const routes = [
     // /******************** */
     
     { path: "/admin", name: "Dashboard", component: DashBoard, meta: { requiresAuth: true }, },
-    { path: "/admin/order", name: "OrderForm", component: OrderForm, meta: { requiresAuth: true }, },
-    { path: "/admin/sales-orders", name: "Order", component: OrderList, meta: { requiresAuth: true }, },
+    { path: "/admin/catalog", name: "Catalog", component: Catalog, meta: { requiresAuth: true }, },
+    { path: "/admin/product", name: "Product", component: Product, meta: { requiresAuth: true }, },
     { path: "/admin/category", name: "Category", component: Category, meta: { requiresAuth: true }, },
+    { path: "/admin/sub-category", name: "SubCategory", component: SubCategory, meta: { requiresAuth: true }, },
 
     // /******************** */
 

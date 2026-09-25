@@ -75,6 +75,11 @@ export default {
                     icon: "fa fa-clipboard",
                 },
                 {
+                    href: "/admin/Catalog",
+                    title: "Catalog",
+                    icon: "fa fa-th-list",                    
+                },
+                {
                     href: "/admin/category",
                     title: "Categories",
                     icon: "fa fa-bar-chart",                    
@@ -126,17 +131,4 @@ export default {
 .v-footer {
     flex: initial;
 }
-
-/* .v-sidebar-menu {
-    --vsm-primary-color: #FFFFFF ;
-    --vsm-item-active-color: #04A9F5 ;
-    --vsm-item-hover-color: #04A9F5 ;
-    --vsm-item-open-color: #04A9F5 ;
-    --vsm-dropdown-bg: #FFFFFF;
-    --vsm-item-hover-bg: #E4F5FD;
-    --vsm-item-active-bg: #E4F5FD;
-    --vsm-icon-bg: #FFFFFF;
-    --vsm-icon-active-bg: #E4F5FD;
-    --vsm-icon-active-color: #04A9F5;
-} */
 </style>
