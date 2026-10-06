@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <v-app :theme="theme" id="main" :class="{ collapsed: collapsed }">
       <v-header>
           <Header></Header>
@@ -17,6 +17,27 @@
       <Footer> </Footer>
   </v-app>
   {{ checkUrl }}
+</template> -->
+<template>
+  <v-app :theme="theme" id="main" :class="{ collapsed: collapsed }">
+    <v-header v-if="!hideChrome">
+      <Header></Header>
+    </v-header>
+
+    <v-main>
+      <div v-if="!hideChrome" class="bg-for_marquee text-subtitle-2">
+        <marquee-text :duration="15" :repeat="2">
+          Eid Mubarak! Due to the Eid Holiday, our online activities and some outlets are out of operation. For Eid holiday schedule please visit our contact page. For more details please call. We will be open after vacation.&nbsp;
+        </marquee-text>
+      </div>
+
+      <v-container fluid :class="{ 'pa-0': hideChrome }">
+        <router-view></router-view>
+      </v-container>
+    </v-main>
+
+    <Footer v-if="!hideChrome"></Footer>
+  </v-app>
 </template>
 
 <script setup>
@@ -56,10 +77,11 @@
     {            
       
     },
-    computed: 
-    {        
-      
-    }
+    computed: {
+        hideChrome() {
+            return !!this.$route.meta.hideChrome;
+        },
+    },
   };
 </script>
 <style scoped>

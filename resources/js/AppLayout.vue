@@ -75,15 +75,87 @@ export default {
                     icon: "fa fa-clipboard",
                 },
                 {
-                    href: "/admin/Catalog",
-                    title: "Catalog",
-                    icon: "fa fa-th-list",                    
+                    title: "Analytics",
+                    icon: "fa fa-th-list",
+                    child: [
+                        { href: "/admin/sales-analytics", title: "Sales Analytics" },                        
+                    ],
                 },
                 {
-                    href: "/admin/category",
-                    title: "Categories",
-                    icon: "fa fa-bar-chart",                    
-                },                
+                    title: "Catalog",
+                    icon: "fa fa-th-list",
+                    child: [
+                        { href: "/admin/catalog", title: "All Products" },
+                        { href: "/admin/category", title: "Categories" },
+                        { href: "/admin/brand", title: "Brands" },
+                    ],
+                },
+                {
+                    title: "Orders",
+                    icon: "fa fa-shopping-cart",
+                    child: [
+                        { href: "/admin/orders", title: "All Orders" },
+                        { href: "/admin/create-order", title: "Create Order" },
+                        { href: "/admin/pending", title: "Pending" },
+                        { href: "/admin/orders/processing", title: "Processing" },
+                        { href: "/admin/orders/cancelled", title: "Cancelled" },
+                        { href: "/admin/orders/returns", title: "Returns & Refunds" },
+                    ],
+                },
+                {
+                    title: "Customers",
+                    icon: "fa fa-users",
+                    child: [
+                        { href: "/admin/customers", title: "All Customers" },
+                        { href: "/admin/customers/groups", title: "Customer Groups" },
+                        { href: "/admin/reviews", title: "Reviews & Ratings" },
+                    ],
+                },
+                {
+                    title: "Inventory",
+                    icon: "fa fa-cubes",
+                    child: [
+                        { href: "/admin/inventory", title: "Stock Levels" },
+                        { href: "/admin/inventory/low-stock", title: "Low Stock" },
+                        { href: "/admin/inventory/suppliers", title: "Suppliers" },
+                    ],
+                },
+                {
+                    title: "Marketing",
+                    icon: "fa fa-bullhorn",
+                    child: [
+                        { href: "/admin/coupons", title: "Coupons & Discounts" },
+                        { href: "/admin/banners", title: "Banners & Promotions" },
+                        { href: "/admin/notifications", title: "Notifications" },
+                    ],
+                },
+                {
+                    title: "Shipping",
+                    icon: "fa fa-truck",
+                    child: [
+                        { href: "/admin/shipping", title: "Shipping Zones" },
+                        { href: "/admin/shipping/methods", title: "Shipping Methods" },
+                    ],
+                },
+                {
+                    title: "Reports",
+                    icon: "fa fa-line-chart",
+                    child: [
+                        { href: "/admin/sales-report", title: "Sales Report" },
+                        { href: "/admin/inventory-report", title: "Inventory Report" },
+                        { href: "/admin/customer-report", title: "Customer Report" },
+                    ],
+                },
+                {
+                    title: "Settings",
+                    icon: "fa fa-cog",
+                    child: [
+                        { href: "/admin/general-settings", title: "General" },
+                        { href: "/admin/storefront", title: "Storefront" },
+                        { href: "/admin/settings/payment", title: "Payment Methods" },
+                        { href: "/admin/roles", title: "Staff & Roles" },
+                    ],
+                },             
                  
             ],
 
