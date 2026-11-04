@@ -78,7 +78,8 @@ export default {
                     title: "Analytics",
                     icon: "fa fa-th-list",
                     child: [
-                        { href: "/admin/sales-analytics", title: "Sales Analytics" },                        
+                        { href: "/admin/sales-analytics", title: "Sales Analytics" },
+                        { href: "/admin/seo-analytics", title: "Seo Analytics" },                        
                     ],
                 },
                 {
@@ -155,7 +156,15 @@ export default {
                         { href: "/admin/settings/payment", title: "Payment Methods" },
                         { href: "/admin/roles", title: "Staff & Roles" },
                     ],
-                },             
+                },   
+                {
+                    title: "Profile",
+                    icon: "fa fa-cog",
+                    child: [
+                        { href: "/admin/profile", title: "Page" },
+                        { href: "/admin/profile-edit", title: "Settings" },                        
+                    ],
+                },            
                  
             ],
 

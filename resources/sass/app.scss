@@ -61,3 +61,186 @@
 .hover-red:hover {
   background-color: #E25311 !important;
 }
+
+
+// sidebar starts 
+
+/* ════════════════════════════════════════════════════════════════════
+   vue-sidebar-menu  ·  Tanjil Traders
+   Expanded : "Deep green rail"  (white logo plate, mint active item)
+   Collapsed: "Slim icon rail"   (icon-only, mint tile for the active page)
+
+   Import AFTER the package CSS:
+     import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
+     import "@/assets/sidebar-theme.css";
+
+   Recommended props:  width="248px"  width-collapsed="64px"
+   Sizes and state colours use !important so they win over the package
+   themes and any global CSS.
+   ════════════════════════════════════════════════════════════════════ */
+
+.v-sidebar-menu {
+    --sb-text: #d2e9e2;
+    --sb-dim: #7fb5a6;
+    --sb-line: rgba(255, 255, 255, 0.1);
+    --sb-hover: rgba(255, 255, 255, 0.07);
+    --sb-tile: #0f4d43;
+    --sb-active: #14584c;
+    --sb-mint: #6ee7b7;
+    --sb-deep: #053d35;
+
+    font-family: Poppins, "Segoe UI", sans-serif;
+    color: var(--sb-text);
+    -webkit-font-smoothing: antialiased;
+    background:
+        radial-gradient(380px 240px at 0% 0%, rgba(110, 231, 183, 0.14), transparent 62%),
+        linear-gradient(180deg, #053d35 0%, #064a40 100%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 14px 0 40px -30px rgba(5, 61, 53, 0.9);
+    overflow-y: scroll;
+}
+
+/* ───────── Brand: whatever sits in the #header slot goes on a white plate ───────── */
+.v-sidebar-menu > :first-child:not(.vsm--scroll-wrapper):not(.vsm--mobile-bg),
+.v-sidebar-menu .tt-sidebar-brand {
+    flex: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+    margin: 14px 12px 6px !important; padding: 10px 12px !important;
+    border-radius: 12px; border-bottom: 0 !important;
+}
+.v-sidebar-menu > :first-child:not(.vsm--scroll-wrapper) img { display: block; max-width: 100%; max-height: 40px; height: auto; width: auto; }
+
+/* ───────── List ───────── */
+.v-sidebar-menu .vsm--scroll-wrapper { padding: 2px 0 !important; }
+.v-sidebar-menu .vsm--list { display: flex !important; flex-direction: column; gap: 2px; padding: 8px 10px 14px !important; }
+.v-sidebar-menu .vsm--item { margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
+
+/* group labels:  { header: "Main menu" } */
+.v-sidebar-menu .vsm--header { padding: 14px 10px 4px !important; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sb-dim) !important; background: transparent !important; }
+
+/* ───────── Links (standard size: 40px high) ───────── */
+.v-sidebar-menu .vsm--link {
+    position: relative; display: flex !important; align-items: center; gap: 10px;
+    height: 40px !important; min-height: 40px !important; margin: 0 !important; padding: 0 10px 0 6px !important;
+    border: 0 !important; border-radius: 10px; font-size: 13.5px; font-weight: 500; line-height: 1.3; text-decoration: none;
+    color: var(--sb-text) !important; background: transparent !important; box-shadow: none !important;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+.v-sidebar-menu .vsm--title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* icon tile */
+.v-sidebar-menu .vsm--icon {
+    flex: none; width: 28px !important; height: 28px !important; margin: 0 !important; display: grid !important; place-items: center;
+    border-radius: 8px; font-size: 15px; line-height: 1; color: #a7f3d0 !important; background: var(--sb-tile) !important; border: 0;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+.v-sidebar-menu .vsm--icon svg, .v-sidebar-menu .vsm--icon i { color: inherit; fill: currentColor; }
+
+/* arrow + badge */
+.v-sidebar-menu .vsm--arrow { margin-left: auto; flex: none; color: var(--sb-dim) !important; transition: color 0.18s ease, transform 0.2s ease; }
+.v-sidebar-menu .vsm--badge { margin-left: auto; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; background: var(--sb-active) !important; color: var(--sb-mint) !important; }
+
+/* hover */
+.v-sidebar-menu .vsm--link:hover,
+.v-sidebar-menu .vsm--link_hover { background: var(--sb-hover) !important; color: #ffffff !important; }
+.v-sidebar-menu .vsm--link:hover .vsm--icon,
+.v-sidebar-menu .vsm--link_hover .vsm--icon { background: #17605a !important; color: #ffffff !important; }
+.v-sidebar-menu .vsm--link:hover .vsm--arrow { color: #ffffff !important; }
+
+/* open parent */
+.v-sidebar-menu .vsm--item_open > .vsm--link,
+.v-sidebar-menu .vsm--link_open { background: var(--sb-hover) !important; color: #ffffff !important; }
+.v-sidebar-menu .vsm--item_open > .vsm--link .vsm--arrow,
+.v-sidebar-menu .vsm--link_open .vsm--arrow,
+.v-sidebar-menu .vsm--arrow_open { color: var(--sb-mint) !important; transform: rotate(90deg) !important; }
+
+/* section that contains the current page */
+.v-sidebar-menu .vsm--link_level-1.vsm--link_active { background: var(--sb-hover) !important; color: #ffffff !important; font-weight: 600; }
+.v-sidebar-menu .vsm--link_level-1.vsm--link_active .vsm--icon { background: #1b6a5c !important; color: var(--sb-mint) !important; }
+
+/* the page you are on */
+.v-sidebar-menu .vsm--link_level-1.vsm--link_exact-active { background: var(--sb-active) !important; color: #ffffff !important; font-weight: 600; }
+.v-sidebar-menu .vsm--link_level-1.vsm--link_exact-active .vsm--icon { background: var(--sb-mint) !important; color: var(--sb-deep) !important; }
+.v-sidebar-menu .vsm--link_level-1.vsm--link_exact-active .vsm--arrow { color: var(--sb-mint) !important; }
+.v-sidebar-menu .vsm--link_level-1.vsm--link_exact-active .vsm--badge { background: rgba(255, 255, 255, 0.18) !important; color: #ffffff !important; }
+
+.v-sidebar-menu .vsm--link_disabled { opacity: 0.4; pointer-events: none; }
+
+/* ───────── Sub menu ───────── */
+.v-sidebar-menu .vsm--child { overflow: hidden; background: transparent !important; }
+.v-sidebar-menu .vsm--dropdown {
+    display: flex !important; flex-direction: column; gap: 2px; background: transparent !important;
+    margin: 2px 0 6px 20px !important; padding: 2px 0 2px 12px !important; border-left: 2px solid rgba(255, 255, 255, 0.14);
+}
+.v-sidebar-menu .vsm--link_level-2 { height: 36px !important; min-height: 36px !important; padding: 0 10px !important; gap: 10px; border-radius: 8px; font-size: 13px; color: var(--sb-dim) !important; }
+.v-sidebar-menu .vsm--link_level-2::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: background 0.18s ease; }
+.v-sidebar-menu .vsm--link_level-2:has(.vsm--icon)::before { display: none; }
+.v-sidebar-menu .vsm--link_level-2 .vsm--icon { width: 22px !important; height: 22px !important; border-radius: 6px; font-size: 12px; }
+.v-sidebar-menu .vsm--link_level-2:hover { background: var(--sb-hover) !important; color: #ffffff !important; }
+.v-sidebar-menu .vsm--link_level-2:hover::before { background: var(--sb-mint); }
+.v-sidebar-menu .vsm--link_level-2.vsm--link_active,
+.v-sidebar-menu .vsm--link_level-2.vsm--link_exact-active { background: var(--sb-active) !important; color: var(--sb-mint) !important; font-weight: 600; }
+.v-sidebar-menu .vsm--link_level-2.vsm--link_active::before,
+.v-sidebar-menu .vsm--link_level-2.vsm--link_exact-active::before { background: var(--sb-mint); }
+
+/* ═════════ Collapsed: slim icon rail ═════════ */
+.v-sidebar-menu.vsm_collapsed > :first-child:not(.vsm--scroll-wrapper):not(.vsm--mobile-bg) { width: 40px; height: 40px; margin: 12px auto 6px !important; padding: 0 !important; overflow: hidden; border-radius: 11px; }
+.v-sidebar-menu.vsm_collapsed > img:first-child,
+.v-sidebar-menu.vsm_collapsed > :first-child:not(.vsm--scroll-wrapper) img { width: 40px; height: 40px; max-width: none; max-height: none; object-fit: cover; object-position: left center; }
+
+.v-sidebar-menu.vsm_collapsed .vsm--list { align-items: center; padding: 8px 0 14px !important; }
+.v-sidebar-menu.vsm_collapsed .vsm--item { width: 100%; display: flex; justify-content: center; }
+.v-sidebar-menu.vsm_collapsed .vsm--link { width: 40px; height: 40px !important; min-height: 40px !important; margin: 0 auto !important; padding: 0 !important; justify-content: center; border-radius: 11px; }
+.v-sidebar-menu.vsm_collapsed .vsm--icon { width: auto !important; height: auto !important; background: none !important; font-size: 18px; }
+.v-sidebar-menu.vsm_collapsed .vsm--link:hover .vsm--icon { background: none !important; }
+.v-sidebar-menu.vsm_collapsed .vsm--link_level-1.vsm--link_active { background: var(--sb-hover) !important; }
+.v-sidebar-menu.vsm_collapsed .vsm--link_level-1.vsm--link_exact-active { background: var(--sb-mint) !important; }
+.v-sidebar-menu.vsm_collapsed .vsm--link_level-1.vsm--link_exact-active .vsm--icon { background: none !important; color: var(--sb-deep) !important; }
+.v-sidebar-menu.vsm_collapsed .vsm--arrow,
+.v-sidebar-menu.vsm_collapsed .vsm--badge { display: none !important; }
+.v-sidebar-menu.vsm_collapsed .vsm--header { font-size: 0; width: 28px; padding: 0 !important; margin: 8px auto; border-top: 1px solid var(--sb-line); }
+
+/* hover pop-out that holds the sub menu */
+.v-sidebar-menu .vsm--mobile-item .vsm--child,
+.v-sidebar-menu.vsm_collapsed .vsm--child {
+    min-width: 210px; padding: 6px !important; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #064a40 !important; box-shadow: 0 24px 44px -22px rgba(0, 0, 0, 0.7);
+}
+.v-sidebar-menu.vsm_collapsed .vsm--dropdown { margin: 0 !important; padding: 0 !important; border-left: 0; }
+.v-sidebar-menu .vsm--link_mobile { width: auto !important; height: 38px !important; margin: 0 0 4px !important; border-radius: 8px; font-weight: 600; background: var(--sb-active) !important; color: var(--sb-mint) !important; justify-content: flex-start; padding: 0 10px !important; }
+
+/* ───────── Footer: optional user card + collapse button ───────── */
+.v-sidebar-menu .tt-sidebar-user { display: flex; align-items: center; gap: 10px; margin: 8px 10px 10px; padding: 8px 10px; border-radius: 10px; background: var(--sb-hover); border: 1px solid var(--sb-line); color: #ffffff; }
+.v-sidebar-menu .tt-su-av { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--sb-deep); background: #a7f3d0; }
+.v-sidebar-menu .tt-su-name { font-size: 13px; font-weight: 600; line-height: 1.25; }
+.v-sidebar-menu .tt-su-role { font-size: 11px; color: var(--sb-dim); }
+.v-sidebar-menu .tt-su-dot { margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--sb-mint); }
+.v-sidebar-menu.vsm_collapsed .tt-sidebar-user { margin: 8px auto 10px; width: 40px; height: 40px; padding: 0; justify-content: center; }
+.v-sidebar-menu.vsm_collapsed .tt-sidebar-user > div:not(.tt-su-av), .v-sidebar-menu.vsm_collapsed .tt-su-dot { display: none; }
+
+.v-sidebar-menu.vsm_white-theme .vsm--menu > .vsm--item:first-child {
+  display: none !important;
+}
+.v-sidebar-menu > :first-child:not(.vsm--scroll-wrapper):not(.vsm--mobile-bg) {
+    margin-top: 0px !important;
+}
+
+.v-sidebar-menu.vsm_white-theme .vsm--item {
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+.v-sidebar-menu .vsm--toggle-btn { position: sticky; padding: 10px; z-index: 20; opacity: 1; bottom: 0; height: 46px !important; border: 0 !important; border-top: 1px solid var(--sb-line) !important; cursor: pointer; background: rgba(0, 0, 0, 0.18) !important; color: #a7f3d0 !important; transition: background 0.18s ease, color 0.18s ease; }
+.v-sidebar-menu .vsm--toggle-btn:hover { background: rgba(0, 0, 0, 0.3) !important; color: #ffffff !important; }
+.v-sidebar-menu .vsm--toggle-btn:focus-visible { outline: 2px solid var(--sb-mint); outline-offset: -4px; }
+
+/* ───────── Scrollbar, mobile overlay, focus ───────── */
+.v-sidebar-menu .vsm--scroll-thumb { background: rgba(255, 255, 255, 0.24) !important; border-radius: 6px; width: 5px; }
+.vsm--mobile-bg { background: rgba(5, 61, 53, 0.55) !important; backdrop-filter: blur(3px); }
+.v-sidebar-menu .vsm--link:focus-visible { outline: 2px solid var(--sb-mint); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .v-sidebar-menu .vsm--link, .v-sidebar-menu .vsm--icon, .v-sidebar-menu .vsm--arrow { transition: none; }
+}
+
+// sidebar ends 

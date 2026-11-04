@@ -38,6 +38,9 @@ import CreateOrder from "@/admin/CreateOrder.vue";
 import SalesAnalytics from "@/admin/SalesAnalytics.vue";
 import StoreFront from "@/admin/StoreFront.vue";
 import GeneralSettings from "@/admin/GeneralSettings.vue";
+import ProfileOverview from "@/admin/ProfileOverview.vue";
+import ProfileEdit from "@/admin/ProfileEdit.vue";
+import SeoAnalytics from "@/admin/SeoAnalytics.vue";
 
 // import Users from '@/admin/auth/Users.vue';
 
@@ -80,6 +83,10 @@ const routes = [
     { path: "/admin/sales-analytics", name: "SalesAnalytics", component: SalesAnalytics, meta: { requiresAuth: true }, },
     { path: "/admin/storefront", name: "StoreFront", component: StoreFront, meta: { requiresAuth: true }, },
     { path: "/admin/general-settings", name: "GeneralSettings", component: GeneralSettings, meta: { requiresAuth: true } },
+
+    { path: "/admin/profile", name: "ProfileOverview", component: ProfileOverview, meta: { requiresAuth: true } },
+    { path: "/admin/profile-edit", name: "ProfileEdit", component: ProfileEdit, meta: { requiresAuth: true } },
+    { path: "/admin/seo-analytics", name: "SeoAnalytics", component: SeoAnalytics, meta: { requiresAuth: true } },
     
 
     // /******************** */
