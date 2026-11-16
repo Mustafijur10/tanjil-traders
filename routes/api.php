@@ -9,6 +9,7 @@ use App\Http\Controllers\DemoOrderController;
 use App\Http\Controllers\AttributeOptionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\PageController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -27,6 +28,9 @@ Route::get('/categories/{id}',  [CategoryController::class, 'show']);
 Route::get('/brands',           [BrandController::class, 'index']);
 Route::get('/brands/{id}',      [BrandController::class, 'show']);
 Route::get('/attribute/brand',  [BrandController::class, 'index']); // backward compatibility
+
+Route::get('/pages/menu',   [PageController::class, 'menu']);
+Route::get('/pages/{slug}', [PageController::class, 'publicShow']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Your protected routes here
@@ -52,5 +56,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/save-option',            [AttributeOptionController::class, 'store']);
     Route::put('/attribute-option-update', [AttributeOptionController::class, 'update']);
     Route::post('/remove-option',          [AttributeOptionController::class, 'destroy']);
+
+    // settings
+    Route::prefix('cms')->group(function () {
+        Route::post('/uploads',               [PageController::class, 'upload']);
+        Route::get('/pages',                  [PageController::class, 'index']);
+        Route::post('/pages',                 [PageController::class, 'store']);
+        Route::get('/pages/{id}',             [PageController::class, 'show']);
+        Route::put('/pages/{id}',             [PageController::class, 'update']);
+        Route::delete('/pages/{id}',          [PageController::class, 'destroy']);
+        Route::post('/pages/{id}/status',     [PageController::class, 'setStatus']);
+        Route::post('/pages/{id}/duplicate',  [PageController::class, 'duplicate']);
+    });
 
 });

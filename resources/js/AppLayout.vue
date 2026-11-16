@@ -104,6 +104,21 @@ export default {
                     ],
                 },
                 {
+                    title: "Message Center",
+                    icon: "fa fa-comments",
+                    child: [
+                        { href: "/admin/inbox",            title: "Inbox",           icon: "fa fa-inbox",       badge: { text: "12" } },
+                        { href: "/admin/publish",          title: "Create Post",     icon: "fa fa-edit" },
+                        { href: "/admin/content-calendar", title: "Content Calendar",icon: "fa fa-calendar-alt" },
+                        { href: "/admin/campaigns",        title: "Email & SMS",     icon: "fa fa-envelope" },
+                        { href: "/admin/audiences",        title: "Audiences",       icon: "fa fa-address-book" },
+                        { href: "/admin/message-templates",title: "Templates",       icon: "fa fa-file-alt" },
+                        { href: "/admin/automations",      title: "Automations",     icon: "fa fa-bolt" },
+                        { href: "/admin/channels",         title: "Channels",        icon: "fa fa-plug" },
+                        { href: "/admin/channel-reports",  title: "Performance",     icon: "fa fa-chart-line" },
+                    ],
+                },
+                {
                     title: "Customers",
                     icon: "fa fa-users",
                     child: [
@@ -125,19 +140,11 @@ export default {
                     title: "Marketing",
                     icon: "fa fa-bullhorn",
                     child: [
-                        { href: "/admin/coupons", title: "Coupons & Discounts" },
+                        { href: "/admin/discount", title: "Coupons & Discounts" },
                         { href: "/admin/banners", title: "Banners & Promotions" },
                         { href: "/admin/notifications", title: "Notifications" },
                     ],
-                },
-                {
-                    title: "Shipping",
-                    icon: "fa fa-truck",
-                    child: [
-                        { href: "/admin/shipping", title: "Shipping Zones" },
-                        { href: "/admin/shipping/methods", title: "Shipping Methods" },
-                    ],
-                },
+                },               
                 {
                     title: "Reports",
                     icon: "fa fa-line-chart",
@@ -148,12 +155,39 @@ export default {
                     ],
                 },
                 {
+                    title: "Pages",
+                    icon: "fa fa-file-alt",
+                    child: [
+                        { href: "/admin/pages", title: "All Pages" },
+                        { href: "/admin/pages/new", title: "Add New Page" },
+                        { href: "/admin/pages?status=draft", title: "Draft Pages" },
+                        { href: "/admin/pages?status=published", title: "Published Pages" },
+                    ],
+                },
+                { title: "After-Sales", icon: "fa fa-shield-alt", child: [
+                    { href: "/admin/warranty", title: "Warranty Registry" },
+                    { href: "/admin/warranty-claims", title: "Warranty Claims" },
+                    { href: "/admin/service-tickets", title: "Repair & Service" },
+                    { href: "/admin/trade-in", title: "Trade-in / Exchange" },
+                ]},
+                { title: "Purchasing", icon: "fa fa-truck-loading", child: [
+                    { href: "/admin/purchase-orders", title: "Purchase Orders" },
+                    { href: "/admin/import-costing", title: "Import Costing" },
+                    { href: "/admin/stock-transfers", title: "Stock Transfers" },
+                ]},
+                { title: "Finance", icon: "fa fa-money-bill-wave", child: [
+                    { href: "/admin/settlements", title: "Payments & COD Settlements" },
+                    { href: "/admin/expenses", title: "Expenses" },
+                    { href: "/admin/profit-loss", title: "Profit & Loss" },
+                ]},
+                {
                     title: "Settings",
                     icon: "fa fa-cog",
                     child: [
                         { href: "/admin/general-settings", title: "General" },
                         { href: "/admin/storefront", title: "Storefront" },
-                        { href: "/admin/settings/payment", title: "Payment Methods" },
+                        { href: "/admin/settings-payment", title: "Payment Methods" },
+                        { href: "/admin/shipping", title: "Shipping Zones" },
                         { href: "/admin/roles", title: "Staff & Roles" },
                     ],
                 },   

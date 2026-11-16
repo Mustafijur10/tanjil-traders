@@ -13,9 +13,13 @@
    
     <meta name="title" content="Tanjil-Traders">
     <meta name="keywords" content="Computer, Camera, Gadget, Accessories">
-    <meta name="description" content="Leading Computer, Laptop & Gadget Shop in Bangladesh">
+    <meta name="description" content="Leading Computer, Laptop & Gadget Shop in Bangladesh">    
 
-    <title>Tanjil Traders - Leading Computer, Laptop & Gadget Shop in Bangladesh</title>
+    @isset($page)
+        @include('partials.page-meta')
+    @else
+        <title>Tanjil Traders - Leading Computer, Laptop & Gadget Shop in Bangladesh</title>
+    @endisset
     
 
     <!-- Scripts -->
