@@ -1,30 +1,40 @@
 <template>
-    <div :class="[$store.state.layout_style, $store.state.menu_style]">
-        <v-card theme="light"
-            ><component v-bind:is="layout"></component
-        ></v-card>
-    </div>
+    <v-app>
+        <component :is="layout" />
+
+        <v-snackbar
+            :model-value="snackbar.open"
+            :color="snackbarColor"
+            location="bottom right"
+            timeout="3200"
+            @update:model-value="!$event && $store.commit('hideSnackbar')"
+        >
+            {{ snackbar.text }}
+            <template #actions>
+                <v-btn-tertiary icon="mdi-close" size="small" :aria-label="$t('Close')" @click="$store.commit('hideSnackbar')" />
+            </template>
+        </v-snackbar>
+    </v-app>
 </template>
-<script setup>
-import { computed } from "vue";
-import { useStore } from "vuex";
-const store = useStore();
-const layout = computed(() => {
-    return store.getters.layout;
-});
-</script>
+
 <script>
-import appLayout from "@/AppLayout.vue";
-import authLayout from "@/AuthLayout.vue";
-import frontLayout from "@/FrontLayout.vue";
+import AdminLayout from "@/AppLayout.vue";
+import AuthLayout from "@/AuthLayout.vue";
+import FrontLayout from "@/FrontLayout.vue";
 
 export default {
-    components: {
-        app: appLayout,
-        auth: authLayout,
-        front: frontLayout,
+    name: "App",
+    components: { AdminLayout, AuthLayout, FrontLayout },
+    computed: {
+        layout() {
+            return { admin: "AdminLayout", auth: "AuthLayout" }[this.$store.getters.layout] || "FrontLayout";
+        },
+        snackbar() {
+            return this.$store.state.snackbar;
+        },
+        snackbarColor() {
+            return { error: "error", warning: "warning", info: "info" }[this.snackbar.type] || "secondary";
+        },
     },
-
-    methods: {},
 };
 </script>

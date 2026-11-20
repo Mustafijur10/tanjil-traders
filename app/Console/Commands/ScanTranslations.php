@@ -17,14 +17,28 @@ class ScanTranslations extends Command
 
     public function handle(): int
     {
-        $pattern = '/(?<![\w.])\$?t\(\s*([\'"])((?:\\\\.|(?!\1).)+?)\1\s*[,)]/s';
+        $patterns = [
+            // $t("Add to cart") and t("Add to cart")
+            '/(?<![\w.])\$?t\(\s*([\'"])((?:\\\\.|(?!\1).)+?)\1\s*[,)]/s',
+            // Texts passed to components that translate them: <PageHeader title="Orders" />
+            '/\s(?:title|subtitle|lead|text|label|hint|confirm-text)=(")([^"{}<>]{2,})"/',
+            // Texts in menus, settings lists and route titles: { title: "Orders" }
+            '/\b(?:title|subtitle|label|hint|suffix|lead)\s*:\s*(")([^"{}<>]{2,})"/',
+        ];
         $found = [];
 
-        $files = (new Finder())->files()->in(resource_path('js'))->name(['*.vue', '*.js']);
+        $files = (new Finder())->files()->in(resource_path('js'))->exclude('_legacy')->name(['*.vue', '*.js']);
         foreach ($files as $file) {
-            if (preg_match_all($pattern, $file->getContents(), $m)) {
-                foreach ($m[2] as $text) {
-                    $found[stripcslashes($text)] = true;
+            $code = $file->getContents();
+            foreach ($patterns as $pattern) {
+                if (preg_match_all($pattern, $code, $m)) {
+                    foreach ($m[2] as $text) {
+                        $text = stripcslashes($text);
+                        // Skip things that are clearly not words: icons, paths, CSS classes.
+                        if (! preg_match('/^(mdi-|\/|#|\.|https?:)/', $text) && preg_match('/[A-Za-z]/', $text)) {
+                            $found[$text] = true;
+                        }
+                    }
                 }
             }
         }

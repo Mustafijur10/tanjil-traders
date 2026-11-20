@@ -43,6 +43,7 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     Route::put('/translations/{translation}', [Admin\TranslationController::class, 'update']);
     Route::delete('/translations/{translation}', [Admin\TranslationController::class, 'destroy']);
     Route::post('/translations/approve', [Admin\TranslationController::class, 'approve']);
+    Route::post('/translations/register', [Admin\TranslationController::class, 'register']);
     Route::post('/translations/scan', [Admin\TranslationController::class, 'scan']);
     Route::post('/translations/auto', [Admin\TranslationController::class, 'autoTranslate']);
 

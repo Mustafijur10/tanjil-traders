@@ -1,80 +1,71 @@
- <template>
-  <v-container>
-    <v-row justify="center">
-      <v-col cols="12" sm="8" md="6">
-        <v-card class="elevation-12">
-          <v-toolbar dark color="primary">
-            <v-toolbar-title>Login</v-toolbar-title>
-          </v-toolbar>
-          <v-card-text>
-            <v-form ref="form"  lazy-validation>
-                <v-text-field prepend-icon="mdi-email" v-model="user.email" label="Email" :rules="[rules.required, rules.email]"></v-text-field>
-                <v-text-field prepend-icon="mdi-lock" type="password" v-model="user.password" label="Password" :rules="[rules.required]"></v-text-field>
-            </v-form>
-          </v-card-text>
-          <v-card-actions class="pa-5">
-                  
-            <v-btn class="ml-auto" @click="saveForm" outlined color="primary">Login</v-btn>
-            
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+<template>
+    <AuthShell title="Sign in to the admin panel" lead="Use the email or phone number of your admin or staff account.">
+        <v-form @submit.prevent="submit">
+            <v-input-trz
+                v-model.trim="form.login"
+                :label="$t('Email or phone')"
+                prepend-inner-icon="mdi-account-outline"
+                autocomplete="username"
+                autofocus
+                :error-messages="errors.login"
+                class="mb-4"
+                @update:model-value="errors.login = null"
+            />
+            <v-input-trz
+                v-model="form.password"
+                :label="$t('Password')"
+                prepend-inner-icon="mdi-lock-outline"
+                :type="showPassword ? 'text' : 'password'"
+                autocomplete="current-password"
+                :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+                :error-messages="errors.password"
+                @click:append-inner="showPassword = !showPassword"
+                @update:model-value="errors.password = null"
+            />
+            <div class="tt-auth-row">
+                <span></span>
+                <router-link to="/admin/forgot-password">{{ $t("Forgot password?") }}</router-link>
+            </div>
+            <v-btn-primary type="submit" block size="large" :loading="loading" :disabled="!form.login || !form.password">
+                {{ $t("Sign in") }}
+            </v-btn-primary>
+        </v-form>
+        <div class="tt-auth-foot">
+            <router-link to="/">{{ $t("Back to the store") }}</router-link>
+        </div>
+    </AuthShell>
 </template>
 
-
-<script setup>
-document.title = 'Admin Login';
-</script>
-
-
 <script>
-  import Auth from '@/auth.js';
-  import { ref } from 'vue';
-  const theme = ref('light');
+import AuthShell from "@/components/AuthShell.vue";
+import { fieldErrors } from "@/api";
 
-    export default {
-      data() {
-          return {
-              value:String,
-              user: {
-                  email: '',
-                  password: '',
-              },    
-
-              rules: Rules,
-          };
-      },
-
-      methods: {
-            async saveForm() 
-            { 
-
-              /*let token = await this.checkRecaptcha()
-              if (!token) 
-              {
-                return;
-              }  */
-                
-              const { valid } = await this.$refs.form.validate();
-
-              if (!valid) return;
-
-
-              this.axios.post('/api/login', this.user)
-                  .then(({data}) => {
-                      Auth.login(data.access_token,data.user);
-
-                      this.$router.push('/admin');
-
-
-                      
-                  })
-                  .catch((error) => {
-                      alert('wrong access');
-                  });
+export default {
+    name: "AdminLogin",
+    components: { AuthShell },
+    data: () => ({
+        form: { login: "", password: "" },
+        errors: {},
+        loading: false,
+        showPassword: false,
+    }),
+    methods: {
+        async submit() {
+            this.loading = true;
+            this.errors = {};
+            try {
+                await this.$store.dispatch("auth/login", { ...this.form, admin: true });
+                const target = this.$route.query.redirect;
+                this.$router.replace(typeof target === "string" && target.startsWith("/admin") ? target : "/admin");
+            } catch (e) {
+                this.errors = fieldErrors(e);
+                if (!Object.keys(this.errors).length) {
+                    this.errors = { login: this.$t("Could not sign in. Please try again.") };
+                }
+            } finally {
+                this.loading = false;
             }
-      }
-    }
+        },
+    },
+};
 </script>

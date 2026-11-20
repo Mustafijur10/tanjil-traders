@@ -1,167 +1,41 @@
-import "./bootstrap";
+/*
+ * App entry. Every global package, component and alias is registered here, once.
+ * Styles: resources/sass/app.scss is the only stylesheet; components have no <style> blocks.
+ */
+import "../sass/app.scss";
+
 import { createApp } from "vue";
-
-import axios from "axios";
-import VueAxios from "vue-axios";
-
-import VueSidebarMenu from "vue-sidebar-menu";
-import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
-import "@fortawesome/fontawesome-free/css/all.css";
-
-import VueSweetalert2 from "vue-sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
-
-// Vuetify
-import "vuetify/styles";
-import { createVuetify } from "vuetify";
-import * as components from "vuetify/components";
-import * as directives from "vuetify/directives";
-import "@mdi/font/css/materialdesignicons.css";
-import { VBtn, VTextField, VSelect, VTextarea } from 'vuetify/components';
-
-const vuetify = createVuetify({
-    aliases: {
-        VBtnPrimary: VBtn,
-        VBtnSecondary: VBtn,
-        VBtnTertiary: VBtn,
-
-        VInputTrz: VTextField,
-        VSelectTrz: VSelect,
-        VTextareaTrz: VTextarea,
-    },
-    theme: {
-        themes: {
-            light: {
-                variables: {
-                    
-                }, 
-                colors: {
-                    // primary: "rgba(255, 110, 44, 1)",
-                    primary: "#050c2e",
-                    primary_lite: "rgba(255, 236, 227, 1)",
-                    secondary: "#E25311",
-                    secondary_lite: "rgba(248, 249, 255, 1)",
-                    white: "#ffffff",
-                    grey: "rgb(245, 245, 245)",
-                    greyheader: "rgba(168, 168, 168, 1)",
-                    greymain: "#525252",
-                    error: '#FF0000',
-                    info: '#2196F3',
-                    success: '#00A560',
-                    success_lite: '#E5F6EF',
-                    warning: '#FB8C00',
-                    orange:'#FF6E2C',
-                    customer_btn: '#AAC7FE',
-                    purple: 'rgba(170, 178, 254, 1)',
-                    purple_lite: '#F8F9FF',
-                    for_marquee: '#f0c040',
-                    black: '#000000',
-
-                    ash: '#696973',
-                    
-                },
-                variations: {
-                    colors: ['primary', 'secondary'],
-                    lighten: 1,
-                    darken: 2,
-                },
-            },
-        },
-    },
-    
-    defaults: {
-        VBtnPrimary: { color: 'primary', variant: 'flat', },
-        VBtnSecondary: { color: 'secondary', variant: 'flat', },
-        VBtnTertiary: { color: 'secondary', rounded: true, variant: 'plain', },
-
-        VInputTrz: {density: "compact", variant: "outlined", },
-        VSelectTrz: { density: "compact", variant: "outlined", },
-        VTextareaTrz: { density: "compact", variant: "outlined", rows: "3",}
-    },
-    components,
-    directives,
-});
-
-import Vue3EasyDataTable from "vue3-easy-data-table";
-import "vue3-easy-data-table/dist/style.css";
-
-import MarqueeText from 'vue-marquee-text-component';
-import Category from "@/admin/Category.vue";
-import SubCategory from "@/admin/SubCategory.vue";
-
-
 
 import App from "@/app.vue";
 import router from "@/router";
 import store from "@/store";
+import vuetify from "@/plugins/vuetify";
+import i18n from "@/plugins/i18n";
+
+// Shared UI building blocks, available in every template without importing
+import PageHeader from "@/components/ui/PageHeader.vue";
+import EmptyState from "@/components/ui/EmptyState.vue";
+import ConfirmDialog from "@/components/ui/ConfirmDialog.vue";
+import ImageUpload from "@/components/ui/ImageUpload.vue";
+import StatusChip from "@/components/ui/StatusChip.vue";
+import PrefToggles from "@/components/ui/PrefToggles.vue";
 
 const app = createApp(App);
 
+app.use(store);
+app.use(router);
 app.use(vuetify);
-app.use(VueAxios, axios);
-app.use(store).use(router);
-app.use(VueSidebarMenu);
-app.use(VueSweetalert2);
-app.component('EasyDataTable', Vue3EasyDataTable);
+app.use(i18n);
+// Charts (vue3-apexcharts) are registered by the pages that use them, so other pages stay light.
 
-//
-app.component('Category', Category);
-app.component('SubCategory', SubCategory);
+app.component("PageHeader", PageHeader);
+app.component("EmptyState", EmptyState);
+app.component("ConfirmDialog", ConfirmDialog);
+app.component("ImageUpload", ImageUpload);
+app.component("StatusChip", StatusChip);
+app.component("PrefToggles", PrefToggles);
 
-app.component('marquee-text', MarqueeText);
+// Theme and language are applied before the first page renders.
+store.dispatch("prefs/boot");
 
-app.mount("#app");
-
-if (axios.interceptors) {
-    axios.interceptors.response.use(
-        function (response) {
-            return response;
-        },
-        function (error) {
-            if (error.response.status == 401) {
-                //location.reload();
-                router.push("/admin/login");
-            } else if (error.response.status == 422) {
-                Swal.fire({
-                    position: "bottom-end",
-                    icon: "warning",
-                    title: Object.values(error.response.data.errors),
-                    showConfirmButton: false,
-                    timer: 2000,
-                });
-                //Swal.fire('Please fill all required inputs', '', 'warning');
-            } else if (error.response.status == 500) {
-                Swal.fire({
-                    position: "bottom-end",
-                    icon: "error",
-                    title: "Server error.",
-                    showConfirmButton: false,
-                    timer: 2000,
-                });
-            } else if (
-                error.response.status == 419 ||
-                error.response.status == 401
-            )
-                location.reload();
-        }
-    );
-}
-
-window.Rules = {
-    required: (value) => !!value || "This field is required",
-    email: (value) => /.+@.+\..+/.test(value) || "Must be a valid email",
-    integer: (value) =>
-        Number.isInteger(Number(value)) || "Must be a valid number",
-    max(value, max) {
-        return (
-            (value || "").length <= max ||
-            `This field is too long (maximum is ${max} characters).`
-        );
-    },
-    min(value, min) {
-        return (
-            (value || "").length >= min ||
-            `This field is too short (minimum is ${min} characters).`
-        );
-    },
-};
+router.isReady().then(() => app.mount("#app"));

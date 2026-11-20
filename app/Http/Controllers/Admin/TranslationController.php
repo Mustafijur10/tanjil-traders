@@ -70,6 +70,24 @@ class TranslationController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Texts a staff member saw in English while browsing in Bangla. Sent by the browser in small batches.
+     * Body: { texts: ["...", ...] }
+     */
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+            'texts'   => ['required', 'array', 'max:200'],
+            'texts.*' => ['string', 'max:2000'],
+        ]);
+
+        foreach ($data['texts'] as $text) {
+            Translation::register($text, 'ui');
+        }
+
+        return response()->noContent();
+    }
+
     /** Find new interface text in the Vue files. */
     public function scan()
     {

@@ -24,16 +24,14 @@
  * Child components get this instance through provide/inject as `hdr`, so each setting has ONE source of truth
  * and any button in any menu calls the same method.
  */
-import { useTheme } from "vuetify";
-import Auth from "@/auth.js";
 import HeaderNavigation from "./Header/HeaderNavigation.vue";
 import HeaderClock from "./Header/HeaderClock.vue";
 import HeaderMenus from "./Header/HeaderMenus.vue";
 import HeaderSettings from "./Header/HeaderSettings.vue";
-import "./Header/header.scss";
 
+// Theme and language live in the global store (store/prefs.js) so they apply to every page.
+// The other header options are saved in this browser and on the signed-in account.
 const SETTINGS_KEY = "tt_header_settings_v2";
-const THEME_KEY = "theme_mode";
 const ACCENTS = [
     { value: "green", label: "Emerald", hex: "#0f9d6b" },
     { value: "blue", label: "Blue", hex: "#2f5be7" },
@@ -113,15 +111,8 @@ export default {
     },
     emits: ["toggle-sidebar", "theme-change", "date-select", "language-change", "period-change", "store-change", "compare-change", "export"],
 
-    setup() {
-        // Uses Vuetify's theme if "light" / "dark" themes are registered; otherwise only the stored flag is used.
-        const vTheme = useTheme();
-        return { vTheme };
-    },
-
     data() {
         return {
-            theme: "light",
             s: makeDefaults(this.weekStart, this.hijriOffset),
             clock: new Date(),
             now: new Date(),
@@ -135,12 +126,11 @@ export default {
             isFullscreen: false,
             loggingOut: false,
 
-            accountRoute: "/admin/account/settings",
+            accountRoute: "/admin/profile",
             accentOptions: ACCENTS,
             languages: [
                 { value: "en", name: "English" },
                 { value: "bn", name: "বাংলা" },
-                { value: "ar", name: "العربية" },
             ],
             // Country flags used for the language switcher (English: UK, Bangla: Bangladesh, Arabic: Saudi Arabia)
             flagSvg: {
@@ -200,8 +190,14 @@ export default {
     },
 
     computed: {
+        theme() {
+            return this.$store.state.prefs.theme;
+        },
         isDark() {
             return this.theme === "dark";
+        },
+        locale() {
+            return this.$store.state.prefs.locale;
         },
         localTz() {
             try {
@@ -261,12 +257,18 @@ export default {
         "s.comparePrev"(v) {
             this.$emit("compare-change", v);
         },
+        // The site language also drives the clock and calendar language.
+        locale: {
+            immediate: true,
+            handler(v) {
+                if (this.s.dateLang !== v) this.s.dateLang = v;
+            },
+        },
     },
 
     mounted() {
-        this.theme = window.localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
-        this.applyTheme(this.theme);
         this.loadSettings();
+        this.s.dateLang = this.locale;
         this.applyAccent(this.s.accent);
 
         window.addEventListener("keydown", this.onGlobalKey);
@@ -315,7 +317,9 @@ export default {
         // ── Settings storage ──
         loadSettings() {
             try {
-                const o = JSON.parse(window.localStorage.getItem(SETTINGS_KEY) || "{}");
+                // The account's saved header options win over this browser's copy.
+                const saved = this.$store.state.auth.user?.preferences?.header;
+                const o = saved || JSON.parse(window.localStorage.getItem(SETTINGS_KEY) || "{}");
                 const d = this.s;
                 Object.keys(d).forEach((k) => {
                     if (!(k in o)) return;
@@ -339,6 +343,7 @@ export default {
             } catch (e) {
                 /* storage unavailable */
             }
+            this.$store.dispatch("prefs/savePreferences", { header: this.s });
         },
         resetSettings() {
             Object.assign(this.s, makeDefaults(this.weekStart, this.hijriOffset));
@@ -353,31 +358,18 @@ export default {
         setTheme(name) {
             const next = name === "dark" ? "dark" : "light";
             if (next === this.theme) return;
-            this.theme = next;
-            try {
-                window.localStorage.setItem(THEME_KEY, next);
-            } catch (e) {
-                /* storage unavailable */
-            }
-            this.applyTheme(next);
+            this.$store.dispatch("prefs/setTheme", next);
             this.$emit("theme-change", next);
         },
         toggleTheme() {
             this.setTheme(this.isDark ? "light" : "dark");
         },
-        applyTheme(name) {
-            document.documentElement.setAttribute("data-theme", name);
-            try {
-                if (this.vTheme && this.vTheme.themes && this.vTheme.themes.value[name]) this.vTheme.global.name.value = name;
-            } catch (e) {
-                /* theme not registered, ignore */
-            }
-        },
         setHour12(v) {
             this.s.hour12 = v;
         },
+        // Changes the language of the whole site, not just the clock.
         setDateLang(v) {
-            this.s.dateLang = v;
+            this.$store.dispatch("prefs/setLocale", v);
             this.$emit("language-change", v);
         },
         setStore(v) {
@@ -462,14 +454,11 @@ export default {
         logout() {
             if (this.loggingOut) return;
             this.loggingOut = true;
-            this.axios
-                .post("/api/logout", window.localStorage.getItem("user"))
-                .then(() => {
-                    Auth.logout();
-                    window.location.href = "/admin/login";
-                })
-                .catch(() => {
+            this.$store
+                .dispatch("auth/logout")
+                .finally(() => {
                     this.loggingOut = false;
+                    this.$router.push("/admin/login");
                 });
         },
     },

@@ -328,14 +328,9 @@ export default {
 
         // ── User ──
         user() {
-            let u = {};
-            try {
-                const raw = JSON.parse(window.localStorage.getItem("user") || "{}") || {};
-                u = raw.user || raw;
-            } catch (e) {
-                u = {};
-            }
-            return { name: u.name || u.username || "Admin", email: u.email || "", role: u.role || u.role_name || "Administrator" };
+            const u = this.$store.state.auth.user || {};
+            const role = { admin: "Administrator", staff: "Staff" }[u.role] || u.role || "";
+            return { name: u.name || "Admin", email: u.email || "", role: this.$t(role) };
         },
         initials() {
             return this.user.name

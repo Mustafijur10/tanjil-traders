@@ -1,5 +1,5 @@
 <template>
-  <header class="tt-header">
+  <header class="tt-shop-header">
     <!-- ============ ANNOUNCEMENT ============ -->
     <div class="announce">
       <div class="wrap">
@@ -162,6 +162,8 @@
 </template>
 
 <script>
+import api from '@/api'
+
 export default {
   name: 'SiteHeader',
 
@@ -342,7 +344,7 @@ export default {
       }
       this.suggestTimer = setTimeout(async () => {
         try {
-          const { data } = await this.axios.get('/api/search/suggest', { params: { q: this.query, category: this.searchScope } })
+          const { data } = await api.get('/search/suggest', { params: { q: this.query, category: this.searchScope }, quiet: true })
           this.suggestions = data.slice(0, 6)
         } catch (e) {
           this.suggestions = []
@@ -350,7 +352,7 @@ export default {
       }, 250)
     },
     async fetchHeaderState() {
-      const { data } = await this.axios.get('/api/header')
+      const { data } = await api.get('/header', { quiet: true })
       this.user = data.user
       this.cartCount = data.cart.count
       this.cartTotal = data.cart.total
@@ -361,138 +363,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
-.tt-header {
-  --deep: #053d35;
-  --deep-2: #0a5548;
-  --deep-3: #0b5f50;
-  --accent: #0f9d6b;
-  --accent-dk: #0b7a53;
-  --accent-tint: #e3f6ee;
-  --ink: #0f2a26;
-  --ink-2: #3d5450;
-  --muted: #6b7f7b;
-  --line: #e3eae8;
-  --surface: #ffffff;
-  --wash: #f3f7f6;
-
-  font-family: Poppins, "Segoe UI", sans-serif;
-  font-size: 14px;
-}
-
-.tt-header a { text-decoration: none; }
-.tt-header .announce__nav a { color: #8fe3c6; }
-
-.wrap { max-width: 1340px; margin: 0 auto; padding: 0 20px; }
-
-/* ---------- announcement ---------- */
-.announce {
-  background: var(--deep);
-  color: #c9ded9;
-  font-size: 12.5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-.announce .wrap { display: flex; justify-content: space-between; align-items: center; height: 38px; gap: 16px; }
-.announce__msg { margin: 0; }
-.announce__msg b { color: #8fe3c6; }
-.announce__nav { display: flex; gap: 20px; }
-.announce__nav a:hover { color: #fff; }
-
-/* ---------- main bar ---------- */
-.mainbar { background: linear-gradient(135deg, var(--deep) 0%, var(--deep-2) 55%, var(--deep-3) 100%); }
-.mainbar .wrap { display: flex; align-items: center; gap: 24px; height: 78px; }
-.mainbar__burger { color: #fff; margin-left: -8px; }
-
-.logo { display: flex; align-items: center; gap: 10px; color: #fff; flex: none; }
-.logo__mark {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.22);
-  display: grid; place-items: center; flex: none; color: #6ee7b7;
-}
-.logo__text { font-weight: 700; font-size: 21px; letter-spacing: -0.02em; line-height: 1.05; }
-.logo__text em { font-style: normal; font-weight: 400; color: #8fe3c6; }
-.logo__text small { display: block; font-size: 10.5px; font-weight: 500; color: rgba(255,255,255,0.55); letter-spacing: 0.02em; }
-
-/* ---------- search ---------- */
-.search { flex: 1; max-width: 660px; display: flex; background: #fff; border-radius: 9px; position: relative; }
-.search__scope {
-  border: 0; background: transparent; padding: 0 14px; font: inherit; color: var(--muted);
-  border-right: 1px solid var(--line); outline: none; border-radius: 9px 0 0 9px;
-}
-.search__input { flex: 1; border: 0; padding: 14px; font: inherit; outline: none; color: var(--ink); min-width: 0; }
-.search__input::placeholder { color: var(--muted); }
-.search__btn {
-  border: 0; background: var(--accent); color: #fff; padding: 0 22px; font: 600 13.5px inherit;
-  cursor: pointer; display: flex; align-items: center; gap: 7px; border-radius: 0 9px 9px 0;
-}
-.search__btn:hover { background: var(--accent-dk); }
-
-.search__drop {
-  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 9px;
-  box-shadow: 0 20px 40px rgba(5, 30, 25, 0.18); list-style: none; padding: 6px; margin: 0; z-index: 70;
-}
-.search__drop a { display: flex; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 7px; }
-.search__drop a:hover { background: var(--wash); }
-.search__drop img { width: 36px; height: 36px; object-fit: contain; }
-.search__drop b { display: block; font-size: 12.8px; font-weight: 600; color: var(--ink); }
-.search__drop em { font-style: normal; font-size: 12px; color: var(--accent); font-weight: 700; }
-
-/* ---------- header actions ---------- */
-.hacts { display: flex; gap: 4px; margin-left: auto; }
-.hact { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 9px; color: #fff; position: relative; }
-.hact:hover { background: rgba(255, 255, 255, 0.09); }
-.hact--accent :deep(.v-icon) { color: #6ee7b7; }
-.hact__label small { display: block; font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.25; }
-.hact__label strong { display: block; font-size: 13px; font-weight: 600; line-height: 1.25; }
-.hact__dot {
-  position: absolute; top: 3px; left: 26px; background: var(--accent); color: #fff; border-radius: 99px;
-  font-size: 10px; font-weight: 700; font-style: normal; padding: 0 5px; line-height: 15px;
-}
-
-/* ---------- nav bar ---------- */
-.navbar { background: #072e28; position: sticky; top: 0; z-index: 50; }
-.navbar .wrap { display: flex; align-items: stretch; gap: 4px; height: 48px; }
-.allcat {
-  display: flex; align-items: center; gap: 9px; background: var(--accent); color: #fff;
-  padding: 13.4px 18px; font: 650 13.5px inherit; border: 0; cursor: pointer;
-}
-.allcat:hover { background: var(--accent-dk); }
-.navlink { display: flex; align-items: center; padding: 0 14px; color: #b7ccc7; font-size: 13.2px; font-weight: 500; }
-.navlink:hover, .navlink.router-link-active { color: #fff; box-shadow: inset 0 -3px 0 var(--accent); }
-.navlink__sale { color: #ff9a6e; font-weight: 650; }
-.navright { margin-left: auto; display: flex; align-items: center; gap: 8px; color: #b7ccc7; font-size: 12.8px; }
-.navright b { color: #fff; }
-
-/* ---------- mega menu ---------- */
-.mega-host { position: relative; }
-.mega {
-  position: absolute; top: 100%; left: 0; width: 860px; background: var(--surface);
-  border: 1px solid var(--line); border-radius: 0 0 12px 12px;
-  box-shadow: 0 22px 44px rgba(5, 30, 25, 0.18); display: grid; grid-template-columns: 232px 1fr;
-  overflow: hidden; z-index: 60;
-}
-.mega__list { background: var(--wash); border-right: 1px solid var(--line); padding: 8px; }
-.mega__listitem { display: flex; align-items: center; gap: 10px; padding: 9px 11px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
-.mega__listitem--on, .mega__listitem:hover { background: var(--surface); color: var(--accent-dk); box-shadow: 0 1px 3px rgba(5, 30, 25, 0.08); }
-.mega__panel { padding: 18px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.mega__col h4 { font-size: 12.5px; font-weight: 700; margin: 0 0 9px; color: var(--ink); }
-.mega__col a { display: block; font-size: 12.6px; color: var(--muted); padding: 4px 0; }
-.mega__col a:hover { color: var(--accent-dk); }
-
-/* ---------- drawer ---------- */
-.drawer__head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 17px; letter-spacing: -0.02em; }
-.drawer__head .v-btn { margin-left: auto; }
-
-@media (max-width: 1279px) { .mega { width: 640px; } }
-@media (max-width: 960px) {
-  .announce__nav { display: none; }
-  .mainbar .wrap { height: 66px; gap: 12px; }
-  .logo__text small { display: none; }
-  .search__scope { display: none; }
-  .hact__label { display: none; }
-}
-</style>
