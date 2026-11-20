@@ -1,72 +1,54 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Store;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CountryController;
-use App\Http\Controllers\DemoOrderController;
-use App\Http\Controllers\AttributeOptionController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\PageController;
+/*
+|--------------------------------------------------------------------------
+| Storefront (public)
+|--------------------------------------------------------------------------
+*/
+Route::get('/bootstrap', Store\BootstrapController::class);
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/password/forgot', [AuthController::class, 'forgotPassword']);
+    Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+});
 
-Route::resource('settings/country', CountryController::class);
-
-Route::get('/nav-categories', [AttributeOptionController::class, 'navCategories']);
-
-// ── Categories (Public & Storefront) ───────────────────────────────
-Route::get('/nav-categories',   [CategoryController::class, 'navCategories']);
-Route::get('/categories',       [CategoryController::class, 'index']);
-Route::get('/categories/tree',  [CategoryController::class, 'tree']);
-Route::get('/categories/{id}',  [CategoryController::class, 'show']);
-
-// ── Brands (Public & Storefront) ──────────────────────────────────
-Route::get('/brands',           [BrandController::class, 'index']);
-Route::get('/brands/{id}',      [BrandController::class, 'show']);
-Route::get('/attribute/brand',  [BrandController::class, 'index']); // backward compatibility
-
-Route::get('/pages/menu',   [PageController::class, 'menu']);
-Route::get('/pages/{slug}', [PageController::class, 'publicShow']);
-
+/*
+|--------------------------------------------------------------------------
+| Any signed-in user
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth:sanctum')->group(function () {
-    // Your protected routes here
-
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::put('/me', [AuthController::class, 'updateProfile']);
+    Route::put('/me/preferences', [AuthController::class, 'updatePreferences']);
     Route::post('/logout', [AuthController::class, 'logout']);
+});
 
-    // ── Categories (Admin mutations) ──────────────────────────────────
-    Route::post('/categories',          [CategoryController::class, 'store']);
-    Route::put('/categories/{id}',      [CategoryController::class, 'update']);
-    Route::delete('/categories/{id}',   [CategoryController::class, 'destroy']);
-    Route::post('/categories/bulk',     [CategoryController::class, 'bulkStore']);
+/*
+|--------------------------------------------------------------------------
+| Admin panel (admin and staff)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(function () {
+    Route::post('/uploads', [Admin\UploadController::class, 'store']);
 
-    // ── Brands (Admin mutations) ──────────────────────────────────────
-    Route::post('/brands',              [BrandController::class, 'store']);
-    Route::post('/brands/{id}',         [BrandController::class, 'update']); // for FormData method spoofing
-    Route::put('/brands/{id}',          [BrandController::class, 'update']);
-    Route::delete('/brands/{id}',       [BrandController::class, 'destroy']);
+    Route::get('/translations', [Admin\TranslationController::class, 'index']);
+    Route::put('/translations/{translation}', [Admin\TranslationController::class, 'update']);
+    Route::delete('/translations/{translation}', [Admin\TranslationController::class, 'destroy']);
+    Route::post('/translations/approve', [Admin\TranslationController::class, 'approve']);
+    Route::post('/translations/scan', [Admin\TranslationController::class, 'scan']);
+    Route::post('/translations/auto', [Admin\TranslationController::class, 'autoTranslate']);
 
-   // ── Attribute options (admin) ─────────────────────────────────────────
-    Route::get('/attribute-options',       [AttributeOptionController::class, 'index']);
-    Route::get('/attribute/makers',        [AttributeOptionController::class, 'makers']);
-    Route::get('/attribute/category',      [AttributeOptionController::class, 'categories']);
-    Route::post('/save-option',            [AttributeOptionController::class, 'store']);
-    Route::put('/attribute-option-update', [AttributeOptionController::class, 'update']);
-    Route::post('/remove-option',          [AttributeOptionController::class, 'destroy']);
-
-    // settings
-    Route::prefix('cms')->group(function () {
-        Route::post('/uploads',               [PageController::class, 'upload']);
-        Route::get('/pages',                  [PageController::class, 'index']);
-        Route::post('/pages',                 [PageController::class, 'store']);
-        Route::get('/pages/{id}',             [PageController::class, 'show']);
-        Route::put('/pages/{id}',             [PageController::class, 'update']);
-        Route::delete('/pages/{id}',          [PageController::class, 'destroy']);
-        Route::post('/pages/{id}/status',     [PageController::class, 'setStatus']);
-        Route::post('/pages/{id}/duplicate',  [PageController::class, 'duplicate']);
+    // Store-wide settings: admins only
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/settings', [Admin\SettingController::class, 'index']);
+        Route::put('/settings', [Admin\SettingController::class, 'update']);
     });
-
 });

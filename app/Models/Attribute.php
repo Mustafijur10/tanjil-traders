@@ -2,34 +2,38 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslatableText;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Attribute extends Model
 {
-    protected $table = 'attributes';
+    use HasTranslatableText;
+
+    public const TYPES = ['select', 'text'];
 
     protected $fillable = [
-        'title',
-        'slug',
-        'type',
-        'status',
-        'parent_attribute_id',
+        'name', 'slug', 'type', 'unit', 'group',
+        'is_filterable', 'is_comparable', 'is_variant', 'sort_order',
     ];
 
-    // ─── RELATIONSHIPS ───────────────────────────────────────────────
+    protected $casts = [
+        'is_filterable' => 'boolean',
+        'is_comparable' => 'boolean',
+        'is_variant'    => 'boolean',
+        'sort_order'    => 'integer',
+    ];
 
-    public function options()
+    protected array $translatable = ['name', 'group'];
+
+    public function values(): HasMany
     {
-        return $this->hasMany(AttributeOption::class, 'attribute_id');
+        return $this->hasMany(AttributeValue::class)->orderBy('sort_order')->orderBy('value');
     }
 
-    public function parent()
+    public function categories(): BelongsToMany
     {
-        return $this->belongsTo(Attribute::class, 'parent_attribute_id');
-    }
-
-    public function children()
-    {
-        return $this->hasMany(Attribute::class, 'parent_attribute_id');
+        return $this->belongsToMany(Category::class)->withPivot('sort_order');
     }
 }

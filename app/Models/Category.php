@@ -2,108 +2,65 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\HasTranslatableText;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    use HasFactory;
-
-    protected $table = 'categories';
+    use HasTranslatableText;
 
     protected $fillable = [
-        'parent_id',
-        'title',
-        'slug',
-        'description',
-        'icon',
-        'accent_color',
-        'status',
-        'show_in_nav',
-        'featured',
-        'allow_reviews',
-        'order',
+        'parent_id', 'name', 'slug', 'icon', 'image', 'description',
+        'meta_title', 'meta_description', 'show_in_nav', 'is_featured', 'sort_order', 'is_active',
     ];
 
     protected $casts = [
-        'show_in_nav'   => 'boolean',
-        'featured'      => 'boolean',
-        'allow_reviews' => 'boolean',
-        'order'         => 'integer',
-        'parent_id'     => 'integer',
+        'parent_id'   => 'integer',
+        'show_in_nav' => 'boolean',
+        'is_featured' => 'boolean',
+        'is_active'   => 'boolean',
+        'sort_order'  => 'integer',
     ];
 
-    protected $appends = [
-        'sub_count',
-    ];
+    protected array $translatable = ['name'];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $category->slug = static::generateUniqueSlug($category->title);
-            }
-        });
-    }
-
-    public static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
-    {
-        $base = Str::slug($title);
-        if (empty($base)) {
-            $base = 'category';
-        }
-        $slug = $base;
-        $counter = 1;
-
-        while (static::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
-            $slug = "{$base}-{$counter}";
-            $counter++;
-        }
-
-        return $slug;
-    }
-
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    public function children()
+    public function children(): HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id')->orderBy('order')->orderBy('title');
+        return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order')->orderBy('name');
     }
 
-    public function allChildren()
+    public function products(): HasMany
     {
-        return $this->children()->with('allChildren');
+        return $this->hasMany(Product::class);
     }
 
-    public function scopeTopLevel($query)
+    public function attributes(): BelongsToMany
     {
-        return $query->where(function ($q) {
-            $q->whereNull('parent_id')
-              ->orWhere('parent_id', 0);
-        });
+        return $this->belongsToMany(Attribute::class)->withPivot('sort_order')->orderByPivot('sort_order');
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $q): Builder
     {
-        return $query->where('status', 'Active');
+        return $q->where('is_active', true);
     }
 
-    public function scopeInNav($query)
+    public function scopeRoots(Builder $q): Builder
     {
-        return $query->where('show_in_nav', true);
+        return $q->whereNull('parent_id');
     }
 
-    public function getSubCountAttribute(): int
+    /** This category's id plus its subcategory ids, for "show everything under Laptops". */
+    public function selfAndChildIds(): array
     {
-        if ($this->relationLoaded('children')) {
-            return $this->children->count();
-        }
-        return $this->children()->count();
+        return array_merge([$this->id], $this->children()->pluck('id')->all());
     }
 }
