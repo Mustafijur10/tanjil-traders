@@ -35,6 +35,8 @@ import CustomerReport from "@/admin/CustomerReport.vue";
 import InventoryReport from "@/admin/InventoryReport.vue";
 import Brand from "@/admin/Brand.vue";
 import CreateOrder from "@/admin/CreateOrder.vue";
+import Attributes from "@/admin/Attributes.vue";
+import Variants from "@/admin/Variants.vue";
 
 // marketting 
 
@@ -70,6 +72,10 @@ import MessageTemplates from "@/admin/message-center/MessageTemplates.vue";
 // import Channels from "@/admin/message-center/Channels.vue";
 // import ChannelReports from "@/admin/message-center/ChannelReports.vue";
 
+// customers
+import Customers from "@/admin/customers/Customers.vue";
+import CustomerGroups from "@/admin/customers/CustomerGroups.vue";
+import Reviews from "@/admin/customers/Reviews.vue";
 
 // import Users from '@/admin/auth/Users.vue';
 
@@ -111,6 +117,8 @@ const routes = [
     { path: "/admin/brand", name: "Brand", component: Brand, meta: { requiresAuth: true }, },
     { path: "/admin/create-order", name: "CreateOrder", component: CreateOrder, meta: { requiresAuth: true }, },
     { path: "/admin/sales-analytics", name: "SalesAnalytics", component: SalesAnalytics, meta: { requiresAuth: true }, },
+    { path: "/admin/attributes", name: "Attributes", component: Attributes, meta: { requiresAuth: true }, },
+    { path: "/admin/variants", name: "Variants", component: Variants, meta: { requiresAuth: true }, },
 
 
     // message center starts
@@ -144,6 +152,13 @@ const routes = [
     { path: "/admin/pages", component: () => import("@/admin/Pages.vue") },
     { path: "/admin/pages/new", component: () => import("@/admin/Pages.vue") },
     { path: "/admin/pages/:id(\\d+)/edit", component: () => import("@/admin/Pages.vue") },
+
+    // customer    
+    { path: "/admin/customers", name: "Customers", component: Customers, meta: { requiresAuth: true } },
+    { path: "/admin/customers-groups", name: "CustomerGroups", component: CustomerGroups, meta: { requiresAuth: true } },
+    { path: "/admin/reviews", name: "Reviews", component: Reviews, meta: { requiresAuth: true } },
+
+
 
     // public site: ONE route for every CMS page. Add it LAST, after every other storefront route.
     // (Vue Router can't use nested groups like (?:...) in a param pattern, so the pattern stays simple.)
