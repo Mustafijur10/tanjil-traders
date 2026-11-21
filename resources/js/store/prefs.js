@@ -32,6 +32,8 @@ export default {
         locale: "en",
         settings: {},
         dictionary: {},
+        // From /api/bootstrap: category menu, footer pages and live announcement-bar messages
+        site: { menu: [], footer_pages: [], announcements: [] },
         ready: false,
     }),
 
@@ -55,6 +57,9 @@ export default {
         setDictionary(state, dict) {
             state.dictionary = dict || {};
         },
+        setSite(state, data) {
+            state.site = { menu: data.menu || [], footer_pages: data.footer_pages || [], announcements: data.announcements || [] };
+        },
         setReady(state) {
             state.ready = true;
         },
@@ -74,6 +79,7 @@ export default {
                 const { data } = await api.get("/bootstrap", { quiet: true });
                 commit("setSettings", data.settings);
                 commit("setDictionary", data.translations?.bn);
+                commit("setSite", data);
 
                 if (!THEMES.includes(theme)) dispatch("setTheme", { value: data.settings["appearance.default_theme"] || "light", save: false });
                 if (!LOCALES.includes(locale)) dispatch("setLocale", { value: data.settings["language.default"] || "en", save: false });
@@ -88,6 +94,7 @@ export default {
             const { data } = await api.get("/bootstrap", { quiet: true });
             commit("setDictionary", data.translations?.bn);
             commit("setSettings", data.settings);
+            commit("setSite", data);
         },
 
         setTheme({ commit, dispatch }, payload) {

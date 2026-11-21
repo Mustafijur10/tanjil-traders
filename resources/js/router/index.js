@@ -23,6 +23,7 @@ const routes = [
     // ── Storefront ──
     { path: "/", name: "home", component: () => import("@/front/Home.vue"), meta: { layout: "front", title: "Home" } },
     { path: "/reset-password", component: () => import("@/admin/auth/PasswordReset.vue"), meta: { layout: "auth", title: "Reset password" } },
+    { path: "/contact", component: () => import("@/front/Contact.vue"), meta: { layout: "front", title: "Contact us" } },
 
     // ── Admin sign-in ──
     { path: "/admin/login", component: () => import("@/admin/auth/Login.vue"), meta: { layout: "auth", guest: true, title: "Sign in" } },
@@ -57,6 +58,8 @@ const routes = [
 
     // ── Not found ──
     { path: "/admin/:pathMatch(.*)*", component: () => import("@/PageNotFound.vue"), meta: { layout: "admin", staff: true, title: "Page not found" } },
+    // Information pages from Admin › Content › Pages (/about-us, /warranty-policy ...)
+    { path: "/:slug([a-z0-9][a-z0-9-]*)", component: () => import("@/front/CmsPage.vue"), meta: { layout: "front" } },
     { path: "/:pathMatch(.*)*", component: () => import("@/PageNotFound.vue"), meta: { layout: "front", title: "Page not found" } },
 ];
 
