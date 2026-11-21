@@ -39,6 +39,7 @@
         "vue-marquee-text-component": "^2.0.1",
         "vue-router": "^4.3.0",
         "vue3-apexcharts": "^1.11.1",
+        "vue3-easy-data-table": "^1.5.47",
         "vue3-marquee": "^4.2.2",
         "vuetify": "^3.5.13",
         "vuex": "^4.0.2"

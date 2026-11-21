@@ -2,6 +2,7 @@
  * App entry. Every global package, component and alias is registered here, once.
  * Styles: resources/sass/app.scss is the only stylesheet; components have no <style> blocks.
  */
+import "vue3-easy-data-table/dist/style.css"; // base table styles; colours are overridden in app.scss (.tt-edt)
 import "../sass/app.scss";
 
 import { createApp, defineAsyncComponent } from "vue";
@@ -19,6 +20,7 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog.vue";
 import ImageUpload from "@/components/ui/ImageUpload.vue";
 import StatusChip from "@/components/ui/StatusChip.vue";
 import PrefToggles from "@/components/ui/PrefToggles.vue";
+import DataTable from "@/components/ui/DataTable.vue";
 // Rich text editor (Tiptap) is loaded only by pages that use it.
 const RichText = defineAsyncComponent(() => import("@/components/ui/RichText.vue"));
 import { VueDraggable } from "vue-draggable-plus";
@@ -37,6 +39,8 @@ app.component("ConfirmDialog", ConfirmDialog);
 app.component("ImageUpload", ImageUpload);
 app.component("StatusChip", StatusChip);
 app.component("PrefToggles", PrefToggles);
+// Every admin table: <DataTable> (vue3-easy-data-table with the store's look)
+app.component("DataTable", DataTable);
 app.component("RichText", RichText);
 // Drag and drop lists: <VueDraggable v-model="items" handle=".tt-drag"> <div v-for="item in items" :key="item.id">…</div> </VueDraggable>
 app.component("VueDraggable", VueDraggable);

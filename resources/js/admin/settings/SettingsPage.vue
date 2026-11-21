@@ -2,6 +2,7 @@
     <div>
         <PageHeader :title="section.title" :subtitle="section.subtitle" />
 
+        <div class="tt-split">
             <div class="tt-vstack">
                 <template v-if="loading">
                     <div class="tt-box tt-box-body tt-skel-group">
@@ -104,19 +105,26 @@
                     </div>
                 </template>
             </div>
+
+            <aside class="tt-split-aside">
+                <SettingsPreview v-if="!loading" :section="$route.meta.section" :values="form" />
+            </aside>
+        </div>
     </div>
 </template>
 
 <script>
 /*
  * Every "simple" settings page (Store Information, Appearance & Language, Payments, Integrations & SEO).
- * The route's meta.section picks the field list from schema.js.
+ * The route's meta.section picks the field list from schema.js; the right column previews the result.
  */
 import api from "@/api";
 import schema from "./schema";
+import SettingsPreview from "./SettingsPreview.vue";
 
 export default {
     name: "SettingsPage",
+    components: { SettingsPreview },
 
     data: () => ({
         loading: true,

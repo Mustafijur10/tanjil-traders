@@ -5,23 +5,29 @@
         :rail="rail && !mobile"
         :temporary="mobile"
         :permanent="!mobile"
-        width="264"
+        width="268"
         rail-width="72"
         :expand-on-hover="rail && !mobile"
     >
-        <router-link to="/admin" class="tt-sidebar-brand">
-            <img v-if="logo" :src="logo" :alt="storeName" />
-            <template v-else>
-                <span class="tt-sidebar-mark">{{ storeName.charAt(0) }}</span>
-                <span class="tt-sidebar-name">{{ storeName }}<small>{{ $t("Admin panel") }}</small></span>
-            </template>
-        </router-link>
+        <template #prepend>
+            <router-link to="/admin" class="tt-sidebar-brand">
+                <img v-if="logo" :src="logo" :alt="storeName" />
+                <template v-else>
+                    <span class="tt-sidebar-mark">{{ storeName.charAt(0) }}</span>
+                    <span class="tt-sidebar-name">{{ storeName }}<small>{{ $t("Admin panel") }}</small></span>
+                </template>
+            </router-link>
+        </template>
 
-        <v-list v-model:opened="opened" nav density="compact" color="primary">
-            <template v-for="item in menu" :key="item.title">
-                <v-list-group v-if="item.children" :value="item.title">
-                    <template #activator="{ props }">
-                        <v-list-item v-bind="props" :prepend-icon="item.icon" :title="$t(item.title)" />
+        <v-list v-model:opened="opened" nav density="compact" color="primary" class="tt-sidebar-list">
+            <template v-for="(item, i) in menu" :key="item.section || item.title">
+                <div v-if="item.section" class="tt-sidebar-section" :class="{ 'is-first': i === 0 }">{{ $t(item.section) }}</div>
+
+                <v-list-group v-else-if="item.children" :value="item.title">
+                    <template #activator="{ props, isOpen }">
+                        <v-list-item v-bind="props" :class="{ 'is-current-group': isCurrentGroup(item) && !isOpen }" :title="$t(item.title)">
+                            <template #prepend><span class="tt-sidebar-ico"><v-icon :icon="item.icon" size="19" /></span></template>
+                        </v-list-item>
                     </template>
                     <v-list-item
                         v-for="child in item.children"
@@ -35,18 +41,29 @@
                     </v-list-item>
                 </v-list-group>
 
-                <v-list-item
-                    v-else
-                    :to="item.ready ? item.to : undefined"
-                    :exact="item.exact"
-                    :disabled="!item.ready"
-                    :prepend-icon="item.icon"
-                    :title="$t(item.title)"
-                >
+                <v-list-item v-else :to="item.ready ? item.to : undefined" :exact="item.exact" :disabled="!item.ready" :title="$t(item.title)">
+                    <template #prepend><span class="tt-sidebar-ico"><v-icon :icon="item.icon" size="19" /></span></template>
                     <template v-if="!item.ready" #append><span class="tt-sidebar-soon">{{ $t("Soon") }}</span></template>
                 </v-list-item>
             </template>
         </v-list>
+
+        <template #append>
+            <div class="tt-sidebar-foot">
+                <a href="/" target="_blank" rel="noopener" class="tt-sidebar-store">
+                    <v-icon size="18">mdi-storefront-outline</v-icon>
+                    <span>{{ $t("View store") }}</span>
+                    <v-icon size="15" class="ml-auto">mdi-open-in-new</v-icon>
+                </a>
+                <div class="tt-sidebar-user">
+                    <span class="tt-sidebar-avatar">{{ initials }}</span>
+                    <span class="tt-ellipsis">
+                        <b class="tt-ellipsis">{{ user?.name }}</b>
+                        <small>{{ $t(user?.role === "admin" ? "Administrator" : "Staff") }}</small>
+                    </span>
+                </div>
+            </div>
+        </template>
     </v-navigation-drawer>
 
     <v-main class="tt-shell-main">
@@ -60,7 +77,7 @@
 <script>
 import { useDisplay } from "vuetify";
 import Header from "@/admin/Header.vue";
-import menu from "@/admin/menu.js";
+import menu, { findMenuEntry } from "@/admin/menu.js";
 import { fileUrl } from "@/api";
 import { storage } from "@/store/storage";
 
@@ -81,16 +98,21 @@ export default {
         };
     },
     computed: {
-        isAdmin() {
-            return this.$store.getters["auth/isAdmin"];
+        user() {
+            return this.$store.state.auth.user;
         },
-        // Staff do not see admin-only pages.
+        initials() {
+            return (this.user?.name || "A").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+        },
+        // Staff do not see admin-only pages; a section label is dropped when nothing under it is visible.
         menu() {
-            const visible = (i) => !i.admin || this.isAdmin;
-            return menu
-                .filter(visible)
+            const isAdmin = this.$store.getters["auth/isAdmin"];
+            const visible = (i) => !i.admin || isAdmin;
+            const items = menu
+                .filter((i) => i.section || visible(i))
                 .map((i) => (i.children ? { ...i, children: i.children.filter(visible) } : i))
                 .filter((i) => !i.children || i.children.length);
+            return items.filter((i, idx) => !i.section || (items[idx + 1] && !items[idx + 1].section));
         },
         storeName() {
             return this.$store.state.prefs.settings["store.name"] || "Tanjil Traders";
@@ -112,13 +134,16 @@ export default {
         "$route.path": {
             immediate: true,
             handler(path) {
-                const group = menu.find((i) => i.children && i.children.some((c) => path.startsWith(c.to)));
-                if (group && !this.opened.includes(group.title)) this.opened = [group.title];
+                const entry = findMenuEntry(path, menu);
+                if (entry?.group && !this.opened.includes(entry.group.title)) this.opened = [entry.group.title];
                 if (this.mobile) this.drawer = false;
             },
         },
     },
     methods: {
+        isCurrentGroup(group) {
+            return findMenuEntry(this.$route.path, menu)?.group?.title === group.title;
+        },
         toggleSidebar() {
             if (this.mobile) {
                 this.drawer = !this.drawer;

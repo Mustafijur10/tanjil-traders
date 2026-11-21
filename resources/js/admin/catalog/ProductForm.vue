@@ -112,16 +112,11 @@
                     <div class="tt-box-head">
                         <div>
                             <h2>{{ $t("Search engine listing") }}</h2>
-                            <p>{{ $t("How this product can look in Google results.") }}</p>
+                            <p>{{ $t("Leave empty to use the product name and key features. The Google preview on the right updates as you type.") }}</p>
                         </div>
                     </div>
                     <div class="tt-box-body">
-                        <div class="tt-serp" aria-hidden="true">
-                            <span class="tt-serp-url">{{ siteHost }} › product › {{ form.slug || "…" }}</span>
-                            <span class="tt-serp-title">{{ form.meta_title || form.name || $t("Product name") }}</span>
-                            <span class="tt-serp-desc">{{ form.meta_description || plainShort || $t("Add a description so people know what they will find.") }}</span>
-                        </div>
-                        <div class="tt-form-grid mt-4">
+                        <div class="tt-form-grid">
                             <v-input-trz v-model="form.meta_title" class="is-full" :label="$t('Page title')" counter="60" :placeholder="form.name" />
                             <v-textarea-trz v-model="form.meta_description" class="is-full" :label="$t('Description')" counter="160" :placeholder="plainShort" />
                             <v-input-trz
@@ -151,6 +146,29 @@
                             :aria-label="$t('Status')"
                         />
                         <v-switch-trz v-model="form.is_featured" :label="$t('Featured product')" />
+                    </div>
+                </section>
+
+                <section class="tt-box">
+                    <div class="tt-box-head">
+                        <span class="tt-box-ico"><v-icon size="18">mdi-google</v-icon></span>
+                        <div>
+                            <h2>{{ $t("Google preview") }}</h2>
+                            <p>{{ $t("How this product can look in search results") }}</p>
+                        </div>
+                    </div>
+                    <div class="tt-box-body">
+                        <GooglePreview
+                            :title="form.meta_title || form.name"
+                            :description="form.meta_description || plainShort"
+                            :path="`/product/${form.slug || ''}`"
+                            :image="form.images[0] ? fileUrl(form.images[0].path) : ''"
+                            :price="previewPrice"
+                            :rating="saved.review_count ? saved.rating_avg : 0"
+                            :reviews="saved.review_count || 0"
+                            :stock="previewStock > 0"
+                            :extra-checks="seoChecks"
+                        />
                     </div>
                 </section>
 
@@ -219,9 +237,10 @@
 </template>
 
 <script>
-import api, { fieldErrors } from "@/api";
+import api, { fieldErrors, fileUrl } from "@/api";
 import ProductImages from "@/components/catalog/ProductImages.vue";
 import ProductVariants from "@/components/catalog/ProductVariants.vue";
+import GooglePreview from "@/components/ui/GooglePreview.vue";
 
 const slugify = (s) => String(s || "").toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, "").trim().replace(/[\s_]+/g, "-").replace(/-+/g, "-");
 let keySeq = 0;
@@ -234,7 +253,7 @@ const blank = () => ({
 
 export default {
     name: "ProductForm",
-    components: { ProductImages, ProductVariants },
+    components: { ProductImages, ProductVariants, GooglePreview },
     data: () => ({
         loading: true,
         saving: false,
@@ -257,8 +276,33 @@ export default {
         currency() {
             return this.$store.state.prefs.settings["store.currency_symbol"] || "৳";
         },
-        siteHost() {
-            return window.location.host;
+        // ── Google preview ──
+        previewPrice() {
+            if (this.hasVariants) {
+                const prices = this.form.variants.filter((v) => v.is_active).map((v) => Number(v.sale_price || v.price) || 0);
+                return prices.length ? this.$money(Math.min(...prices)) : "";
+            }
+            const p = Number(this.form.sale_price || this.form.price);
+            return p ? this.$money(p) : "";
+        },
+        previewStock() {
+            return this.hasVariants ? this.variantStock : Number(this.form.stock_qty) || 0;
+        },
+        seoChecks() {
+            const imgs = this.form.images;
+            const features = (this.form.short_description || "").split("\n").filter((l) => l.trim()).length;
+            return [
+                imgs.length ? { ok: true, text: this.$tn(imgs.length, "{n} photo", "{n} photos") } : { ok: false, text: this.$t("Add at least one photo (Google shows it next to the result)") },
+                imgs.length && imgs.some((i) => !i.alt)
+                    ? { ok: false, warn: true, text: this.$t("Describe every photo for image search") }
+                    : imgs.length ? { ok: true, text: this.$t("All photos are described") } : null,
+                features >= 3 ? { ok: true, text: this.$t("Key features are filled in") } : { ok: false, warn: true, text: this.$t("Add at least 3 key features") },
+                this.specFields.length
+                    ? this.filledSpecs >= Math.ceil(this.specFields.length / 2)
+                        ? { ok: true, text: this.$t("Specs are filled in, so the product shows up in filters") }
+                        : { ok: false, warn: true, text: this.$t("Fill more specs so customers can find it with filters") }
+                    : null,
+            ].filter(Boolean);
         },
         categoryOptions() {
             const cats = this.options.categories;
@@ -360,6 +404,7 @@ export default {
         return !this.isDirty || window.confirm(this.$t("You have unsaved changes. Leave without saving?"));
     },
     methods: {
+        fileUrl,
         warnUnsaved(e) {
             if (this.isDirty) {
                 e.preventDefault();

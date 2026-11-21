@@ -1,8 +1,19 @@
 <template>
     <div>
-        <PageHeader title="Products" subtitle="Everything in your catalog. Click a product to edit it.">
+        <PageHeader title="All Products" subtitle="Everything in your catalog. Click a product to edit it.">
+            <v-btn-secondary prepend-icon="mdi-shape-outline" to="/admin/categories">{{ $t("Categories") }}</v-btn-secondary>
             <v-btn-primary prepend-icon="mdi-plus" to="/admin/products/new">{{ $t("Add product") }}</v-btn-primary>
         </PageHeader>
+
+        <div class="tt-stat-tiles">
+            <button v-for="s in stats" :key="s.key" type="button" class="tt-stat-tile" :class="['is-' + s.tone, { 'is-on': tab === s.tab }]" :disabled="!s.tab" @click="s.tab && setTab(s.tab)">
+                <span class="tt-stat-ico"><v-icon :icon="s.icon" size="20" /></span>
+                <span>
+                    <small>{{ $t(s.label) }}</small>
+                    <b>{{ s.value }}</b>
+                </span>
+            </button>
+        </div>
 
         <section class="tt-box">
             <div class="tt-toolbar">
@@ -11,91 +22,83 @@
                         {{ $t(t.label) }}<span class="tt-count tt-num">{{ $num(counts[t.value] ?? 0) }}</span>
                     </button>
                 </div>
-            </div>
-            <div class="tt-toolbar">
+                <div class="tt-toolbar-grow"></div>
                 <v-input-trz v-model="search" density="compact" prepend-inner-icon="mdi-magnify" :placeholder="$t('Search name or SKU')" clearable :aria-label="$t('Search')" />
                 <v-autocomplete-trz v-model="filters.category_id" density="compact" :items="categoryOptions" :placeholder="$t('All categories')" clearable :aria-label="$t('Category')" />
                 <v-autocomplete-trz v-model="filters.brand_id" density="compact" :items="brandOptions" :placeholder="$t('All brands')" clearable :aria-label="$t('Brand')" />
             </div>
 
             <div v-if="selected.length" class="tt-bulk-bar" role="region" :aria-label="$t('Bulk actions')">
-                <span>{{ $t("{n} selected", { n: $num(selected.length) }) }}</span>
-                <v-btn-tertiary size="small" @click="bulk('active')">{{ $t("Publish") }}</v-btn-tertiary>
-                <v-btn-tertiary size="small" @click="bulk('draft')">{{ $t("Move to draft") }}</v-btn-tertiary>
-                <v-btn-tertiary size="small" @click="bulk('feature')">{{ $t("Feature") }}</v-btn-tertiary>
+                <span>{{ $tn(selected.length, "{n} product selected", "{n} products selected") }}</span>
+                <v-btn-tertiary size="small" prepend-icon="mdi-eye-outline" @click="bulk('active')">{{ $t("Publish") }}</v-btn-tertiary>
+                <v-btn-tertiary size="small" prepend-icon="mdi-eye-off-outline" @click="bulk('draft')">{{ $t("Move to draft") }}</v-btn-tertiary>
+                <v-btn-tertiary size="small" prepend-icon="mdi-star-outline" @click="bulk('feature')">{{ $t("Feature") }}</v-btn-tertiary>
                 <v-btn-tertiary size="small" @click="bulk('unfeature')">{{ $t("Unfeature") }}</v-btn-tertiary>
-                <v-btn-tertiary size="small" color="error" @click="bulkDeleteDialog = true">{{ $t("Delete") }}</v-btn-tertiary>
-                <v-btn-tertiary size="small" class="ml-auto" @click="selected = []">{{ $t("Clear selection") }}</v-btn-tertiary>
+                <v-btn-tertiary size="small" color="error" prepend-icon="mdi-trash-can-outline" @click="bulkDeleteDialog = true">{{ $t("Delete") }}</v-btn-tertiary>
+                <v-btn-tertiary size="small" class="ml-auto" @click="selected = []">{{ $t("Clear") }}</v-btn-tertiary>
             </div>
 
-            <v-table-server-trz
-                v-model="selected"
-                v-model:items-per-page="perPage"
-                v-model:page="page"
-                v-model:sort-by="sortBy"
+            <DataTable
+                v-model:items-selected="selected"
+                v-model:server-options="serverOptions"
+                :server-items-length="total"
                 :headers="headers"
                 :items="items"
-                :items-length="total"
                 :loading="loading"
-                show-select
-                item-value="id"
-                :items-per-page-text="$t('Rows per page')"
-                :loading-text="$t('Loading…')"
-                class="tt-products-table"
-                @click:row="(e, { item }) => $router.push(`/admin/products/${item.id}`)"
+                must-sort
+                class="tt-edt-clickable"
+                @click-row="(row) => $router.push(`/admin/products/${row.id}`)"
             >
-                <template #item.name="{ item }">
+                <template #item-name="row">
                     <div class="tt-product-cell">
-                        <span class="tt-thumb"><img v-if="item.image" :src="url(item.image)" alt="" loading="lazy" /><v-icon v-else size="20">mdi-image-off-outline</v-icon></span>
+                        <span class="tt-thumb"><img v-if="row.image" :src="url(row.image)" alt="" loading="lazy" /><v-icon v-else size="20">mdi-image-off-outline</v-icon></span>
                         <div class="tt-ellipsis">
-                            <b class="tt-ellipsis">{{ item.name }}</b>
+                            <b class="tt-ellipsis">{{ row.name }}</b>
                             <span class="tt-muted tt-small">
-                                <template v-if="item.sku">{{ item.sku }}</template>
-                                <template v-if="item.sku && item.variants_count"> · </template>
-                                <template v-if="item.variants_count">{{ $tn(item.variants_count, "{n} variant", "{n} variants") }}</template>
-                                <template v-if="item.is_featured"><v-icon size="13" color="accent">mdi-star</v-icon>{{ $t("Featured") }}</template>
+                                <template v-if="row.sku">{{ row.sku }}</template>
+                                <template v-if="row.sku && row.variants_count"> · </template>
+                                <template v-if="row.variants_count">{{ $tn(row.variants_count, "{n} variant", "{n} variants") }}</template>
+                                <template v-if="row.is_featured"><v-icon size="13" color="accent">mdi-star</v-icon>{{ $t("Featured") }}</template>
                             </span>
                         </div>
                     </div>
                 </template>
-                <template #item.category="{ item }">
+                <template #item-category="row">
                     <div class="tt-two-line">
-                        <span>{{ item.category?.name || "—" }}</span>
-                        <small v-if="parentName(item.category)">{{ parentName(item.category) }}</small>
+                        <span>{{ row.category?.name || "—" }}</span>
+                        <small v-if="parentName(row.category)">{{ parentName(row.category) }}</small>
                     </div>
                 </template>
-                <template #item.brand="{ item }">
-                    <span class="tt-small">{{ item.brand?.name || "—" }}</span>
-                </template>
-                <template #item.price="{ item }">
+                <template #item-brand="row">{{ row.brand?.name || "—" }}</template>
+                <template #item-price="row">
                     <div class="tt-price-cell tt-num">
-                        <b>{{ $money(item.final_price) }}</b>
-                        <s v-if="item.final_price < item.price">{{ $money(item.price) }}</s>
+                        <b>{{ $money(row.final_price) }}</b>
+                        <s v-if="row.final_price < row.price">{{ $money(row.price) }}</s>
                     </div>
                 </template>
-                <template #item.stock_qty="{ item }">
-                    <StatusChip :label="stockLabel(item)" :tone="stockTone(item)" />
+                <template #item-stock_qty="row">
+                    <StatusChip :label="stockLabel(row)" :tone="stockTone(row)" />
                 </template>
-                <template #item.status="{ item }">
-                    <StatusChip :label="item.status === 'active' ? 'Published' : 'Draft'" :tone="item.status === 'active' ? 'green' : 'amber'" />
+                <template #item-status="row">
+                    <StatusChip :label="row.status === 'active' ? 'Published' : 'Draft'" :tone="row.status === 'active' ? 'green' : 'amber'" />
                 </template>
-                <template #item.updated_at="{ item }">
-                    <span class="tt-small tt-muted">{{ $date(item.updated_at) }}</span>
+                <template #item-updated_at="row">
+                    <span class="tt-muted tt-nowrap-cell">{{ $date(row.updated_at) }}</span>
                 </template>
-                <template #item.actions="{ item }">
+                <template #item-actions="row">
                     <v-menu location="bottom end">
                         <template #activator="{ props }">
                             <v-btn-tertiary v-bind="props" icon="mdi-dots-vertical" size="small" :aria-label="$t('More actions')" @click.stop />
                         </template>
                         <v-list density="compact" min-width="190">
-                            <v-list-item prepend-icon="mdi-pencil-outline" :title="$t('Edit')" :to="`/admin/products/${item.id}`" />
-                            <v-list-item prepend-icon="mdi-content-copy" :title="$t('Duplicate')" @click="duplicate(item)" />
-                            <v-list-item v-if="item.status === 'active'" prepend-icon="mdi-open-in-new" :title="$t('View on website')" :href="`/product/${item.slug}`" target="_blank" />
-                            <v-list-item prepend-icon="mdi-trash-can-outline" :title="$t('Delete')" base-color="error" @click="askDelete(item)" />
+                            <v-list-item prepend-icon="mdi-pencil-outline" :title="$t('Edit')" :to="`/admin/products/${row.id}`" />
+                            <v-list-item prepend-icon="mdi-content-copy" :title="$t('Duplicate')" @click="duplicate(row)" />
+                            <v-list-item v-if="row.status === 'active'" prepend-icon="mdi-open-in-new" :title="$t('View on website')" :href="`/product/${row.slug}`" target="_blank" />
+                            <v-list-item prepend-icon="mdi-trash-can-outline" :title="$t('Delete')" base-color="error" @click="askDelete(row)" />
                         </v-list>
                     </v-menu>
                 </template>
-                <template #no-data>
+                <template #empty-message>
                     <EmptyState
                         :icon="hasFilters ? 'mdi-magnify' : 'mdi-package-variant-closed'"
                         :title="hasFilters ? 'No products match' : 'No products yet'"
@@ -104,11 +107,11 @@
                         <v-btn-primary v-if="!hasFilters" prepend-icon="mdi-plus" to="/admin/products/new">{{ $t("Add product") }}</v-btn-primary>
                     </EmptyState>
                 </template>
-            </v-table-server-trz>
+            </DataTable>
         </section>
 
         <ConfirmDialog v-model="deleteDialog" :title="$t('Delete “{name}”?', { name: deleting?.name || '' })" text="Past orders keep the product's name and price. This cannot be undone." :loading="busy" @confirm="remove" />
-        <ConfirmDialog v-model="bulkDeleteDialog" :title="$t('Delete {n} products?', { n: $num(selected.length) })" text="Past orders keep the products' names and prices. This cannot be undone." :loading="busy" @confirm="bulk('delete')" />
+        <ConfirmDialog v-model="bulkDeleteDialog" :title="$tn(selected.length, 'Delete {n} product?', 'Delete {n} products?')" text="Past orders keep the products' names and prices. This cannot be undone." :loading="busy" @confirm="bulk('delete')" />
     </div>
 </template>
 
@@ -139,9 +142,7 @@ export default {
             tab: q.tab || "all",
             search: q.q || "",
             filters: { category_id: q.category ? Number(q.category) : null, brand_id: q.brand ? Number(q.brand) : null },
-            page: Number(q.page) || 1,
-            perPage: 25,
-            sortBy: [{ key: "updated_at", order: "desc" }],
+            serverOptions: { page: Number(q.page) || 1, rowsPerPage: 25, sortBy: "updated_at", sortType: "desc" },
             loadTimer: null,
             deleteDialog: false,
             bulkDeleteDialog: false,
@@ -151,16 +152,26 @@ export default {
     },
     computed: {
         tabs: () => TABS,
+        stats() {
+            const c = this.counts;
+            return [
+                { key: "all", tab: "all", label: "Products", value: this.$num(c.all ?? 0), icon: "mdi-package-variant-closed", tone: "green" },
+                { key: "active", tab: "active", label: "Published", value: this.$num(c.active ?? 0), icon: "mdi-eye-outline", tone: "blue" },
+                { key: "low", tab: "low", label: "Low stock", value: this.$num(c.low ?? 0), icon: "mdi-alert-outline", tone: "amber" },
+                { key: "out", tab: "out", label: "Out of stock", value: this.$num(c.out ?? 0), icon: "mdi-package-variant-remove", tone: "red" },
+                { key: "value", tab: null, label: "Stock value", value: this.$money(c.stock_value ?? 0), icon: "mdi-cash-multiple", tone: "violet" },
+            ];
+        },
         headers() {
             return [
-                { title: this.$t("Product"), key: "name", sortable: true, minWidth: 280 },
-                { title: this.$t("Category"), key: "category", sortable: false },
-                { title: this.$t("Brand"), key: "brand", sortable: false },
-                { title: this.$t("Price"), key: "price", sortable: true, align: "end" },
-                { title: this.$t("Stock"), key: "stock_qty", sortable: true },
-                { title: this.$t("Status"), key: "status", sortable: false },
-                { title: this.$t("Updated"), key: "updated_at", sortable: true },
-                { title: "", key: "actions", sortable: false, align: "end", width: 52 },
+                { text: this.$t("Product"), value: "name", sortable: true, width: 300 },
+                { text: this.$t("Category"), value: "category" },
+                { text: this.$t("Brand"), value: "brand" },
+                { text: this.$t("Price"), value: "price", sortable: true },
+                { text: this.$t("Stock"), value: "stock_qty", sortable: true },
+                { text: this.$t("Status"), value: "status" },
+                { text: this.$t("Updated"), value: "updated_at", sortable: true },
+                { text: "", value: "actions", width: 56 },
             ];
         },
         categoryOptions() {
@@ -174,12 +185,12 @@ export default {
             return !!(this.search || this.filters.category_id || this.filters.brand_id || this.tab !== "all");
         },
         params() {
-            const sort = this.sortBy[0] || { key: "updated_at", order: "desc" };
+            const o = this.serverOptions;
             return {
-                page: this.page,
-                per_page: this.perPage,
-                sort: sort.key,
-                dir: sort.order,
+                page: o.page,
+                per_page: o.rowsPerPage,
+                sort: o.sortBy || "updated_at",
+                dir: o.sortType || "desc",
                 search: this.search || undefined,
                 category_id: this.filters.category_id || undefined,
                 brand_id: this.filters.brand_id || undefined,
@@ -191,13 +202,13 @@ export default {
     watch: {
         params: { handler: "load", deep: true },
         search() {
-            this.page = 1;
+            this.firstPage();
         },
         "filters.category_id"() {
-            this.page = 1;
+            this.firstPage();
         },
         "filters.brand_id"() {
-            this.page = 1;
+            this.firstPage();
         },
     },
     async created() {
@@ -209,17 +220,19 @@ export default {
     },
     methods: {
         url: fileUrl,
+        firstPage() {
+            this.serverOptions = { ...this.serverOptions, page: 1 };
+        },
         setTab(value) {
             this.tab = value;
-            this.page = 1;
             this.selected = [];
+            this.firstPage();
         },
         parentName(cat) {
             return cat?.parent_id ? this.categories.find((c) => c.id === cat.parent_id)?.name || "" : "";
         },
         stockLabel(p) {
-            if (p.stock_qty <= 0) return this.$t("Out of stock");
-            return this.$t("{n} in stock", { n: this.$num(p.stock_qty) });
+            return p.stock_qty <= 0 ? this.$t("Out of stock") : this.$t("{n} in stock", { n: this.$num(p.stock_qty) });
         },
         stockTone(p) {
             if (p.stock_qty <= 0) return "red";
@@ -238,7 +251,7 @@ export default {
                     ...(this.search && { q: this.search }),
                     ...(this.filters.category_id && { category: this.filters.category_id }),
                     ...(this.filters.brand_id && { brand: this.filters.brand_id }),
-                    ...(this.page > 1 && { page: this.page }),
+                    ...(this.serverOptions.page > 1 && { page: this.serverOptions.page }),
                 },
             });
             try {
@@ -273,7 +286,7 @@ export default {
         async bulk(action) {
             this.busy = true;
             try {
-                const { data } = await api.post("/admin/products/bulk", { ids: this.selected, action });
+                const { data } = await api.post("/admin/products/bulk", { ids: this.selected.map((p) => p.id), action });
                 this.$store.dispatch("notify", this.$tn(data.count, "{n} product updated.", "{n} products updated."));
                 this.selected = [];
                 this.bulkDeleteDialog = false;

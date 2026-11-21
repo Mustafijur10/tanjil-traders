@@ -216,16 +216,18 @@ class ProductController extends Controller
              sum(case when status = 'active' then 1 else 0 end) as active,
              sum(case when status = 'draft' then 1 else 0 end) as draft,
              sum(case when stock_qty between 1 and ? then 1 else 0 end) as low,
-             sum(case when stock_qty <= 0 then 1 else 0 end) as out_of_stock",
+             sum(case when stock_qty <= 0 then 1 else 0 end) as out_of_stock,
+             sum(case when stock_qty > 0 then stock_qty * coalesce(cost_price, price) else 0 end) as stock_value",
             [$low]
         )->first();
 
         return [
-            'all'    => (int) $row->total,
-            'active' => (int) $row->active,
-            'draft'  => (int) $row->draft,
-            'low'    => (int) $row->low,
-            'out'    => (int) $row->out_of_stock,
+            'all'         => (int) $row->total,
+            'active'      => (int) $row->active,
+            'draft'       => (int) $row->draft,
+            'low'         => (int) $row->low,
+            'out'         => (int) $row->out_of_stock,
+            'stock_value' => (float) $row->stock_value, // at cost price where known
         ];
     }
 }
