@@ -43,6 +43,7 @@ return [
         'checkout.bkash_number'   => '',
         'checkout.nagad_enabled'  => false,
         'checkout.nagad_number'   => '',
+        'checkout.return_days'    => 7,      // days after delivery a customer can ask for a return (0 = off)
 
         // SEO defaults
         'seo.meta_title'       => 'Tanjil Traders - Electronics, gadgets and gear',

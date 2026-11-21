@@ -21,6 +21,13 @@ Route::get('/compare', [Store\ShopController::class, 'compare']);
 Route::get('/pages/{slug}', [Store\PageController::class, 'show']);
 Route::post('/contact', [Store\PageController::class, 'contact'])->middleware('throttle:5,10');
 
+// Cart and checkout (guests allowed; a sign-in token is used when present)
+Route::post('/cart', [Store\CheckoutController::class, 'cart'])->middleware('throttle:60,1');
+Route::get('/checkout', [Store\CheckoutController::class, 'options']);
+Route::post('/checkout/quote', [Store\CheckoutController::class, 'quote'])->middleware('throttle:60,1');
+Route::post('/checkout', [Store\CheckoutController::class, 'place'])->middleware('throttle:10,1');
+Route::post('/orders/track', [Store\CheckoutController::class, 'track'])->middleware('throttle:20,1');
+
 Route::middleware('throttle:10,1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
@@ -38,6 +45,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/me', [AuthController::class, 'updateProfile']);
     Route::put('/me/preferences', [AuthController::class, 'updatePreferences']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Customer account
+    Route::get('/me/summary', [Store\AccountController::class, 'summary']);
+    Route::get('/me/orders', [Store\AccountController::class, 'orders']);
+    Route::get('/me/orders/{number}', [Store\AccountController::class, 'order']);
+    Route::post('/me/orders/{number}/cancel', [Store\AccountController::class, 'cancel']);
+    Route::post('/me/orders/{number}/return', [Store\AccountController::class, 'requestReturn']);
+    Route::get('/me/wishlist', [Store\AccountController::class, 'wishlist']);
+    Route::post('/me/wishlist/sync', [Store\AccountController::class, 'syncWishlist']);
+    Route::post('/me/wishlist/{product}', [Store\AccountController::class, 'toggleWishlist']);
 });
 
 /*
@@ -63,6 +80,27 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
 
     Route::apiResource('reviews', Admin\ReviewController::class)->only(['index', 'update', 'destroy']);
 
+    // Orders and after-sales
+    Route::get('/orders/products', [Admin\OrderController::class, 'products']);
+    Route::post('/orders/bulk', [Admin\OrderController::class, 'bulk']);
+    Route::apiResource('orders', Admin\OrderController::class)->except('destroy');
+    Route::post('/orders/{order}/returns', [Admin\ReturnController::class, 'store']);
+    Route::get('/returns', [Admin\ReturnController::class, 'index']);
+    Route::put('/returns/{return}', [Admin\ReturnController::class, 'update']);
+
+    // Delivery
+    Route::get('/couriers', [Admin\DeliveryController::class, 'couriers']);
+    Route::post('/couriers', [Admin\DeliveryController::class, 'storeCourier']);
+    Route::put('/couriers/{courier}', [Admin\DeliveryController::class, 'updateCourier']);
+    Route::delete('/couriers/{courier}', [Admin\DeliveryController::class, 'destroyCourier']);
+    Route::post('/delivery/reorder', [Admin\DeliveryController::class, 'reorder']);
+
+    // Customers and stock
+    Route::apiResource('customers', Admin\CustomerController::class)->only(['index', 'show', 'update']);
+    Route::get('/inventory', [Admin\InventoryController::class, 'index']);
+    Route::post('/inventory/adjust', [Admin\InventoryController::class, 'adjust']);
+    Route::get('/inventory/movements', [Admin\InventoryController::class, 'movements']);
+
     // Website content
     Route::post('/banners/reorder', [Admin\BannerController::class, 'reorder']);
     Route::apiResource('banners', Admin\BannerController::class)->except('show');
@@ -84,5 +122,9 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     Route::middleware('role:admin')->group(function () {
         Route::get('/settings', [Admin\SettingController::class, 'index']);
         Route::put('/settings', [Admin\SettingController::class, 'update']);
+        Route::get('/shipping-methods', [Admin\DeliveryController::class, 'shipping']);
+        Route::post('/shipping-methods', [Admin\DeliveryController::class, 'storeShipping']);
+        Route::put('/shipping-methods/{method}', [Admin\DeliveryController::class, 'updateShipping']);
+        Route::delete('/shipping-methods/{method}', [Admin\DeliveryController::class, 'destroyShipping']);
     });
 });

@@ -15,6 +15,6 @@ Route::get('/search', [SeoPageController::class, 'noindex']);
 Route::get('/compare', [SeoPageController::class, 'noindex']);
 // Information pages (/about-us ...). Addresses used by the shop itself are excluded.
 Route::get('/{slug}', [SeoPageController::class, 'page'])
-    ->where('slug', '(?!(?:admin|shop|deals|brands|contact|login|register|cart|checkout|account|wishlist|track-order|reset-password|up)$)[a-z0-9][a-z0-9-]*');
+    ->where('slug', '(?!(?:admin|shop|deals|brands|contact|login|register|cart|checkout|account|wishlist|track-order|order-placed|forgot-password|reset-password|up)$)[a-z0-9][a-z0-9-]*');
 
 Route::view('/{any?}', 'app')->where('any', '^(?!api|storage|build).*$');
