@@ -25,6 +25,16 @@ const routes = [
     { path: "/reset-password", component: () => import("@/admin/auth/PasswordReset.vue"), meta: { layout: "auth", title: "Reset password" } },
     { path: "/contact", component: () => import("@/front/Contact.vue"), meta: { layout: "front", title: "Contact us" } },
 
+    // Shop: one page component for every product list
+    { path: "/shop", component: () => import("@/front/Shop.vue"), meta: { layout: "front", title: "All products" } },
+    { path: "/category/:slug", component: () => import("@/front/Shop.vue"), meta: { layout: "front" } },
+    { path: "/brand/:slug", component: () => import("@/front/Shop.vue"), meta: { layout: "front" } },
+    { path: "/search", component: () => import("@/front/Shop.vue"), meta: { layout: "front", title: "Search" } },
+    { path: "/deals", component: () => import("@/front/Shop.vue"), meta: { layout: "front", title: "Deals and offers" } },
+    { path: "/brands", component: () => import("@/front/Brands.vue"), meta: { layout: "front", title: "Brands" } },
+    { path: "/product/:slug", component: () => import("@/front/ProductPage.vue"), meta: { layout: "front" } },
+    { path: "/compare", component: () => import("@/front/Compare.vue"), meta: { layout: "front", title: "Compare products" } },
+
     // ── Admin sign-in ──
     { path: "/admin/login", component: () => import("@/admin/auth/Login.vue"), meta: { layout: "auth", guest: true, title: "Sign in" } },
     { path: "/admin/forgot-password", component: () => import("@/admin/auth/ForgotPassword.vue"), meta: { layout: "auth", guest: true, title: "Forgot password" } },
@@ -69,6 +79,8 @@ const router = createRouter({
     scrollBehavior(to, from, saved) {
         if (saved) return saved;
         if (to.hash) return { el: to.hash, behavior: "smooth" };
+        // Changing filters or sorting on the same page keeps the scroll position
+        if (to.path === from.path) return false;
         return { left: 0, top: 0 };
     },
 });

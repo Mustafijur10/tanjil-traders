@@ -125,4 +125,18 @@ class ShopTest extends TestCase
     {
         $this->getJson('/api/search/suggest?q=red')->assertOk()->assertJsonPath('products.0.name', 'Redmi Note 13');
     }
+    public function test_product_pages_carry_seo_tags_and_structured_data(): void
+    {
+        $html = $this->withoutVite()->get("/product/galaxy-a55")->assertOk()->getContent();
+
+        $this->assertStringContainsString("<title>Galaxy A55 | ", $html);
+        $this->assertStringContainsString("\"@type\":\"Product\"", $html);
+        $this->assertStringContainsString("\"priceCurrency\":\"BDT\"", $html);
+        $this->assertStringContainsString("rel=\"canonical\"", $html);
+
+        $this->withoutVite()->get("/product/hidden")->assertNotFound();
+        $this->withoutVite()->get("/no-such-page")->assertNotFound();
+        $this->withoutVite()->get("/shop")->assertOk();
+        $this->assertStringContainsString("noindex", $this->withoutVite()->get("/search?q=x")->getContent());
+    }
 }

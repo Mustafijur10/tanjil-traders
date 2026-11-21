@@ -7,9 +7,10 @@
 import { createStore } from "vuex";
 import auth from "./auth";
 import prefs from "./prefs";
+import compare from "./compare";
 
 export default createStore({
-    modules: { auth, prefs },
+    modules: { auth, prefs, compare },
 
     state: {
         layout: "front",

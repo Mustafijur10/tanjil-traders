@@ -8,6 +8,17 @@
             <span v-else-if="p.is_featured" class="tt-pcard-badge">{{ $t("Popular") }}</span>
             <span v-if="!p.in_stock" class="tt-pcard-out">{{ $t("Out of stock") }}</span>
         </router-link>
+        <button
+            type="button"
+            class="tt-pcard-compare"
+            :class="{ 'is-on': inCompare }"
+            :aria-pressed="inCompare"
+            :aria-label="$t(inCompare ? 'Remove from compare' : 'Add to compare')"
+            :title="$t(inCompare ? 'Remove from compare' : 'Add to compare')"
+            @click="$store.dispatch('compare/toggle', p)"
+        >
+            <v-icon size="18">{{ inCompare ? "mdi-check" : "mdi-compare-horizontal" }}</v-icon>
+        </button>
 
         <div class="tt-pcard-body">
             <span v-if="p.brand" class="tt-pcard-brand">{{ p.brand }}</span>
@@ -40,6 +51,9 @@ export default {
     computed: {
         link() {
             return `/product/${this.p.slug}`;
+        },
+        inCompare() {
+            return this.$store.getters["compare/has"](this.p.id);
         },
     },
     methods: {

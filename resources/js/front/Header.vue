@@ -29,8 +29,51 @@
                         <option value="">{{ $t("All") }}</option>
                         <option v-for="c in menu" :key="c.id" :value="c.slug">{{ $t(c.name) }}</option>
                     </select>
-                    <input v-model="query" type="search" :placeholder="$t('Search phones, laptops, chargers…')" :aria-label="$t('Search products')" />
+                    <input
+                        v-model="query"
+                        type="search"
+                        autocomplete="off"
+                        :placeholder="$t('Search phones, laptops, chargers…')"
+                        :aria-label="$t('Search products')"
+                        aria-autocomplete="list"
+                        :aria-expanded="showSuggest"
+                        @focus="focused = true"
+                        @blur="onBlur"
+                        @keydown.esc="focused = false"
+                        @keydown.down.prevent="move(1)"
+                        @keydown.up.prevent="move(-1)"
+                        @keydown.enter="activeLink && (($event.preventDefault()), openLink(activeLink))"
+                    />
                     <button type="submit" :aria-label="$t('Search')"><v-icon size="20">mdi-magnify</v-icon></button>
+
+                    <!-- Live suggestions -->
+                    <div v-if="showSuggest" class="tt-suggest" role="listbox">
+                        <template v-if="suggest.products.length">
+                            <div class="tt-suggest-label">{{ $t("Products") }}</div>
+                            <router-link
+                                v-for="(p, i) in suggest.products"
+                                :key="p.id"
+                                :to="`/product/${p.slug}`"
+                                class="tt-suggest-product"
+                                :class="{ 'is-active': active === i }"
+                                role="option"
+                                @mousedown.prevent="openLink(`/product/${p.slug}`)"
+                            >
+                                <span class="tt-thumb"><img v-if="p.image" :src="fileUrl(p.image)" alt="" /><v-icon v-else size="18">mdi-image-outline</v-icon></span>
+                                <span class="tt-ellipsis">{{ p.name }}</span>
+                                <b>{{ $money(p.final_price) }}</b>
+                            </router-link>
+                        </template>
+                        <div v-if="suggest.categories.length || suggest.brands.length" class="tt-suggest-tags">
+                            <router-link v-for="c in suggest.categories" :key="'c' + c.slug" :to="`/category/${c.slug}`" class="tt-subcat" @mousedown.prevent="openLink(`/category/${c.slug}`)">
+                                <v-icon size="15">mdi-shape-outline</v-icon>{{ $t(c.name) }}
+                            </router-link>
+                            <router-link v-for="b in suggest.brands" :key="'b' + b.slug" :to="`/brand/${b.slug}`" class="tt-subcat" @mousedown.prevent="openLink(`/brand/${b.slug}`)">
+                                <v-icon size="15">mdi-tag-outline</v-icon>{{ b.name }}
+                            </router-link>
+                        </div>
+                        <button type="submit" class="tt-suggest-all" @mousedown.prevent="doSearch">{{ $t("See all results for “{q}”", { q: query.trim() }) }}<v-icon size="16">mdi-arrow-right</v-icon></button>
+                    </div>
                 </form>
 
                 <div class="tt-shop-actions">
@@ -57,16 +100,16 @@
                     <div v-if="mega && menu.length" class="tt-mega-panel">
                         <ul class="tt-mega-list">
                             <li v-for="c in menu" :key="c.id">
-                                <router-link :to="`/category/${c.slug}`" :class="{ 'is-on': active?.id === c.id }" @mouseenter="hoverCat = c.id" @click="mega = false">
+                                <router-link :to="`/category/${c.slug}`" :class="{ 'is-on': activeCategory?.id === c.id }" @mouseenter="hoverCat = c.id" @click="mega = false">
                                     <v-icon size="18">{{ c.icon || "mdi-shape-outline" }}</v-icon>{{ $t(c.name) }}
                                     <v-icon v-if="c.children.length" size="16" class="ml-auto">mdi-chevron-right</v-icon>
                                 </router-link>
                             </li>
                         </ul>
-                        <div v-if="active" class="tt-mega-sub">
-                            <router-link :to="`/category/${active.slug}`" class="tt-mega-sub-title" @click="mega = false">{{ $t("All {name}", { name: $t(active.name) }) }}<v-icon size="16">mdi-arrow-right</v-icon></router-link>
+                        <div v-if="activeCategory" class="tt-mega-sub">
+                            <router-link :to="`/category/${activeCategory.slug}`" class="tt-mega-sub-title" @click="mega = false">{{ $t("All {name}", { name: $t(activeCategory.name) }) }}<v-icon size="16">mdi-arrow-right</v-icon></router-link>
                             <div class="tt-mega-sub-grid">
-                                <router-link v-for="s in active.children" :key="s.id" :to="`/category/${s.slug}`" @click="mega = false">{{ $t(s.name) }}</router-link>
+                                <router-link v-for="s in activeCategory.children" :key="s.id" :to="`/category/${s.slug}`" @click="mega = false">{{ $t(s.name) }}</router-link>
                             </div>
                         </div>
                     </div>
@@ -107,11 +150,21 @@
 </template>
 
 <script>
-import { fileUrl } from "@/api";
+import api, { fileUrl } from "@/api";
 
 export default {
     name: "SiteHeader",
-    data: () => ({ query: "", scope: "", mega: false, hoverCat: null, drawer: false }),
+    data: () => ({
+        query: "",
+        scope: "",
+        mega: false,
+        hoverCat: null,
+        drawer: false,
+        focused: false,
+        suggest: { products: [], categories: [], brands: [] },
+        active: -1,
+        suggestTimer: null,
+    }),
     computed: {
         settings() {
             return this.$store.state.prefs.settings;
@@ -138,8 +191,16 @@ export default {
             const path = this.$store.getters["prefs/isDark"] ? this.settings["store.logo_dark"] || this.settings["store.logo"] : this.settings["store.logo"];
             return path ? fileUrl(path) : "";
         },
-        active() {
+        activeCategory() {
             return this.menu.find((c) => c.id === this.hoverCat) || this.menu[0];
+        },
+        showSuggest() {
+            const s = this.suggest;
+            return this.focused && this.query.trim().length >= 2 && (s.products.length || s.categories.length || s.brands.length);
+        },
+        activeLink() {
+            const p = this.suggest.products[this.active];
+            return this.showSuggest && p ? `/product/${p.slug}` : null;
         },
         account() {
             const user = this.$store.state.auth.user;
@@ -148,6 +209,24 @@ export default {
         },
     },
     watch: {
+        query(q) {
+            clearTimeout(this.suggestTimer);
+            this.active = -1;
+            if (q.trim().length < 2) {
+                this.suggest = { products: [], categories: [], brands: [] };
+                return;
+            }
+            this.suggestTimer = setTimeout(async () => {
+                try {
+                    this.suggest = (await api.get("/search/suggest", { params: { q: q.trim() }, quiet: true })).data;
+                } catch (e) {
+                    /* suggestions are optional */
+                }
+            }, 220);
+        },
+        "$route.fullPath"() {
+            this.focused = false;
+        },
         "$route.query.q": {
             immediate: true,
             handler(q) {
@@ -156,10 +235,26 @@ export default {
         },
     },
     methods: {
+        fileUrl,
         doSearch() {
             const q = this.query.trim();
             if (!q) return;
-            this.$router.push({ path: "/search", query: { q, ...(this.scope && { category: this.scope }) } });
+            this.focused = false;
+            // Searching inside one category goes to that category page with the words as a filter
+            if (this.scope) this.$router.push({ path: `/category/${this.scope}`, query: { q } });
+            else this.$router.push({ path: "/search", query: { q } });
+        },
+        onBlur() {
+            setTimeout(() => (this.focused = false), 150);
+        },
+        move(dir) {
+            const n = this.suggest.products.length;
+            if (!n) return;
+            this.active = (this.active + dir + n) % n;
+        },
+        openLink(to) {
+            this.focused = false;
+            this.$router.push(to);
         },
     },
 };
