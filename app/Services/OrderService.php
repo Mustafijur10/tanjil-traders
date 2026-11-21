@@ -94,8 +94,7 @@ class OrderService
     /** Variant price, honouring the product's sale end date. */
     public function variantPrice(Product $p, ProductVariant $v): float
     {
-        $saleLive = $v->sale_price !== null && $v->sale_price < $v->price
-            && ($p->sale_ends_at === null || $p->sale_ends_at->isFuture());
+        $saleLive = $v->sale_price !== null && $v->sale_price < $v->price && $p->saleWindowOpen();
 
         return $saleLive ? $v->sale_price : $v->price;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\StoresShopTime;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,9 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    use StoresShopTime;
+
     protected $fillable = [
         'category_id', 'brand_id', 'name', 'slug', 'sku', 'short_description', 'description',
-        'price', 'sale_price', 'sale_ends_at', 'cost_price', 'stock_qty', 'warranty',
+        'price', 'sale_price', 'sale_starts_at', 'sale_ends_at', 'cost_price', 'stock_qty', 'warranty',
         'is_featured', 'status', 'meta_title', 'meta_description',
     ];
 
@@ -25,6 +28,7 @@ class Product extends Model
         'is_featured'  => 'boolean',
         'rating_avg'   => 'float',
         'review_count' => 'integer',
+        'sale_starts_at' => 'datetime',
         'sale_ends_at' => 'datetime',
     ];
 
@@ -67,13 +71,38 @@ class Product extends Model
         return $q->where('status', 'active');
     }
 
-    /** True while a sale price is set and its end date (if any) has not passed. */
+    /** True while a sale price is set and now is inside its start and end time (both optional). */
     public function onSale(): bool
     {
         return $this->sale_price !== null
             && $this->price !== null
             && $this->sale_price < $this->price
+            && $this->saleWindowOpen();
+    }
+
+    /** The sale period has started and not ended (used for option prices too). */
+    public function saleWindowOpen(): bool
+    {
+        return ($this->sale_starts_at === null || ! $this->sale_starts_at->isFuture())
             && ($this->sale_ends_at === null || $this->sale_ends_at->isFuture());
+    }
+
+    /**
+     * The same rule in SQL. "Now" comes from the app clock (Asia/Dhaka), the same clock the
+     * dates are saved with, so it is right on every database and server timezone.
+     */
+    public static function saleLiveSql(string $table = 'products'): string
+    {
+        $now = "'" . now()->format('Y-m-d H:i:s') . "'";
+
+        return "({$table}.sale_price IS NOT NULL AND {$table}.sale_price < {$table}.price"
+            . " AND ({$table}.sale_starts_at IS NULL OR {$table}.sale_starts_at <= {$now})"
+            . " AND ({$table}.sale_ends_at IS NULL OR {$table}.sale_ends_at > {$now}))";
+    }
+
+    public function scopeOnSaleNow(Builder $q): Builder
+    {
+        return $q->whereRaw(self::saleLiveSql($q->getModel()->getTable()));
     }
 
     // Both accessors cope with products loaded with only a few columns (e.g. "product:id,name").

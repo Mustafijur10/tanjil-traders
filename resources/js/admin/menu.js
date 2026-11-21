@@ -51,8 +51,8 @@ export default [
         title: "Promotions",
         icon: "mdi-ticket-percent-outline",
         children: [
-            { title: "Coupons", to: "/admin/coupons", ready: false },
-            { title: "Flash Sales", to: "/admin/flash-sales", ready: false },
+            { title: "Coupons", to: "/admin/coupons", ready: true },
+            { title: "Flash Sales", to: "/admin/flash-sales", ready: true },
         ],
     },
 

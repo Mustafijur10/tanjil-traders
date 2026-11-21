@@ -188,6 +188,7 @@
                         <template v-else>
                             <v-input-trz v-model.number="form.price" type="number" min="0" :label="$t('Price')" :prefix="currency" :error-messages="errors.price" />
                             <v-input-trz v-model.number="form.sale_price" type="number" min="0" :label="$t('Sale price (optional)')" :prefix="currency" :error-messages="errors.sale_price" />
+                            <v-input-trz v-if="form.sale_price" v-model="form.sale_starts_at" type="datetime-local" :label="$t('Sale starts (optional)')" :hint="$t('Empty = starts now')" persistent-hint :error-messages="errors.sale_starts_at" />
                             <v-input-trz v-if="form.sale_price" v-model="form.sale_ends_at" type="datetime-local" :label="$t('Sale ends (optional)')" :error-messages="errors.sale_ends_at" />
                         </template>
                         <v-input-trz
@@ -248,7 +249,7 @@ let keySeq = 0;
 
 const blank = () => ({
     name: "", slug: "", sku: "", category_id: null, brand_id: null, short_description: "", description: "",
-    price: null, sale_price: null, sale_ends_at: null, cost_price: null, stock_qty: 0, warranty: "",
+    price: null, sale_price: null, sale_starts_at: null, sale_ends_at: null, cost_price: null, stock_qty: 0, warranty: "",
     is_featured: false, status: "active", meta_title: "", meta_description: "", images: [], variants: [],
 });
 
@@ -379,6 +380,7 @@ export default {
                 // With variants the server sets the real price from the cheapest one; this just passes validation.
                 price: this.hasVariants ? (variants.length ? Math.min(...variants.map((v) => v.price)) : 0) : this.form.price,
                 sale_price: this.hasVariants ? null : this.form.sale_price || null,
+                sale_starts_at: this.form.sale_price ? fromLocalInput(this.form.sale_starts_at) : null,
                 sale_ends_at: this.form.sale_price ? fromLocalInput(this.form.sale_ends_at) : null,
                 cost_price: this.form.cost_price === "" ? null : this.form.cost_price,
                 sku: this.form.sku || null,
@@ -442,6 +444,7 @@ export default {
             this.form = {
                 ...blank(),
                 ...Object.fromEntries(Object.keys(blank()).map((k) => [k, p[k] ?? blank()[k]])),
+                sale_starts_at: toLocalInput(p.sale_starts_at),
                 sale_ends_at: toLocalInput(p.sale_ends_at),
                 images: p.images.map(({ path, alt }) => ({ path, alt })),
                 variants: p.variants.map((v) => ({

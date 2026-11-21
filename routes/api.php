@@ -97,6 +97,17 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     Route::post('/delivery/reorder', [Admin\DeliveryController::class, 'reorder']);
     Route::get('/shipping-methods', [Admin\DeliveryController::class, 'shipping']); // editing is admin-only, below
 
+    // Promotions
+    Route::get('/coupons', [Admin\PromotionController::class, 'coupons']);
+    Route::post('/coupons', [Admin\PromotionController::class, 'storeCoupon']);
+    Route::put('/coupons/{coupon}', [Admin\PromotionController::class, 'updateCoupon']);
+    Route::delete('/coupons/{coupon}', [Admin\PromotionController::class, 'destroyCoupon']);
+    Route::get('/flash-sales', [Admin\PromotionController::class, 'flashSales']);
+    Route::post('/flash-sales', [Admin\PromotionController::class, 'storeFlashSale']);
+    Route::get('/flash-sales/{flashSale}', [Admin\PromotionController::class, 'showFlashSale']);
+    Route::put('/flash-sales/{flashSale}', [Admin\PromotionController::class, 'updateFlashSale']);
+    Route::delete('/flash-sales/{flashSale}', [Admin\PromotionController::class, 'destroyFlashSale']);
+
     // Customers and stock
     Route::apiResource('customers', Admin\CustomerController::class)->only(['index', 'show', 'update']);
     Route::get('/inventory', [Admin\InventoryController::class, 'index']);

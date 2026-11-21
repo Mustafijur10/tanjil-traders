@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTranslatableText;
+use App\Models\Concerns\StoresShopTime;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model
 {
+    use StoresShopTime;
+
     use HasTranslatableText;
 
     public const TYPES = ['hero', 'promo', 'marquee'];

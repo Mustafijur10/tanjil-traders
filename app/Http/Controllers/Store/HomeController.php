@@ -38,9 +38,7 @@ class HomeController extends Controller
         $items = match ($s->type) {
             'featured'     => $products(ProductCard::query()->where('is_featured', true)->latest()),
             'new'          => $products(ProductCard::query()->latest()),
-            'deals'        => $products(ProductCard::query()
-                ->whereNotNull('sale_price')->whereColumn('sale_price', '<', 'price')
-                ->where(fn ($q) => $q->whereNull('sale_ends_at')->orWhere('sale_ends_at', '>', now()))
+            'deals'        => $products(ProductCard::query()->onSaleNow()
                 ->orderByRaw('sale_ends_at is null')->orderBy('sale_ends_at')),
             'best_sellers' => $this->bestSellers($limit),
             'category'     => $s->category

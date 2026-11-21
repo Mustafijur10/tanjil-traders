@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\StoresShopTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
+    use StoresShopTime;
+
     public const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
     public const PAYMENT_METHODS = ['cod', 'bkash', 'nagad'];
     public const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded'];

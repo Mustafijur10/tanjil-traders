@@ -26,7 +26,7 @@ class ProductSaver
 
             $fields = collect($data)->only([
                 'category_id', 'brand_id', 'name', 'sku', 'short_description', 'description',
-                'price', 'sale_price', 'sale_ends_at', 'cost_price', 'warranty',
+                'price', 'sale_price', 'sale_starts_at', 'sale_ends_at', 'cost_price', 'warranty',
                 'is_featured', 'status', 'meta_title', 'meta_description',
             ])->all();
             $fields['slug'] = Slug::unique(Product::class, $data['slug'] ?? null, $data['name'], $product->id);

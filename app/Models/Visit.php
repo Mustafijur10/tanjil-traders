@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\StoresShopTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Visit extends Model
 {
+    use StoresShopTime;
+
     public const UPDATED_AT = null;
 
     protected $fillable = [

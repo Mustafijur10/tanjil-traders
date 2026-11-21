@@ -183,7 +183,7 @@ class ShopController extends Controller
                     'id'          => $v->id,
                     'sku'         => $v->sku,
                     'price'       => $v->price,
-                    'final_price' => $v->sale_price !== null && $v->sale_price < $v->price ? $v->sale_price : $v->price,
+                    'final_price' => app(\App\Services\OrderService::class)->variantPrice($product, $v),
                     'stock_qty'   => $v->stock_qty,
                     'image'       => $v->image,
                     'value_ids'   => $v->values->pluck('id')->sort()->values(),

@@ -42,11 +42,7 @@ class ProductFilter
     /** The price a customer pays right now (sale price while the sale runs). */
     public static function priceSql(): string
     {
-        $now = DB::connection()->getDriverName() === 'sqlite' ? "datetime('now')" : 'NOW()';
-
-        return "(CASE WHEN products.sale_price IS NOT NULL AND products.sale_price < products.price
-                 AND (products.sale_ends_at IS NULL OR products.sale_ends_at > {$now})
-                 THEN products.sale_price ELSE products.price END)";
+        return '(CASE WHEN ' . Product::saleLiveSql() . ' THEN products.sale_price ELSE products.price END)';
     }
 
     public function category(): ?Category
