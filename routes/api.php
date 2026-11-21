@@ -71,7 +71,6 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     // Every staff account
     Route::post('/uploads', [Admin\UploadController::class, 'store']);
     Route::get('/dashboard/kpis', [Admin\DashboardController::class, 'kpis']);
-    Route::get('/dashboard/overview', [Admin\DashboardController::class, 'overview']);
     // Read-only lists other pages need (products picker, delivery options)
     Route::get('/orders/products', [Admin\OrderController::class, 'products']);
     Route::get('/shipping-methods', [Admin\DeliveryController::class, 'shipping']);
