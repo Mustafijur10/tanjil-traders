@@ -145,10 +145,11 @@ class ProductFilter
         }
         if ($except !== 'price') {
             if (is_numeric($i['min'] ?? null)) {
-                $query->whereRaw(self::priceSql() . ' >= ?', [(float) $i['min']]);
+                // "? + 0" makes the comparison numeric on every database (SQLite would compare as text).
+                $query->whereRaw(self::priceSql() . ' >= (? + 0)', [(float) $i['min']]);
             }
             if (is_numeric($i['max'] ?? null)) {
-                $query->whereRaw(self::priceSql() . ' <= ?', [(float) $i['max']]);
+                $query->whereRaw(self::priceSql() . ' <= (? + 0)', [(float) $i['max']]);
             }
         }
         if (! empty($i['stock']) && $except !== 'stock') {
