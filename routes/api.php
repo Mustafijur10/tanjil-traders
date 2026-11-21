@@ -39,6 +39,20 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(function () {
     Route::post('/uploads', [Admin\UploadController::class, 'store']);
 
+    // Catalog
+    Route::post('/categories/reorder', [Admin\CategoryController::class, 'reorder']);
+    Route::apiResource('categories', Admin\CategoryController::class)->except('show');
+    Route::post('/brands/reorder', [Admin\BrandController::class, 'reorder']);
+    Route::apiResource('brands', Admin\BrandController::class)->except('show');
+    Route::apiResource('attributes', Admin\AttributeController::class)->except('show');
+
+    Route::get('/products/form-data', [Admin\ProductController::class, 'formData']);
+    Route::post('/products/bulk', [Admin\ProductController::class, 'bulk']);
+    Route::post('/products/{product}/duplicate', [Admin\ProductController::class, 'duplicate']);
+    Route::apiResource('products', Admin\ProductController::class);
+
+    Route::apiResource('reviews', Admin\ReviewController::class)->only(['index', 'update', 'destroy']);
+
     Route::get('/translations', [Admin\TranslationController::class, 'index']);
     Route::put('/translations/{translation}', [Admin\TranslationController::class, 'update']);
     Route::delete('/translations/{translation}', [Admin\TranslationController::class, 'destroy']);

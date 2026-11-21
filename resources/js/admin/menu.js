@@ -8,12 +8,12 @@ export default [
         title: "Catalog",
         icon: "mdi-package-variant-closed",
         children: [
-            { title: "All Products", to: "/admin/products", ready: false },
-            { title: "Add Product", to: "/admin/products/new", ready: false },
-            { title: "Categories", to: "/admin/categories", ready: false },
-            { title: "Brands", to: "/admin/brands", ready: false },
-            { title: "Attributes & Specs", to: "/admin/attributes", ready: false },
-            { title: "Reviews", to: "/admin/reviews", ready: false },
+            { title: "All Products", to: "/admin/products", exact: true, ready: true },
+            { title: "Add Product", to: "/admin/products/new", ready: true },
+            { title: "Categories", to: "/admin/categories", ready: true },
+            { title: "Brands", to: "/admin/brands", ready: true },
+            { title: "Attributes & Specs", to: "/admin/attributes", ready: true },
+            { title: "Reviews", to: "/admin/reviews", ready: true },
         ],
     },
     {

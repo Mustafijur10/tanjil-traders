@@ -4,7 +4,7 @@
  */
 import "../sass/app.scss";
 
-import { createApp } from "vue";
+import { createApp, defineAsyncComponent } from "vue";
 
 import App from "@/app.vue";
 import router from "@/router";
@@ -19,6 +19,9 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog.vue";
 import ImageUpload from "@/components/ui/ImageUpload.vue";
 import StatusChip from "@/components/ui/StatusChip.vue";
 import PrefToggles from "@/components/ui/PrefToggles.vue";
+// Rich text editor (Tiptap) is loaded only by pages that use it.
+const RichText = defineAsyncComponent(() => import("@/components/ui/RichText.vue"));
+import { VueDraggable } from "vue-draggable-plus";
 
 const app = createApp(App);
 
@@ -34,6 +37,9 @@ app.component("ConfirmDialog", ConfirmDialog);
 app.component("ImageUpload", ImageUpload);
 app.component("StatusChip", StatusChip);
 app.component("PrefToggles", PrefToggles);
+app.component("RichText", RichText);
+// Drag and drop lists: <VueDraggable v-model="items" handle=".tt-drag"> <div v-for="item in items" :key="item.id">…</div> </VueDraggable>
+app.component("VueDraggable", VueDraggable);
 
 // Theme and language are applied before the first page renders.
 store.dispatch("prefs/boot");

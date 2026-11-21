@@ -48,6 +48,14 @@ export function t(text, params) {
     return fill(translated || s, params);
 }
 
+/**
+ * Count-aware text: $tn(1, "{n} product", "{n} products") -> "1 product", "3 products".
+ * Both forms go to the translation list; Bangla usually uses the same word for both.
+ */
+export function tn(count, singular, plural) {
+    return t(Number(count) === 1 ? singular : plural, { n: num(count) });
+}
+
 const numberLocale = () => (store.state.prefs.locale === "bn" ? "bn-BD" : "en-US");
 
 export function num(value, options = {}) {
@@ -69,6 +77,7 @@ export function date(value, options = { day: "numeric", month: "short", year: "n
 export default {
     install(app) {
         app.config.globalProperties.$t = t;
+        app.config.globalProperties.$tn = tn;
         app.config.globalProperties.$num = num;
         app.config.globalProperties.$money = money;
         app.config.globalProperties.$date = date;

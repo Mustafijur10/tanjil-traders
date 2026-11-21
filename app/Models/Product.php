@@ -71,18 +71,24 @@ class Product extends Model
     public function onSale(): bool
     {
         return $this->sale_price !== null
+            && $this->price !== null
             && $this->sale_price < $this->price
             && ($this->sale_ends_at === null || $this->sale_ends_at->isFuture());
     }
 
-    public function getFinalPriceAttribute(): float
+    // Both accessors cope with products loaded with only a few columns (e.g. "product:id,name").
+    public function getFinalPriceAttribute(): ?float
     {
+        if ($this->price === null) {
+            return null;
+        }
+
         return $this->onSale() ? $this->sale_price : $this->price;
     }
 
-    public function getInStockAttribute(): bool
+    public function getInStockAttribute(): ?bool
     {
-        return $this->stock_qty > 0;
+        return $this->stock_qty === null ? null : $this->stock_qty > 0;
     }
 
     /** After variants change: product price = cheapest active variant, stock = total stock. */

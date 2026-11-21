@@ -2,7 +2,7 @@
     <div>
         <PageHeader :title="section.title" :subtitle="section.subtitle" />
 
-            <div class="tt-stack">
+            <div class="tt-vstack">
                 <template v-if="loading">
                     <div class="tt-box tt-box-body tt-skel-group">
                         <span v-for="n in 4" :key="n" class="tt-skel"></span>

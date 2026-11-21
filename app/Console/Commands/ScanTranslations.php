@@ -20,6 +20,9 @@ class ScanTranslations extends Command
         $patterns = [
             // $t("Add to cart") and t("Add to cart")
             '/(?<![\w.])\$?t\(\s*([\'"])((?:\\\\.|(?!\1).)+?)\1\s*[,)]/s',
+            // Count texts: $tn(n, "{n} product", "{n} products") — both forms are collected.
+            '/\$?tn\([^,()]+(?:\([^()]*\))?,\s*(")([^"]+)"/',
+            '/\$?tn\([^,()]+(?:\([^()]*\))?,\s*"[^"]+",\s*(")([^"]+)"/',
             // Texts passed to components that translate them: <PageHeader title="Orders" />
             '/\s(?:title|subtitle|lead|text|label|hint|confirm-text)=(")([^"{}<>]{2,})"/',
             // Texts in menus, settings lists and route titles: { title: "Orders" }

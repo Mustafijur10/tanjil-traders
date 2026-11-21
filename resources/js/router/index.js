@@ -30,6 +30,16 @@ const routes = [
 
     // ── Admin ──
     admin("", () => import("@/admin/DashBoard.vue"), "Dashboard"),
+
+    // Catalog
+    admin("/products", () => import("@/admin/catalog/Products.vue"), "Products"),
+    admin("/products/new", () => import("@/admin/catalog/ProductForm.vue"), "Add product"),
+    admin("/products/:id(\\d+)", () => import("@/admin/catalog/ProductForm.vue"), "Edit product"),
+    admin("/categories", () => import("@/admin/catalog/Categories.vue"), "Categories"),
+    admin("/brands", () => import("@/admin/catalog/Brands.vue"), "Brands"),
+    admin("/attributes", () => import("@/admin/catalog/Attributes.vue"), "Attributes & Specs"),
+    admin("/reviews", () => import("@/admin/catalog/Reviews.vue"), "Reviews"),
+
     admin("/settings/store", settingsPage, "Store Information", { admin: true, section: "store" }),
     admin("/settings/appearance", settingsPage, "Appearance & Language", { admin: true, section: "appearance" }),
     admin("/settings/payments", settingsPage, "Payments", { admin: true, section: "payments" }),

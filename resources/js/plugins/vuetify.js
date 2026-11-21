@@ -6,8 +6,8 @@ import "vuetify/styles";
 import "@mdi/font/css/materialdesignicons.css";
 import { createVuetify } from "vuetify";
 // Components are imported automatically per page by vite-plugin-vuetify; only alias targets are listed here.
-import { VBtn, VTextField, VSelect, VTextarea, VAutocomplete, VCard, VSwitch, VCheckbox, VDialog } from "vuetify/components";
-import { VDataTable } from "vuetify/components/VDataTable";
+import { VBtn, VTextField, VSelect, VTextarea, VAutocomplete, VCombobox, VCard, VSwitch, VCheckbox, VDialog } from "vuetify/components";
+import { VDataTable, VDataTableServer } from "vuetify/components/VDataTable";
 
 const light = {
     dark: false,
@@ -70,10 +70,11 @@ const field = { variant: "outlined", density: "comfortable", color: "primary", h
  *             <v-btn-secondary>  second action (Scan, Upload, Export)
  *             <v-btn-tertiary>   quiet action (Cancel, Remove, icon buttons)
  *             <v-btn-danger>     destructive action (Delete)
- *   Inputs    <v-input-trz> <v-select-trz> <v-textarea-trz> <v-autocomplete-trz>
+ *   Inputs    <v-input-trz> <v-select-trz> <v-textarea-trz> <v-autocomplete-trz> <v-combobox-trz>
  *             <v-switch-trz> <v-checkbox-trz>
  *   Layout    <v-panel>  bordered card     <v-dialog-trz>  dialog
- *   Data      <v-table-trz>  data table with sorting and paging
+ *   Data      <v-table-trz>         data table, sorted and paged in the browser
+ *             <v-table-server-trz>  data table, sorted and paged by the API (large lists)
  */
 export default createVuetify({
     theme: { defaultTheme: "light", themes: { light, dark } },
@@ -86,11 +87,13 @@ export default createVuetify({
         VSelectTrz: VSelect,
         VTextareaTrz: VTextarea,
         VAutocompleteTrz: VAutocomplete,
+        VComboboxTrz: VCombobox,
         VSwitchTrz: VSwitch,
         VCheckboxTrz: VCheckbox,
         VPanel: VCard,
         VDialogTrz: VDialog,
         VTableTrz: VDataTable,
+        VTableServerTrz: VDataTableServer,
     },
     defaults: {
         VBtn: { rounded: "lg" },
@@ -103,12 +106,14 @@ export default createVuetify({
         VSelectTrz: field,
         VTextareaTrz: { ...field, rows: 3, autoGrow: true },
         VAutocompleteTrz: field,
+        VComboboxTrz: field,
         VSwitchTrz: { color: "primary", inset: true, hideDetails: "auto", density: "compact" },
         VCheckboxTrz: { color: "primary", hideDetails: "auto", density: "compact" },
 
         VPanel: { flat: true, rounded: "lg", border: true },
         VDialogTrz: { maxWidth: 560 },
         VTableTrz: { density: "comfortable", hover: true, itemsPerPage: 25 },
+        VTableServerTrz: { density: "comfortable", hover: true, itemsPerPageOptions: [10, 25, 50, 100] },
 
         // Plain components keep sensible defaults too (used inside the header and by Vuetify internally).
         VTextField: field,
