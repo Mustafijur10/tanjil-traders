@@ -4,7 +4,7 @@
 
         <template v-else-if="done">
             <v-alert type="success" variant="tonal" class="mb-5" :text="$t('Your password has been changed.')" />
-            <v-btn-primary block size="large" to="/admin/login">{{ $t("Sign in") }}</v-btn-primary>
+            <v-btn-primary block size="large" to="/login">{{ $t("Sign in") }}</v-btn-primary>
         </template>
 
         <v-form v-else @submit.prevent="submit">

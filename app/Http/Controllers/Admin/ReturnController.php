@@ -36,7 +36,7 @@ class ReturnController extends Controller
 
         return response()->json([
             'items'  => $items,
-            'counts' => collect(OrderReturn::STATUSES)->mapWithKeys(fn ($s) => [$s => (int) ($counts[$s] ?? 0)])
+            'counts' => collect(OrderReturn::STATUSES)->mapWithKeys(fn ($s) => [$s => (int) ($counts[$s] ?? 0)])->all()
                 + ['all' => (int) $counts->sum(), 'open' => (int) (($counts['requested'] ?? 0) + ($counts['approved'] ?? 0) + ($counts['received'] ?? 0))],
             'next'   => ReturnService::NEXT,
         ]);

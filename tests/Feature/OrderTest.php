@@ -238,6 +238,26 @@ class OrderTest extends TestCase
         $this->getJson('/api/me/wishlist')->assertOk()->assertJsonPath('products.0.name', 'IdeaPad');
     }
 
+    public function test_admin_lists_load_with_counts(): void
+    {
+        $this->checkout([['product_id' => $this->phone->id, 'qty' => 1]])->assertCreated();
+        Courier::create(['name' => 'RedX']);
+        $customer = User::factory()->create(['role' => 'customer']);
+        $this->staff();
+
+        $this->getJson('/api/admin/orders?status=pending&search=0171')->assertOk()
+            ->assertJsonPath('counts.pending', 1)->assertJsonPath('counts.all', 1)->assertJsonPath('items.total', 1);
+        $this->getJson('/api/admin/orders?status=to_ship')->assertOk()->assertJsonPath('items.total', 0);
+        $this->getJson('/api/admin/returns')->assertOk()->assertJsonPath('counts.open', 0);
+        $this->getJson('/api/admin/couriers')->assertOk()->assertJsonPath('0.name', 'RedX');
+        $this->getJson('/api/admin/customers?sort=spent')->assertOk()->assertJsonPath('counts.all', 1);
+        $this->getJson("/api/admin/customers/{$customer->id}")->assertOk();
+        $this->getJson('/api/admin/shipping-methods')->assertOk()->assertJsonCount(1);
+        $this->getJson('/api/admin/orders/products?q=gal')->assertOk()->assertJsonPath('0.name', 'Galaxy A55');
+        $this->getJson('/api/admin/inventory?sort=value&dir=desc')->assertOk();
+        $this->getJson('/api/product-cards?ids=' . $this->phone->id)->assertOk()->assertJsonPath('0.name', 'Galaxy A55');
+    }
+
     public function test_customers_cannot_open_admin_orders(): void
     {
         $this->actingAs(User::factory()->create(['role' => 'customer']), 'sanctum');

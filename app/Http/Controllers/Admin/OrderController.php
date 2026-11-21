@@ -65,7 +65,7 @@ class OrderController extends Controller
 
         return response()->json([
             'items'  => $items,
-            'counts' => collect(Order::STATUSES)->mapWithKeys(fn ($s) => [$s => (int) ($byStatus[$s] ?? 0)])
+            'counts' => collect(Order::STATUSES)->mapWithKeys(fn ($s) => [$s => (int) ($byStatus[$s] ?? 0)])->all()
                 + ['all' => (int) $byStatus->sum(), 'to_ship' => (int) (($byStatus['confirmed'] ?? 0) + ($byStatus['processing'] ?? 0))],
             'stats'  => [
                 'today_orders'  => (clone $today)->count(),

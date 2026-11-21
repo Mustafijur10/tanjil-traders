@@ -86,6 +86,16 @@
                         <v-icon size="24">mdi-account-circle-outline</v-icon>
                         <span>{{ $t(account.label) }}</span>
                     </router-link>
+                    <router-link to="/wishlist" class="tt-shop-icon is-wish" :aria-label="$t('Wishlist')">
+                        <v-icon size="24">mdi-heart-outline</v-icon>
+                        <em v-if="wishCount" class="tt-shop-badge">{{ $num(wishCount) }}</em>
+                        <span>{{ $t("Wishlist") }}</span>
+                    </router-link>
+                    <button type="button" class="tt-shop-icon" :aria-label="$t('Cart, {n} items', { n: cartCount })" @click="$store.commit('cart/drawer', true)">
+                        <v-icon size="24">mdi-cart-outline</v-icon>
+                        <em v-if="cartCount" class="tt-shop-badge">{{ $num(cartCount) }}</em>
+                        <span>{{ $t("Cart") }}</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -117,6 +127,7 @@
                 <router-link v-for="c in menu.slice(0, 7)" :key="c.id" :to="`/category/${c.slug}`" class="tt-shop-navlink">{{ $t(c.name) }}</router-link>
                 <span class="tt-toolbar-grow"></span>
                 <router-link to="/deals" class="tt-shop-navlink is-deal"><v-icon size="17">mdi-lightning-bolt</v-icon>{{ $t("Deals") }}</router-link>
+                <router-link to="/track-order" class="tt-shop-navlink">{{ $t("Track order") }}</router-link>
                 <router-link to="/contact" class="tt-shop-navlink">{{ $t("Contact") }}</router-link>
             </div>
         </nav>
@@ -142,6 +153,8 @@
                     <v-list-item v-else :to="`/category/${c.slug}`" :prepend-icon="c.icon || 'mdi-shape-outline'" :title="$t(c.name)" @click="drawer = false" />
                 </template>
                 <v-list-subheader>{{ $t("Help") }}</v-list-subheader>
+                <v-list-item to="/track-order" prepend-icon="mdi-map-marker-path" :title="$t('Track your order')" @click="drawer = false" />
+                <v-list-item to="/wishlist" prepend-icon="mdi-heart-outline" :title="$t('Wishlist')" @click="drawer = false" />
                 <v-list-item to="/contact" prepend-icon="mdi-message-outline" :title="$t('Contact us')" @click="drawer = false" />
                 <v-list-item v-if="phone" :href="`tel:${phone}`" prepend-icon="mdi-phone-outline" :title="phone" />
             </v-list>
@@ -206,6 +219,12 @@ export default {
             const user = this.$store.state.auth.user;
             if (user && ["admin", "staff"].includes(user.role)) return { to: "/admin", label: "Admin" };
             return user ? { to: "/account", label: "Account" } : { to: "/login", label: "Sign in" };
+        },
+        cartCount() {
+            return this.$store.getters["cart/count"];
+        },
+        wishCount() {
+            return this.$store.getters["wishlist/count"];
         },
     },
     watch: {

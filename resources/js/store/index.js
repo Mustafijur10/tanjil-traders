@@ -8,9 +8,11 @@ import { createStore } from "vuex";
 import auth from "./auth";
 import prefs from "./prefs";
 import compare from "./compare";
+import cart from "./cart";
+import wishlist from "./wishlist";
 
 export default createStore({
-    modules: { auth, prefs, compare },
+    modules: { auth, prefs, compare, cart, wishlist },
 
     state: {
         layout: "front",

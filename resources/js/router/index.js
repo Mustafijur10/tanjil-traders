@@ -35,6 +35,22 @@ const routes = [
     { path: "/product/:slug", component: () => import("@/front/ProductPage.vue"), meta: { layout: "front" } },
     { path: "/compare", component: () => import("@/front/Compare.vue"), meta: { layout: "front", title: "Compare products" } },
 
+    // Cart, checkout and orders
+    { path: "/cart", component: () => import("@/front/Cart.vue"), meta: { layout: "front", title: "Cart" } },
+    { path: "/checkout", component: () => import("@/front/Checkout.vue"), meta: { layout: "front", title: "Checkout" } },
+    { path: "/order-placed/:number", component: () => import("@/front/OrderPlaced.vue"), meta: { layout: "front", title: "Order placed" } },
+    { path: "/track-order", component: () => import("@/front/TrackOrder.vue"), meta: { layout: "front", title: "Track your order" } },
+    { path: "/wishlist", component: () => import("@/front/Wishlist.vue"), meta: { layout: "front", title: "Wishlist" } },
+
+    // Customer accounts
+    { path: "/login", component: () => import("@/front/CustomerAuth.vue"), meta: { layout: "front", guest: true, title: "Sign in" } },
+    { path: "/register", component: () => import("@/front/CustomerAuth.vue"), meta: { layout: "front", guest: true, title: "Create account" } },
+    { path: "/forgot-password", component: () => import("@/admin/auth/ForgotPassword.vue"), meta: { layout: "auth", guest: true, title: "Forgot password" } },
+    { path: "/account", component: () => import("@/front/Account.vue"), meta: { layout: "front", customer: true, tab: "overview", title: "My account" } },
+    { path: "/account/orders", component: () => import("@/front/Account.vue"), meta: { layout: "front", customer: true, tab: "orders", title: "My orders" } },
+    { path: "/account/profile", component: () => import("@/front/Account.vue"), meta: { layout: "front", customer: true, tab: "profile", title: "Profile" } },
+    { path: "/account/orders/:number", component: () => import("@/front/AccountOrder.vue"), meta: { layout: "front", customer: true, title: "Order" } },
+
     // ── Admin sign-in ──
     { path: "/admin/login", component: () => import("@/admin/auth/Login.vue"), meta: { layout: "auth", guest: true, title: "Sign in" } },
     { path: "/admin/forgot-password", component: () => import("@/admin/auth/ForgotPassword.vue"), meta: { layout: "auth", guest: true, title: "Forgot password" } },
@@ -51,6 +67,21 @@ const routes = [
     admin("/attributes", () => import("@/admin/catalog/Attributes.vue"), "Attributes & Specs"),
     admin("/reviews", () => import("@/admin/catalog/Reviews.vue"), "Reviews"),
 
+    // Inventory
+    admin("/inventory", () => import("@/admin/inventory/Stock.vue"), "Stock Overview"),
+    admin("/inventory/movements", () => import("@/admin/inventory/Movements.vue"), "Stock Movements"),
+
+    // Sales
+    admin("/orders", () => import("@/admin/orders/Orders.vue"), "All Orders"),
+    admin("/orders/new", () => import("@/admin/orders/OrderCreate.vue"), "Create Order"),
+    admin("/orders/print", () => import("@/admin/orders/OrderPrint.vue"), "Print", { layout: "print" }),
+    admin("/orders/:id(\\d+)", () => import("@/admin/orders/OrderDetail.vue"), "Order"),
+    admin("/returns", () => import("@/admin/orders/Returns.vue"), "Returns & Refunds"),
+    admin("/couriers", () => import("@/admin/orders/Couriers.vue"), "Couriers"),
+    admin("/customers", () => import("@/admin/customers/Customers.vue"), "Customers"),
+    admin("/customers/:id(\\d+)", () => import("@/admin/customers/CustomerDetail.vue"), "Customer"),
+    admin("/profile", () => import("@/admin/Profile.vue"), "My Profile"),
+
     // Website content
     admin("/banners", () => import("@/admin/content/Banners.vue"), "Carousel & Banners"),
     admin("/announcements", () => import("@/admin/content/Announcements.vue"), "Announcement Bar"),
@@ -63,6 +94,7 @@ const routes = [
     admin("/settings/store", settingsPage, "Store Information", { admin: true, section: "store" }),
     admin("/settings/appearance", settingsPage, "Appearance & Language", { admin: true, section: "appearance" }),
     admin("/settings/payments", settingsPage, "Payments", { admin: true, section: "payments" }),
+    admin("/settings/shipping", () => import("@/admin/settings/Shipping.vue"), "Shipping", { admin: true }),
     admin("/settings/integrations", settingsPage, "Integrations & SEO", { admin: true, section: "integrations" }),
     admin("/settings/translations", () => import("@/admin/settings/Translations.vue"), "Language & Translations"),
 
@@ -97,6 +129,13 @@ router.beforeEach((to) => {
     }
     if (to.meta.guest && to.path.startsWith("/admin") && isStaff) {
         return { path: "/admin" };
+    }
+    // Customer pages: sign in first, then come back
+    if (to.meta.customer && !store.getters["auth/isLoggedIn"]) {
+        return { path: "/login", query: { redirect: to.fullPath } };
+    }
+    if (to.meta.guest && !to.path.startsWith("/admin") && store.getters["auth/isLoggedIn"]) {
+        return { path: isStaff ? "/admin" : "/account" };
     }
 
     store.commit("setLayout", to.meta.layout || "front");

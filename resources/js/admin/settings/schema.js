@@ -117,6 +117,7 @@ export default {
                 title: "Checkout",
                 fields: [
                     { key: "checkout.guest_checkout", label: "Allow ordering without an account", type: "switch", hint: "Customers only need a name, phone and address." },
+                    { key: "checkout.return_days", label: "Online return requests allowed for", type: "number", suffix: "days", hint: "Days after delivery a customer can ask for a return from their account. 0 turns it off." },
                     { key: "inventory.low_stock_threshold", label: "Low stock warning at", type: "number", suffix: "units", hint: "Products at or below this stock appear in Low Stock." },
                 ],
             },

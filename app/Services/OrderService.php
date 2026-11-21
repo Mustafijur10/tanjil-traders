@@ -280,6 +280,9 @@ class OrderService
             ['value' => 'cod', 'label' => 'Cash on delivery', 'enabled' => (bool) ($s['checkout.cod_enabled'] ?? true), 'number' => null],
             ['value' => 'bkash', 'label' => 'bKash', 'enabled' => (bool) ($s['checkout.bkash_enabled'] ?? false), 'number' => $s['checkout.bkash_number'] ?? null],
             ['value' => 'nagad', 'label' => 'Nagad', 'enabled' => (bool) ($s['checkout.nagad_enabled'] ?? false), 'number' => $s['checkout.nagad_number'] ?? null],
-        ])->where('enabled', true)->values()->all();
+        ])
+            // A mobile wallet without a number to send money to cannot be used
+            ->filter(fn ($m) => $m['enabled'] && ($m['value'] === 'cod' || filled($m['number'])))
+            ->values()->all();
     }
 }

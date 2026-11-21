@@ -18,6 +18,7 @@ Route::get('/brands', [Store\ShopController::class, 'brands']);
 Route::get('/products/{slug}', [Store\ShopController::class, 'product']);
 Route::post('/products/{slug}/reviews', [Store\ShopController::class, 'review'])->middleware('throttle:5,10');
 Route::get('/compare', [Store\ShopController::class, 'compare']);
+Route::get('/product-cards', [Store\ShopController::class, 'cards']);
 Route::get('/pages/{slug}', [Store\PageController::class, 'show']);
 Route::post('/contact', [Store\PageController::class, 'contact'])->middleware('throttle:5,10');
 
@@ -94,6 +95,7 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     Route::put('/couriers/{courier}', [Admin\DeliveryController::class, 'updateCourier']);
     Route::delete('/couriers/{courier}', [Admin\DeliveryController::class, 'destroyCourier']);
     Route::post('/delivery/reorder', [Admin\DeliveryController::class, 'reorder']);
+    Route::get('/shipping-methods', [Admin\DeliveryController::class, 'shipping']); // editing is admin-only, below
 
     // Customers and stock
     Route::apiResource('customers', Admin\CustomerController::class)->only(['index', 'show', 'update']);
@@ -122,7 +124,6 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     Route::middleware('role:admin')->group(function () {
         Route::get('/settings', [Admin\SettingController::class, 'index']);
         Route::put('/settings', [Admin\SettingController::class, 'update']);
-        Route::get('/shipping-methods', [Admin\DeliveryController::class, 'shipping']);
         Route::post('/shipping-methods', [Admin\DeliveryController::class, 'storeShipping']);
         Route::put('/shipping-methods/{method}', [Admin\DeliveryController::class, 'updateShipping']);
         Route::delete('/shipping-methods/{method}', [Admin\DeliveryController::class, 'destroyShipping']);

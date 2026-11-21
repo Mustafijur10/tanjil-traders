@@ -107,18 +107,25 @@
                         </div>
                     </div>
 
-                    <!-- Ordering: phone and WhatsApp until the cart opens -->
-                    <div class="tt-pdp-actions">
-                        <v-btn-primary v-if="whatsapp" size="large" prepend-icon="mdi-whatsapp" :href="whatsappLink" target="_blank" rel="noopener" :disabled="stock <= 0 || needsChoice">
-                            {{ $t("Order on WhatsApp") }}
-                        </v-btn-primary>
-                        <v-btn-secondary v-if="phone" size="large" prepend-icon="mdi-phone-outline" :href="`tel:${phone}`">{{ $t("Call to order") }}</v-btn-secondary>
-                        <v-btn-secondary v-if="!whatsapp && !phone" size="large" prepend-icon="mdi-message-outline" to="/contact">{{ $t("Ask about this product") }}</v-btn-secondary>
-                        <v-btn-tertiary size="large" :prepend-icon="inCompare ? 'mdi-check' : 'mdi-compare-horizontal'" :color="inCompare ? 'primary' : undefined" @click="toggleCompare">
-                            {{ $t(inCompare ? "Added to compare" : "Compare") }}
-                        </v-btn-tertiary>
+                    <!-- Buying -->
+                    <div class="tt-pdp-buy">
+                        <QtyStepper v-if="stock > 0" v-model="qty" :max="Math.max(1, stock - inCart)" />
+                        <v-btn-primary size="large" prepend-icon="mdi-cart-plus" :disabled="!canBuy" @click="addToCart(false)">{{ $t("Add to cart") }}</v-btn-primary>
+                        <v-btn-secondary size="large" prepend-icon="mdi-lightning-bolt-outline" :disabled="!canBuy" @click="addToCart(true)">{{ $t("Buy now") }}</v-btn-secondary>
                     </div>
                     <p v-if="needsChoice" class="tt-muted tt-small">{{ $t("Choose an option above to continue.") }}</p>
+                    <p v-else-if="inCart && stock > 0" class="tt-muted tt-small">{{ $tn(inCart, "{n} already in your cart.", "{n} already in your cart.") }}</p>
+
+                    <div class="tt-pdp-actions">
+                        <v-btn-tertiary :prepend-icon="saved ? 'mdi-heart' : 'mdi-heart-outline'" :color="saved ? 'error' : undefined" @click="$store.dispatch('wishlist/toggle', p.id)">
+                            {{ $t(saved ? "Saved" : "Save") }}
+                        </v-btn-tertiary>
+                        <v-btn-tertiary :prepend-icon="inCompare ? 'mdi-check' : 'mdi-compare-horizontal'" :color="inCompare ? 'primary' : undefined" @click="toggleCompare">
+                            {{ $t(inCompare ? "Added to compare" : "Compare") }}
+                        </v-btn-tertiary>
+                        <v-btn-tertiary v-if="whatsapp" prepend-icon="mdi-whatsapp" :href="whatsappLink" target="_blank" rel="noopener">{{ $t("Ask on WhatsApp") }}</v-btn-tertiary>
+                        <v-btn-tertiary v-if="phone" prepend-icon="mdi-phone-outline" :href="`tel:${phone}`">{{ $t("Call to order") }}</v-btn-tertiary>
+                    </div>
 
                     <ul class="tt-pdp-trust">
                         <li v-if="p.warranty"><v-icon size="20">mdi-shield-check-outline</v-icon><span><b>{{ $t("Warranty") }}</b>{{ $t(p.warranty) }}</span></li>
@@ -215,11 +222,14 @@
 import api, { fileUrl, fieldErrors } from "@/api";
 import PageNotFound from "@/PageNotFound.vue";
 import ProductRail from "@/front/components/ProductRail.vue";
+import QtyStepper from "@/front/components/QtyStepper.vue";
+import { keyOf } from "@/store/cart";
 
 export default {
     name: "ProductPage",
-    components: { PageNotFound, ProductRail },
+    components: { PageNotFound, ProductRail, QtyStepper },
     data: () => ({
+        qty: 1,
         loading: true,
         missing: false,
         p: null,
@@ -289,6 +299,16 @@ export default {
         inCompare() {
             return this.$store.getters["compare/has"](this.p.id);
         },
+        saved() {
+            return this.$store.getters["wishlist/has"](this.p.id);
+        },
+        inCart() {
+            const key = keyOf({ product_id: this.p.id, variant_id: this.variant?.id });
+            return this.$store.state.cart.lines.find((l) => keyOf(l) === key)?.qty || 0;
+        },
+        canBuy() {
+            return !this.needsChoice && this.stock > 0 && this.inCart < this.stock;
+        },
         saleLeft() {
             if (!this.p.sale_ends_at || this.variant) return "";
             let s = Math.floor((new Date(this.p.sale_ends_at).getTime() - this.now) / 1000);
@@ -313,6 +333,7 @@ export default {
         "$route.params.slug": { immediate: true, handler: "load" },
         variant(v) {
             if (v?.image) this.imageIndex = 0;
+            this.qty = 1;
         },
     },
     mounted() {
@@ -382,6 +403,27 @@ export default {
         },
         scrollTo(id) {
             document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
+        /** Buy now skips the drawer and goes straight to checkout. */
+        async addToCart(buyNow) {
+            const v = this.variant;
+            const added = await this.$store.dispatch("cart/add", {
+                line: {
+                    product_id: this.p.id,
+                    variant_id: v?.id || null,
+                    qty: this.qty,
+                    name: this.p.name,
+                    variant_label: v?.label || null,
+                    slug: this.p.slug,
+                    image: v?.image || this.p.images[0]?.path || null,
+                    price: this.price,
+                    regular_price: this.regular,
+                    stock: this.stock,
+                },
+                openDrawer: !buyNow,
+            });
+            this.qty = 1;
+            if (buyNow && added !== false) this.$router.push("/checkout");
         },
         toggleCompare() {
             this.$store.dispatch("compare/toggle", { id: this.p.id, name: this.p.name, slug: this.p.slug, image: this.p.images[0]?.path });

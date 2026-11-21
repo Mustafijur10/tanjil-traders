@@ -90,6 +90,15 @@ class ShopController extends Controller
         ]);
     }
 
+    /** Product cards by id (a guest's wishlist, recently viewed ...), in the order asked. */
+    public function cards(Request $request)
+    {
+        $ids = collect(explode(',', (string) $request->query('ids')))->map(fn ($v) => (int) $v)->filter()->unique()->take(60)->values();
+        $cards = ProductCard::query()->whereIn('id', $ids)->get()->sortBy(fn ($p) => $ids->search($p->id));
+
+        return ProductCard::collection($cards);
+    }
+
     public function brands()
     {
         return Brand::query()->active()

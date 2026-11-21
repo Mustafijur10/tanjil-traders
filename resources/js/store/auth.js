@@ -16,6 +16,7 @@ export default {
         isLoggedIn: (s) => !!s.token,
         isStaff: (s) => !!s.user && ["admin", "staff"].includes(s.user.role),
         isAdmin: (s) => s.user?.role === "admin",
+        isCustomer: (s) => !!s.token && s.user?.role === "customer",
         user: (s) => s.user,
     },
 

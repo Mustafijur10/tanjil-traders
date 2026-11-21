@@ -20,7 +20,7 @@
         </v-form>
 
         <div class="tt-auth-foot">
-            <router-link to="/admin/login">{{ $t("Back to sign in") }}</router-link>
+            <router-link :to="$route.path.startsWith('/admin') ? '/admin/login' : '/login'">{{ $t("Back to sign in") }}</router-link>
         </div>
     </AuthShell>
 </template>
