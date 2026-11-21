@@ -6,6 +6,7 @@ use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\StockMovement;
+use App\Support\Html;
 use App\Support\Slug;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -29,6 +30,7 @@ class ProductSaver
                 'is_featured', 'status', 'meta_title', 'meta_description',
             ])->all();
             $fields['slug'] = Slug::unique(Product::class, $data['slug'] ?? null, $data['name'], $product->id);
+            $fields['description'] = Html::clean($fields['description'] ?? null);
             $fields['sku'] = $fields['sku'] ?? null ?: null;
 
             $variants = $data['variants'] ?? [];

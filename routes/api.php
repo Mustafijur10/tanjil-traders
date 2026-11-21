@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/bootstrap', Store\BootstrapController::class);
+Route::get('/home', Store\HomeController::class);
+Route::get('/pages/{slug}', [Store\PageController::class, 'show']);
+Route::post('/contact', [Store\PageController::class, 'contact'])->middleware('throttle:5,10');
 
 Route::middleware('throttle:10,1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -52,6 +55,15 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     Route::apiResource('products', Admin\ProductController::class);
 
     Route::apiResource('reviews', Admin\ReviewController::class)->only(['index', 'update', 'destroy']);
+
+    // Website content
+    Route::post('/banners/reorder', [Admin\BannerController::class, 'reorder']);
+    Route::apiResource('banners', Admin\BannerController::class)->except('show');
+    Route::post('/home-sections/reorder', [Admin\HomeSectionController::class, 'reorder']);
+    Route::apiResource('home-sections', Admin\HomeSectionController::class)->except('show');
+    Route::apiResource('pages', Admin\PageController::class);
+    Route::apiResource('messages', Admin\ContactMessageController::class)->only(['index', 'update', 'destroy'])
+        ->parameters(['messages' => 'contactMessage']);
 
     Route::get('/translations', [Admin\TranslationController::class, 'index']);
     Route::put('/translations/{translation}', [Admin\TranslationController::class, 'update']);
