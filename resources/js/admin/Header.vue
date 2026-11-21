@@ -173,7 +173,7 @@ export default {
                 ],
                 attention: [
                     { label: "Orders awaiting confirmation", count: 6, icon: "mdi-clock-alert-outline", color: "#d97706", tint: "#fff1d1", to: "/admin/orders" },
-                    { label: "Low-stock products", count: 18, icon: "mdi-archive-alert-outline", color: "#dc2626", tint: "#fde8e8", to: "/admin/catalog" },
+                    { label: "Low-stock products", count: 18, icon: "mdi-archive-alert-outline", color: "#dc2626", tint: "#fde8e8", to: "/admin/products?tab=low" },
                     { label: "Pending payments", count: 4, icon: "mdi-cash-clock", color: "#2f5be7", tint: "#e6edff", to: "/admin/orders" },
                 ],
             },
@@ -181,9 +181,9 @@ export default {
             // ── Update these routes to match your router (used by the Create menu and the command palette) ──
             quickCreate: [
                 { label: "New order", icon: "mdi-receipt-text-plus-outline", color: "#0f9d6b", tint: "#dff5ec", to: "/admin/orders" },
-                { label: "Add product", icon: "mdi-package-variant-plus", color: "#2f5be7", tint: "#e6edff", to: "/admin/product" },
-                { label: "Add brand", icon: "mdi-tag-plus-outline", color: "#d97706", tint: "#fff1d1", to: "/admin/brand" },
-                { label: "Add category", icon: "mdi-shape-plus-outline", color: "#7c3aed", tint: "#efe8ff", to: "/admin/category" },
+                { label: "Add product", icon: "mdi-package-variant-plus", color: "#2f5be7", tint: "#e6edff", to: "/admin/products/new" },
+                { label: "Add brand", icon: "mdi-tag-plus-outline", color: "#d97706", tint: "#fff1d1", to: "/admin/brands" },
+                { label: "Add category", icon: "mdi-shape-plus-outline", color: "#7c3aed", tint: "#efe8ff", to: "/admin/categories" },
                 { label: "Add customer", icon: "mdi-account-plus-outline", color: "#0f766e", tint: "#dcf3f0", to: "/admin/customers" },
             ],
         };

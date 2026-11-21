@@ -17,6 +17,7 @@ return [
         'store.email'           => '',
         'store.address'         => '',
         'store.hours'           => '',
+        'store.map_location'    => '',   // Google Maps link/embed code, or empty to use the address
         'store.footer_text'     => '',
         'store.currency_symbol' => '৳',
 

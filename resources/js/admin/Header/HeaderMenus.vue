@@ -274,7 +274,7 @@ export default {
             // ── Sample notifications: replace with GET /api/notifications ──
             notifications: [
                 { id: 1, type: "orders", title: "New order #TT-10482", desc: "Rahim Traders · ৳ 48,500 · Paid via bKash", time: "2m", icon: "mdi-receipt-text-outline", color: "#0f9d6b", tint: "#dff5ec", read: false, to: "/admin/orders" },
-                { id: 2, type: "stock", title: "Low stock: Anker PowerCore 20000", desc: "Only 3 units left across all warehouses", time: "18m", icon: "mdi-alert-outline", color: "#d97706", tint: "#fff1d1", read: false, to: "/admin/catalog" },
+                { id: 2, type: "stock", title: "Low stock: Anker PowerCore 20000", desc: "Only 3 units left across all warehouses", time: "18m", icon: "mdi-alert-outline", color: "#d97706", tint: "#fff1d1", read: false, to: "/admin/products?tab=low" },
                 { id: 3, type: "orders", title: "Delivery delayed — Khulna", desc: "14 parcels stuck for more than 4 days", time: "1h", icon: "mdi-truck-alert-outline", color: "#dc2626", tint: "#fde8e8", read: false, to: "/admin/orders" },
                 { id: 4, type: "orders", title: "Payment received", desc: "Nusrat Jahan · ৳ 12,900 via Nagad", time: "3h", icon: "mdi-cash-check", color: "#2f5be7", tint: "#e6edff", read: true, to: "/admin/orders" },
                 { id: 5, type: "system", title: "Nightly backup completed", desc: "Database snapshot saved successfully", time: "6h", icon: "mdi-database-check-outline", color: "#7c3aed", tint: "#efe8ff", read: true, to: null },

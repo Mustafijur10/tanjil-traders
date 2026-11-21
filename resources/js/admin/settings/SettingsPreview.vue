@@ -28,6 +28,10 @@
                 <div class="tt-pv-social">
                     <span v-for="s in socials" :key="s.key" :class="{ 'is-off': !v[s.key] }" :title="s.label"><v-icon size="17">{{ s.icon }}</v-icon></span>
                 </div>
+                <div v-if="mapUrl" class="tt-pv-map">
+                    <iframe :src="mapUrl" :title="$t('Map preview')" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+                <p v-else class="tt-muted tt-small"><v-icon size="15">mdi-map-marker-off-outline</v-icon> {{ $t("Add an address or a map location to show a map on the Contact page.") }}</p>
                 <p class="tt-muted tt-small mt-3">{{ $t("Empty items are hidden on the website.") }}</p>
             </div>
 
@@ -83,6 +87,7 @@
 /* Right-hand live preview for the simple settings pages. `values` is the unsaved form. */
 import { fileUrl } from "@/api";
 import { ACCENTS } from "./schema";
+import { mapEmbedUrl } from "@/utils/map";
 import GooglePreview from "@/components/ui/GooglePreview.vue";
 
 const META = {
@@ -121,6 +126,9 @@ export default {
             { key: "social.tiktok", icon: "mdi-music-note", label: "TikTok" },
             { key: "social.whatsapp", icon: "mdi-whatsapp", label: "WhatsApp" },
         ],
+        mapUrl() {
+            return mapEmbedUrl(this.v["store.map_location"], this.v["store.address"]);
+        },
         accentHex() {
             return (ACCENTS.find((a) => a.value === this.v["appearance.accent"]) || ACCENTS[0]).hex;
         },

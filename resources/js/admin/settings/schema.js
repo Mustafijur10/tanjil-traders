@@ -27,6 +27,12 @@ export default {
                     { key: "store.email", label: "Email", type: "text" },
                     { key: "store.address", label: "Address", type: "textarea" },
                     { key: "store.hours", label: "Opening hours", type: "text", hint: "e.g. Sat–Thu, 10am–8pm" },
+                    {
+                        key: "store.map_location",
+                        label: "Map location",
+                        type: "textarea",
+                        hint: "Shown on the Contact page. Paste a Google Maps link or the “Embed a map” code, or leave empty to use the address above.",
+                    },
                 ],
             },
             {

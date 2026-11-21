@@ -158,7 +158,29 @@
  * (quick links, store, date range) and the command palette.
  * Shared state and actions come from Header.vue through `hdr`.
  */
+import menu, { findMenuEntry } from "@/admin/menu.js";
+
 const RECENT_KEY = "tt_recent_searches";
+
+// Icons for the section tabs next to the clock (sidebar sub-pages have no icons of their own).
+const TAB_ICONS = {
+    "All Products": "mdi-package-variant-closed",
+    "Add Product": "mdi-plus-box-outline",
+    Categories: "mdi-shape-outline",
+    Brands: "mdi-tag-outline",
+    "Attributes & Specs": "mdi-tune-variant",
+    Reviews: "mdi-star-outline",
+    "Carousel & Banners": "mdi-view-carousel-outline",
+    "Announcement Bar": "mdi-bullhorn-outline",
+    "Homepage Sections": "mdi-view-dashboard-edit-outline",
+    Pages: "mdi-file-document-outline",
+    "Contact Messages": "mdi-email-outline",
+    "Store Information": "mdi-storefront-outline",
+    "Appearance & Language": "mdi-palette-outline",
+    "Language & Translations": "mdi-translate",
+    Payments: "mdi-credit-card-outline",
+    "Integrations & SEO": "mdi-google",
+};
 
 export default {
     name: "HeaderNavigation",
@@ -171,124 +193,6 @@ export default {
             activeIndex: 0,
             recent: [],
 
-            // ── Next to the clock: tabs for the current area, plus counters and actions. Routes match your sidebar. Stats are sample numbers: replace with API values. ──
-            sectionTabs: [
-                {
-                    match: ["/admin/catalog", "/admin/product", "/admin/brand", "/admin/category"],
-                    tabs: [
-                        { label: "Products", to: "/admin/catalog", icon: "mdi-package-variant-closed" },
-                        { label: "Brands", to: "/admin/brand", icon: "mdi-tag-outline" },
-                        { label: "Categories", to: "/admin/category", icon: "mdi-shape-outline" },
-                    ],
-                    stats: [
-                        { label: "Products", value: "2,146", icon: "mdi-package-variant-closed", color: "#2f5be7", tint: "#e6edff" },
-                        { label: "Low stock", value: "18", icon: "mdi-archive-alert-outline", color: "#d97706", tint: "#fff1d1" },
-                        { label: "Out of stock", value: "14", icon: "mdi-alert-circle-outline", color: "#dc2626", tint: "#fde8e8" },
-                    ],
-                    actions: [
-                        { label: "Add product", icon: "mdi-plus", to: "/admin/product", primary: true },
-                        { label: "Import", icon: "mdi-tray-arrow-down", to: "/admin/products/import" },
-                        { label: "Export", icon: "mdi-tray-arrow-up", fn: "exportCsv" },
-                    ],
-                },
-                {
-                    match: ["/admin/orders", "/admin/create-order", "/admin/pending"],
-                    tabs: [
-                        { label: "All orders", to: "/admin/orders", icon: "mdi-receipt-text-outline" },
-                        { label: "Pending", to: "/admin/pending", icon: "mdi-clock-outline" },
-                        { label: "Processing", to: "/admin/orders/processing", icon: "mdi-progress-clock" },
-                        { label: "Returns", to: "/admin/orders/returns", icon: "mdi-backup-restore" },
-                    ],
-                    stats: [
-                        { label: "Orders today", value: "17", icon: "mdi-receipt-text-outline", color: "#2f5be7", tint: "#e6edff" },
-                        { label: "To confirm", value: "6", icon: "mdi-clock-alert-outline", color: "#d97706", tint: "#fff1d1" },
-                        { label: "Unpaid", value: "4", icon: "mdi-cash-clock", color: "#7c3aed", tint: "#efe8ff" },
-                    ],
-                    actions: [
-                        { label: "New order", icon: "mdi-plus", to: "/admin/create-order", primary: true },
-                        { label: "Export", icon: "mdi-tray-arrow-up", fn: "exportCsv" },
-                    ],
-                },
-                {
-                    match: ["/admin/sales-analytics", "/admin/seo-analytics", "/admin/analytics", "/admin/sales-report", "/admin/inventory-report", "/admin/customer-report"],
-                    tabs: [
-                        { label: "Sales analytics", to: "/admin/sales-analytics", icon: "mdi-chart-line" },
-                        { label: "SEO analytics", to: "/admin/seo-analytics", icon: "mdi-magnify-scan" },
-                        { label: "Sales report", to: "/admin/sales-report", icon: "mdi-file-chart-outline" },
-                        { label: "Customer report", to: "/admin/customer-report", icon: "mdi-account-group-outline" },
-                    ],
-                    stats: [
-                        { label: "Revenue today", value: "৳ 48.2K", icon: "mdi-cash-multiple", color: "#0f9d6b", tint: "#dff5ec" },
-                        { label: "Conversion", value: "4.4%", icon: "mdi-percent-outline", color: "#ec4899", tint: "#fde6f1" },
-                    ],
-                    actions: [
-                        { label: "Export report", icon: "mdi-tray-arrow-up", fn: "exportCsv", primary: true },
-                        { label: "Print", icon: "mdi-printer-outline", fn: "printPage" },
-                    ],
-                },
-                {
-                    match: ["/admin/customers", "/admin/reviews"],
-                    tabs: [
-                        { label: "All customers", to: "/admin/customers", icon: "mdi-account-group-outline" },
-                        { label: "Groups", to: "/admin/customers/groups", icon: "mdi-account-multiple-outline" },
-                        { label: "Reviews", to: "/admin/reviews", icon: "mdi-star-outline" },
-                    ],
-                    stats: [
-                        { label: "Customers", value: "1,208", icon: "mdi-account-group-outline", color: "#7c3aed", tint: "#efe8ff" },
-                        { label: "New today", value: "9", icon: "mdi-account-plus-outline", color: "#0f9d6b", tint: "#dff5ec" },
-                    ],
-                    actions: [
-                        { label: "Add customer", icon: "mdi-plus", to: "/admin/customers", primary: true },
-                        { label: "Export", icon: "mdi-tray-arrow-up", fn: "exportCsv" },
-                    ],
-                },
-                {
-                    match: ["/admin/inventory"],
-                    tabs: [
-                        { label: "Stock levels", to: "/admin/inventory", icon: "mdi-warehouse" },
-                        { label: "Low stock", to: "/admin/inventory/low-stock", icon: "mdi-archive-alert-outline" },
-                        { label: "Suppliers", to: "/admin/inventory/suppliers", icon: "mdi-truck-outline" },
-                    ],
-                    stats: [
-                        { label: "Low stock", value: "18", icon: "mdi-archive-alert-outline", color: "#d97706", tint: "#fff1d1" },
-                        { label: "Out of stock", value: "14", icon: "mdi-alert-circle-outline", color: "#dc2626", tint: "#fde8e8" },
-                    ],
-                    actions: [{ label: "Export stock", icon: "mdi-tray-arrow-up", fn: "exportCsv", primary: true }],
-                },
-                {
-                    match: ["/admin/coupons", "/admin/banners", "/admin/notifications"],
-                    tabs: [
-                        { label: "Coupons", to: "/admin/coupons", icon: "mdi-ticket-percent-outline" },
-                        { label: "Banners", to: "/admin/banners", icon: "mdi-image-multiple-outline" },
-                        { label: "Notifications", to: "/admin/notifications", icon: "mdi-bell-outline" },
-                    ],
-                    stats: [{ label: "Active coupons", value: "7", icon: "mdi-ticket-percent-outline", color: "#7c3aed", tint: "#efe8ff" }],
-                    actions: [{ label: "New coupon", icon: "mdi-plus", to: "/admin/coupons", primary: true }],
-                },
-                {
-                    match: ["/admin/shipping"],
-                    tabs: [
-                        { label: "Zones", to: "/admin/shipping", icon: "mdi-map-marker-radius-outline" },
-                        { label: "Methods", to: "/admin/shipping/methods", icon: "mdi-truck-fast-outline" },
-                    ],
-                    stats: [
-                        { label: "On-time", value: "94%", icon: "mdi-truck-check-outline", color: "#0f9d6b", tint: "#dff5ec" },
-                        { label: "Delayed", value: "14", icon: "mdi-truck-alert-outline", color: "#dc2626", tint: "#fde8e8" },
-                    ],
-                    actions: [{ label: "Add method", icon: "mdi-plus", to: "/admin/shipping/methods", primary: true }],
-                },
-                {
-                    match: ["/admin/general-settings", "/admin/storefront", "/admin/settings", "/admin/roles"],
-                    tabs: [
-                        { label: "General", to: "/admin/general-settings", icon: "mdi-cog-outline" },
-                        { label: "Storefront", to: "/admin/storefront", icon: "mdi-storefront-outline" },
-                        { label: "Payments", to: "/admin/settings/payment", icon: "mdi-credit-card-outline" },
-                        { label: "Staff & roles", to: "/admin/roles", icon: "mdi-shield-account-outline" },
-                    ],
-                    stats: [],
-                    actions: [{ label: "Help", icon: "mdi-lifebuoy", to: "/admin/help" }],
-                },
-            ],
         };
     },
 
@@ -297,52 +201,46 @@ export default {
             return this.hdr.s;
         },
 
-        // ── Page context ──
-        crumbs() {
-            const path = (this.$route && this.$route.path) || "";
-            const parts = path.split("/").filter(Boolean);
-            const trimmed = parts[0] === "admin" ? parts.slice(1) : parts;
-            let acc = parts[0] === "admin" ? "/admin" : "";
-            return trimmed.map((p) => {
-                acc += "/" + p;
-                return { label: p.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), to: acc };
-            });
+        // ── Page context: taken from the admin menu (admin/menu.js), so it always matches the sidebar ──
+        menuEntry() {
+            return findMenuEntry((this.$route && this.$route.path) || "", menu);
         },
+        // The one breadcrumb in the admin, e.g. "Catalog / All Products / Edit product". Each part links to a real page.
         parentCrumbs() {
-            return this.crumbs.slice(0, -1);
+            const e = this.menuEntry;
+            if (!e) return [];
+            const list = [];
+            if (e.group) {
+                const first = e.group.children.find((c) => c.ready);
+                if (first) list.push({ label: this.$t(e.group.title), to: first.to });
+            }
+            if (this.$t(e.item.title) !== this.pageTitle && e.item.to !== this.$route.path) {
+                list.push({ label: this.$t(e.item.title), to: e.item.to });
+            }
+            return list;
         },
         pageTitle() {
             const r = this.$route || {};
-            const pretty = (x) => String(x).replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ").replace(/\s+/g, " ").trim();
-            return pretty((r.meta && r.meta.title) || r.name || (this.crumbs.length ? this.crumbs[this.crumbs.length - 1].label : "Dashboard"));
+            return this.$t((r.meta && r.meta.title) || (this.menuEntry && this.menuEntry.item.title) || "Dashboard");
         },
-        // Pages are used for the palette's "Go to" group and to pick the title icon
+        // Every built admin page, for the command palette's "Go to" group
         pages() {
-            return [
-                { label: "Dashboard", to: "/admin/dashboard", icon: "mdi-view-dashboard-outline", hint: "Overview of your store", words: "home overview kpi" },
-                { label: "Sales analytics", to: "/admin/sales-analytics", icon: "mdi-chart-line", hint: "Revenue, funnel, forecast", words: "revenue reports funnel" },
-                { label: "Orders", to: "/admin/orders", icon: "mdi-receipt-text-outline", hint: "Manage customer orders", words: "sales invoices" },
-                { label: "Catalog", to: "/admin/catalog", icon: "mdi-package-variant-closed", hint: "Products and stock", words: "products inventory stock" },
-                { label: "Brands", to: "/admin/brand", icon: "mdi-tag-outline", hint: "Manage brands", words: "samsung anker xiaomi" },
-                { label: "Categories", to: "/admin/category", icon: "mdi-shape-outline", hint: "Catalog structure", words: "subcategory" },
-                { label: "Customers", to: "/admin/customers", icon: "mdi-account-group-outline", hint: "Customer list and tiers", words: "clients buyers" },
-                { label: "Account settings", to: this.hdr.accountRoute, icon: "mdi-account-cog-outline", hint: "Profile and password", words: "profile password" },
-            ];
+            return menu
+                .filter((e) => !e.section)
+                .flatMap((e) => (e.children ? e.children.map((c) => ({ ...c, icon: e.icon, group: e.title })) : [e]))
+                .filter((p) => p.ready)
+                .map((p) => ({ label: this.$t(p.title), to: p.to, icon: p.icon, hint: p.group ? this.$t(p.group) : "", words: `${p.title} ${p.group || ""}`.toLowerCase() }));
         },
         pageIcon() {
-            const path = ((this.$route && this.$route.path) || "").toLowerCase();
-            const hit = this.pages.find((p) => path.startsWith(p.to.toLowerCase()));
-            if (hit) return hit.icon;
-            const map = [["analytic", "mdi-chart-line"], ["order", "mdi-receipt-text-outline"], ["product", "mdi-package-variant-closed"], ["catalog", "mdi-package-variant-closed"], ["brand", "mdi-tag-outline"], ["categor", "mdi-shape-outline"], ["customer", "mdi-account-group-outline"], ["setting", "mdi-cog-outline"]];
-            const m = map.find(([k]) => path.includes(k));
-            return m ? m[1] : "mdi-view-dashboard-outline";
+            const e = this.menuEntry;
+            return (e && ((e.group && e.group.icon) || e.item.icon)) || "mdi-view-dashboard-outline";
         },
 
-        // ── Section area next to the clock ──
+        // ── Section tabs next to the clock: the built pages of the current sidebar group ──
         currentSection() {
-            const path = (this.$route && this.$route.path) || "";
-            const sec = this.sectionTabs.find((x) => x.match.some((m) => path.startsWith(m)));
-            return { tabs: (sec && sec.tabs) || [], stats: (sec && sec.stats) || [], actions: (sec && sec.actions) || [] };
+            const e = this.menuEntry;
+            const tabs = e && e.group ? e.group.children.filter((c) => c.ready).map((c) => ({ label: this.$t(c.title), to: c.to, icon: TAB_ICONS[c.title] || e.group.icon })) : [];
+            return { tabs: tabs.length > 1 ? tabs : [], stats: [], actions: [] };
         },
         currentTabs() {
             return this.currentSection.tabs;
@@ -366,9 +264,9 @@ export default {
             const a = this.hdr.glance.attention;
             return [
                 { label: "Orders", icon: "mdi-receipt-text-outline", color: "#2f5be7", tint: "#e6edff", to: "/admin/orders", badge: a[0].count, tone: "" },
-                { label: "Products", icon: "mdi-package-variant-closed", color: "#0f9d6b", tint: "#dff5ec", to: "/admin/catalog", badge: a[1].count, tone: "warn" },
+                { label: "Products", icon: "mdi-package-variant-closed", color: "#0f9d6b", tint: "#dff5ec", to: "/admin/products", badge: a[1].count, tone: "warn" },
                 { label: "Customers", icon: "mdi-account-group-outline", color: "#7c3aed", tint: "#efe8ff", to: "/admin/customers" },
-                { label: "Reports", icon: "mdi-chart-line", color: "#d97706", tint: "#fff1d1", to: "/admin/sales-analytics" },
+                { label: "Reports", icon: "mdi-chart-line", color: "#d97706", tint: "#fff1d1", to: "/admin/analytics/sales" },
             ];
         },
 
@@ -401,7 +299,7 @@ export default {
                     title: `Search for “${this.query.trim()}”`,
                     items: [
                         { id: "s-orders", label: "Orders", hint: "Find in all orders", icon: "mdi-receipt-text-outline", color: "#0f9d6b", tint: "#dff5ec", to: `/admin/orders?search=${enc}`, remember: true },
-                        { id: "s-products", label: "Products", hint: "Find in catalog", icon: "mdi-package-variant-closed", color: "#2f5be7", tint: "#e6edff", to: `/admin/catalog?search=${enc}`, remember: true },
+                        { id: "s-products", label: "Products", hint: "Find in catalog", icon: "mdi-package-variant-closed", color: "#2f5be7", tint: "#e6edff", to: `/admin/products?q=${enc}`, remember: true },
                         { id: "s-customers", label: "Customers", hint: "Find by name, phone or email", icon: "mdi-account-group-outline", color: "#7c3aed", tint: "#efe8ff", to: `/admin/customers?search=${enc}`, remember: true },
                     ],
                 });

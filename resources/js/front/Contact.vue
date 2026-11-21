@@ -32,13 +32,19 @@
                     <li v-if="s['store.address']"><v-icon size="18">mdi-map-marker-outline</v-icon><span>{{ $t(s["store.address"]) }}</span></li>
                     <li v-if="s['store.hours']"><v-icon size="18">mdi-clock-outline</v-icon><span>{{ $t(s["store.hours"]) }}</span></li>
                 </ul>
+                <v-btn-secondary v-if="directions" class="mt-4" block prepend-icon="mdi-directions" :href="directions" target="_blank" rel="noopener">{{ $t("Get directions") }}</v-btn-secondary>
             </aside>
         </div>
+
+        <section v-if="mapUrl" class="tt-map-card" :aria-label="$t('Our location on the map')">
+            <iframe :src="mapUrl" :title="$t('Map showing {name}', { name: s['store.name'] || '' })" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </section>
     </div>
 </template>
 
 <script>
 import api, { fieldErrors } from "@/api";
+import { mapEmbedUrl, directionsUrl } from "@/utils/map";
 
 export default {
     name: "Contact",
@@ -46,6 +52,12 @@ export default {
     computed: {
         s() {
             return this.$store.state.prefs.settings;
+        },
+        mapUrl() {
+            return mapEmbedUrl(this.s["store.map_location"], this.s["store.address"]);
+        },
+        directions() {
+            return directionsUrl(this.s["store.map_location"], this.s["store.address"]);
         },
     },
     methods: {
