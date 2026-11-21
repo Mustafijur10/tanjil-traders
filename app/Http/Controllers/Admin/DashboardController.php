@@ -73,7 +73,14 @@ class DashboardController extends Controller
                     'value'    => (clone $active)->count(),
                     'previous' => null,
                     'series'   => $series('count(*)', Product::query()),
-                    'meta'     => ['added' => Product::whereBetween('created_at', [$from, $now])->count(), 'drafts' => Product::where('status', 'draft')->count()],
+                    'meta'     => [
+                        'added'   => Product::whereBetween('created_at', [$from, $now])->count(),
+                        'drafts'  => Product::where('status', 'draft')->count(),
+                        // Stock health of published products, for the donut
+                        'healthy' => (clone $active)->where('stock_qty', '>', $low)->count(),
+                        'low'     => (clone $active)->whereBetween('stock_qty', [1, $low])->count(),
+                        'out'     => (clone $active)->where('stock_qty', '<=', 0)->count(),
+                    ],
                 ],
                 'customers' => [
                     'value'    => User::where('role', 'customer')->count(),

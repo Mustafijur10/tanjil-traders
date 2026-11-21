@@ -67,18 +67,49 @@
                     </div>
                     <div class="tt-kpi-value" :class="{ 'is-loading': kpiLoading }">{{ kpiLoading ? "—" : k.value }}</div>
                     <div class="tt-kpi-vs">{{ k.compare }}</div>
-                    <div class="tt-kpi-chart">
-                        <apexchart
-                            v-if="k.spark.length > 1 && k.spark.some((v) => v)"
-                            :key="k.key + range + k.spark.length"
-                            type="bar"
-                            width="100%"
-                            height="64"
-                            :options="barOptions(k)"
-                            :series="[{ name: $t(k.label), data: k.spark }]"
-                        />
-                        <!-- No data yet: faint placeholder bars -->
-                        <div v-else class="tt-kpi-ghost" aria-hidden="true"><span v-for="n in 12" :key="n"></span></div>
+                    <div class="tt-kpi-chart" :class="'is-' + k.chart">
+                        <!-- Products: stock health donut with legend -->
+                        <template v-if="k.chart === 'donut'">
+                            <apexchart v-if="k.raw" :key="'d' + range" type="donut" width="78" height="78" :options="donutOptions(k)" :series="stockParts(k).map((p) => p.n)" />
+                            <span v-else class="tt-kpi-ring-empty"></span>
+                            <ul class="tt-kpi-legend">
+                                <li v-for="p in stockParts(k)" :key="p.label"><i :style="{ '--dot': p.color }"></i>{{ $t(p.label) }}<b>{{ $num(p.n) }}</b></li>
+                            </ul>
+                        </template>
+
+                        <!-- Return rate: one percentage as a ring -->
+                        <template v-else-if="k.chart === 'gauge'">
+                            <apexchart :key="'g' + range" type="radialBar" width="84" height="84" :options="kpiGaugeOptions(k)" :series="[Math.min(100, k.raw)]" />
+                            <div class="tt-kpi-gauge-text">
+                                <b>{{ $t("Of completed orders") }}</b>
+                                <span>{{ $t("Returned after delivery. Lower is better.") }}</span>
+                            </div>
+                        </template>
+
+                        <!-- Low stock: healthy / low / out as one bar -->
+                        <template v-else-if="k.chart === 'stack'">
+                            <div class="tt-kpi-stack" role="img" :aria-label="$t('Stock health')">
+                                <span v-for="p in stockParts(k)" v-show="p.n" :key="p.label" :style="{ '--w': p.n, '--c': p.color }" :title="`${$t(p.label)}: ${$num(p.n)}`"></span>
+                            </div>
+                            <ul class="tt-kpi-legend is-row">
+                                <li v-for="p in stockParts(k)" :key="p.label"><i :style="{ '--dot': p.color }"></i>{{ $t(p.label) }}<b>{{ $num(p.n) }}</b></li>
+                            </ul>
+                        </template>
+
+                        <!-- Trends: bars for counts, area for money, line for averages -->
+                        <template v-else>
+                            <apexchart
+                                v-if="k.spark.length > 1 && k.spark.some((v) => v)"
+                                :key="k.key + range + k.spark.length"
+                                :type="k.chart"
+                                width="100%"
+                                height="64"
+                                :options="k.chart === 'bar' ? barOptions(k) : trendOptions(k)"
+                                :series="[{ name: $t(k.label), data: k.spark }]"
+                            />
+                            <!-- No data yet: faint placeholder bars -->
+                            <div v-else class="tt-kpi-ghost" aria-hidden="true"><span v-for="n in 12" :key="n"></span></div>
+                        </template>
                     </div>
                     <div class="tt-kpi-foot">
                         <v-icon size="15">{{ k.footIcon }}</v-icon><span class="tt-ellipsis">{{ k.foot }}</span>
@@ -1065,7 +1096,7 @@ export default {
                     foot: (m) => this.$tn(m.visitors || 0, "{n} visitor", "{n} visitors"), footIcon: "mdi-account-eye-outline" },
                 { key: "pending", label: "Orders waiting", icon: "mdi-clock-outline", color: "#0891b2", fmt: num, inverse: true,
                     compare: () => this.$t("Pending confirmation right now"),
-                    foot: (m) => (m.oldest_hours === null || m.oldest_hours === undefined ? this.$t("Nothing is waiting") : this.$t("Oldest has waited {n} hours", { n: num(m.oldest_hours) })), footIcon: "mdi-timer-sand" },
+                    foot: (m) => (m.oldest_hours === null || m.oldest_hours === undefined ? this.$t("Nothing is waiting") : m.oldest_hours >= 48 ? this.$tn(Math.floor(m.oldest_hours / 24), "Oldest has waited {n} day", "Oldest has waited {n} days") : this.$tn(m.oldest_hours, "Oldest has waited {n} hour", "Oldest has waited {n} hours")), footIcon: "mdi-timer-sand" },
                 { key: "returns", label: "Return rate", icon: "mdi-backup-restore", color: "#c2410c", fmt: pct, inverse: true,
                     foot: (m) => this.$tn(m.returned || 0, "{n} order returned", "{n} orders returned"), footIcon: "mdi-package-variant-remove" },
                 { key: "low_stock", label: "Low stock", icon: "mdi-alert-outline", color: "#0f766e", fmt: num, inverse: true, to: "/admin/products?tab=low",
@@ -1087,6 +1118,10 @@ export default {
                     spark: this.smooth(d.series || [], def.key === "aov" || def.key === "conversion" ? "avg" : "sum"),
                     foot: this.kpiLoading ? "" : def.foot(d.meta || {}),
                     footIcon: def.footIcon,
+                    // The chart that suits each number best
+                    chart: { revenue: "area", orders: "bar", aov: "line", customers: "bar", products: "donut", conversion: "line", pending: "bar", returns: "gauge", low_stock: "stack" }[def.key],
+                    raw: d.value || 0,
+                    meta: d.meta || {},
                 };
             });
         },
@@ -1688,6 +1723,72 @@ export default {
             } finally {
                 this.kpiLoading = false;
             }
+        },
+        kpiTooltip(k) {
+            const isMoney = ["revenue", "aov"].includes(k.key);
+            return {
+                enabled: true,
+                x: { show: false },
+                marker: { show: false },
+                y: { title: { formatter: () => "" }, formatter: (v) => (isMoney ? this.$money(v) : this.$num(v)) },
+            };
+        },
+        // Area (money) and line (averages, visitors) trends
+        trendOptions(k) {
+            const line = k.chart === "line";
+            return {
+                chart: { sparkline: { enabled: true }, animations: { enabled: true, speed: 450 } },
+                stroke: { curve: "smooth", width: line ? 2.5 : 2.2 },
+                colors: [k.color],
+                fill: line ? { type: "solid", opacity: 1 } : { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.42, opacityTo: 0.02, stops: [0, 100] } },
+                markers: line ? { size: 3, strokeWidth: 2, strokeColors: "#fff", colors: [k.color], hover: { size: 5 } } : { size: 0, hover: { size: 4 } },
+                grid: { padding: { left: 4, right: 4, top: 8, bottom: 4 } },
+                tooltip: this.kpiTooltip(k),
+            };
+        },
+        // Products card: healthy / low / out of stock
+        stockParts(k) {
+            const m = k.meta;
+            if (k.key === "low_stock") {
+                const total = this.kpiData?.cards?.products?.meta || {};
+                return [
+                    { label: "Healthy", n: total.healthy || 0, color: "#0f9d6b" },
+                    { label: "Low", n: k.raw || 0, color: "#f59e0b" },
+                    { label: "Out", n: m.out || 0, color: "#d64545" },
+                ];
+            }
+            return [
+                { label: "In stock", n: m.healthy || 0, color: "#0f9d6b" },
+                { label: "Low", n: m.low || 0, color: "#f59e0b" },
+                { label: "Out", n: m.out || 0, color: "#d64545" },
+            ];
+        },
+        donutOptions(k) {
+            return {
+                chart: { sparkline: { enabled: true } },
+                labels: this.stockParts(k).map((p) => this.$t(p.label)),
+                colors: this.stockParts(k).map((p) => p.color),
+                dataLabels: { enabled: false },
+                legend: { show: false },
+                stroke: { width: 2, colors: [this.$vuetify.theme.current.colors.surface] },
+                plotOptions: { pie: { expandOnClick: false, donut: { size: "66%" } } },
+                tooltip: { y: { formatter: (v) => this.$num(v) } },
+            };
+        },
+        // Return rate ring: a single percentage
+        kpiGaugeOptions(k) {
+            return {
+                chart: { sparkline: { enabled: true } },
+                colors: [k.color],
+                plotOptions: {
+                    radialBar: {
+                        hollow: { size: "56%" },
+                        track: { background: k.color + "1f", strokeWidth: "100%" },
+                        dataLabels: { name: { show: false }, value: { offsetY: 5, fontSize: "14px", fontWeight: 700, color: k.color, formatter: (v) => this.$num(v) + "%" } },
+                    },
+                },
+                stroke: { lineCap: "round" },
+            };
         },
         // Mini bar chart for a KPI card: rounded columns, the latest one in full colour, earlier ones lighter.
         barOptions(k) {

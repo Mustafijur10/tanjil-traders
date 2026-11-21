@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/bootstrap', Store\BootstrapController::class);
 Route::get('/home', Store\HomeController::class);
+Route::get('/shop', [Store\ShopController::class, 'index']);
+Route::get('/search/suggest', [Store\ShopController::class, 'suggest'])->middleware('throttle:60,1');
+Route::get('/brands', [Store\ShopController::class, 'brands']);
+Route::get('/products/{slug}', [Store\ShopController::class, 'product']);
+Route::post('/products/{slug}/reviews', [Store\ShopController::class, 'review'])->middleware('throttle:5,10');
+Route::get('/compare', [Store\ShopController::class, 'compare']);
 Route::get('/pages/{slug}', [Store\PageController::class, 'show']);
 Route::post('/contact', [Store\PageController::class, 'contact'])->middleware('throttle:5,10');
 

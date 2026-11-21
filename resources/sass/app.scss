@@ -1776,6 +1776,25 @@ body.tt-drawer-lock { overflow: hidden; }
 .tt-dash .tt-delta.flat { background: var(--bg2); color: var(--muted); }
 :root[data-theme="dark"] .tt-dash .tt-delta.flat { background: rgba(255, 255, 255, 0.06); }
 
+/* ── KPI card chart variants: donut, gauge, stacked health bar ── */
+.tt-dash .tt-kpi-chart.is-donut, .tt-dash .tt-kpi-chart.is-gauge { height: 84px; display: flex; align-items: center; gap: 16px; margin-top: 4px; margin-bottom: 8px; }
+.tt-dash .tt-kpi-chart.is-stack { height: 84px; display: flex; flex-direction: column; justify-content: center; gap: 12px; margin-top: 4px; margin-bottom: 8px; }
+.tt-dash .tt-kpi-ring-empty { flex: none; width: 70px; height: 70px; border-radius: 50%; border: 10px solid color-mix(in srgb, var(--accent) 14%, transparent); }
+.tt-dash .tt-kpi-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; flex: 1; min-width: 0; font-size: 12.5px; color: var(--muted); }
+.tt-dash .tt-kpi-legend li { display: flex; align-items: center; gap: 8px; }
+.tt-dash .tt-kpi-legend i { flex: none; width: 9px; height: 9px; border-radius: 3px; background: var(--dot); }
+.tt-dash .tt-kpi-legend b { margin-left: auto; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tt-dash .tt-kpi-legend.is-row { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.tt-dash .tt-kpi-legend.is-row b { margin-left: 4px; }
+.tt-dash .tt-kpi-stack { display: flex; gap: 3px; height: 14px; border-radius: 99px; overflow: hidden; background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.tt-dash .tt-kpi-stack span { flex: var(--w) 1 0; min-width: 6px; background: var(--c); border-radius: 99px; }
+.tt-dash .tt-kpi-gauge-text { min-width: 0; display: grid; gap: 2px; }
+.tt-dash .tt-kpi-gauge-text b { font-size: 13.5px; color: var(--ink); font-weight: 600; }
+.tt-dash .tt-kpi-gauge-text span { font-size: 12px; color: var(--muted); line-height: 1.45; }
+.tt-dash .tt-kpi-chart.is-donut .apexcharts-canvas, .tt-dash .tt-kpi-chart.is-gauge .apexcharts-canvas { margin: 0; }
+/* Trend charts are 64px; the others are 84px; the footer always sits at the bottom */
+.tt-dash .tt-kpi-chart.is-bar, .tt-dash .tt-kpi-chart.is-area, .tt-dash .tt-kpi-chart.is-line { margin-top: 18px; margin-bottom: 14px; }
+
 /* ───────── 11. Storefront ───────── */
 .tt-front { --tt-wrap: 1320px; min-height: 100vh; display: flex; flex-direction: column; background: var(--tt-bg); }
 .tt-front > .v-main { flex: 1 0 auto; }
