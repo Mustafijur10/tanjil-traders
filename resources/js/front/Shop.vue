@@ -204,7 +204,7 @@ export default {
         url: fileUrl,
         params() {
             const q = this.$route.query;
-            const p = { page: q.page, sort: q.sort, brand: q.brand, min: q.min, max: q.max, stock: q.stock, sale: q.sale, rating: q.rating, q: q.q, per_page: 24 };
+            const p = { page: q.page, sort: q.sort, brand: q.brand, min: q.min, max: q.max, stock: q.stock, sale: q.sale, rating: q.rating, q: q.q, per_page: Number(this.$store.state.prefs.settings['display.products_per_page']) || 24 };
             if (this.mode === "category") p.category = this.$route.params.slug;
             if (this.mode === "brand") p.brand_page = this.$route.params.slug;
             if (this.mode === "deals") p.sale = 1;

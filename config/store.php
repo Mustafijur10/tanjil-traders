@@ -45,6 +45,35 @@ return [
         'checkout.nagad_number'   => '',
         'checkout.return_days'    => 7,      // days after delivery a customer can ask for a return (0 = off)
 
+        // Storefront display
+        'display.products_per_page' => 24,
+        'display.stock_left_under'  => 3,     // show "Only 3 left" at or below this; 0 = never
+        'display.show_ratings'      => true,
+        'display.show_compare'      => true,
+        'display.show_wishlist'     => true,
+        'display.show_whatsapp'     => true,
+
+        // SMS to customers (private)
+        'sms.enabled'       => false,
+        'sms.provider'      => 'bulksmsbd',  // bulksmsbd | custom
+        'sms.api_key'       => '',
+        'sms.sender_id'     => '',
+        'sms.api_url'       => '',           // custom gateway link with {phone} {message} {key} {sender}
+        'sms.on_placed'     => true,
+        'sms.on_confirmed'  => true,
+        'sms.on_shipped'    => true,
+        'sms.on_delivered'  => false,
+        'sms.on_cancelled'  => true,
+        'sms.tpl_placed'    => 'Dear {name}, we received your order {order} ({total} Tk). We will call you to confirm. - {store}',
+        'sms.tpl_confirmed' => 'Your order {order} is confirmed and will be packed soon. - {store}',
+        'sms.tpl_shipped'   => 'Your order {order} is on the way with {courier}. Tracking: {tracking}. Track: {link}',
+        'sms.tpl_delivered' => 'Your order {order} was delivered. Thank you for shopping with {store}!',
+        'sms.tpl_cancelled' => 'Your order {order} was cancelled. Questions? Call {phone}. - {store}',
+
+        // Alerts to the shop (private)
+        'notify.order_email' => '',
+        'notify.order_sms'   => '',
+
         // SEO defaults
         'seo.meta_title'       => 'Tanjil Traders - Electronics, gadgets and gear',
         'seo.meta_description' => '',
@@ -64,5 +93,6 @@ return [
         'integrations.google_translate_key',
         'integrations.pagespeed_key',
         'integrations.search_console_json',
+        'sms.api_key',
     ],
 ];

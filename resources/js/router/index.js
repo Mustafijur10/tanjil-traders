@@ -10,6 +10,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 import { t } from "@/plugins/i18n";
+import menu, { findMenuEntry } from "@/admin/menu";
 
 const admin = (path, component, title, extra = {}) => ({
     path: `/admin${path}`,
@@ -107,6 +108,9 @@ const routes = [
     admin("/settings/appearance", settingsPage, "Appearance & Language", { admin: true, section: "appearance" }),
     admin("/settings/payments", settingsPage, "Payments", { admin: true, section: "payments" }),
     admin("/settings/shipping", () => import("@/admin/settings/Shipping.vue"), "Shipping", { admin: true }),
+    admin("/settings/header", settingsPage, "Header & Display", { admin: true, section: "display" }),
+    admin("/settings/sms", () => import("@/admin/settings/SmsSettings.vue"), "SMS & Notifications", { admin: true }),
+    admin("/settings/staff", () => import("@/admin/settings/StaffRoles.vue"), "Staff & Roles", { admin: true }),
     admin("/settings/integrations", settingsPage, "Integrations & SEO", { admin: true, section: "integrations" }),
     admin("/settings/translations", () => import("@/admin/settings/Translations.vue"), "Language & Translations"),
 
@@ -134,6 +138,12 @@ router.beforeEach((to) => {
 
     if (to.meta.staff && !isStaff) {
         return { path: "/admin/login", query: to.fullPath !== "/admin" ? { redirect: to.fullPath } : {} };
+    }
+    // Staff limited to some areas (Settings › Staff & Roles): the area comes from the menu entry of the page
+    const area = to.path.startsWith("/admin") ? (findMenuEntry(to.path, menu)?.item.area ?? findMenuEntry(to.path, menu)?.group?.area) : null;
+    if (area && isStaff && !store.getters["auth/canAccess"](area)) {
+        store.dispatch("notify", { text: t("Your account cannot open this page. Ask an admin to allow it."), type: "warning" });
+        return { path: "/admin" };
     }
     if (to.meta.admin && !store.getters["auth/isAdmin"]) {
         store.dispatch("notify", { text: t("Only admins can open this page."), type: "warning" });

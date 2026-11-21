@@ -11,6 +11,7 @@
 
         <div class="tt-pcard-tools">
             <button
+                v-if="show.wishlist"
                 type="button"
                 class="tt-pcard-tool is-wish"
                 :class="{ 'is-on': saved }"
@@ -22,6 +23,7 @@
                 <v-icon size="18">{{ saved ? "mdi-heart" : "mdi-heart-outline" }}</v-icon>
             </button>
             <button
+                v-if="show.compare"
                 type="button"
                 class="tt-pcard-tool"
                 :class="{ 'is-on': inCompare }"
@@ -37,14 +39,14 @@
         <div class="tt-pcard-body">
             <span v-if="p.brand" class="tt-pcard-brand">{{ p.brand }}</span>
             <router-link :to="link" class="tt-pcard-name">{{ p.name }}</router-link>
-            <span v-if="p.reviews" class="tt-pcard-rating" :aria-label="$t('{n} out of 5 stars', { n: p.rating })">
+            <span v-if="p.reviews && show.ratings" class="tt-pcard-rating" :aria-label="$t('{n} out of 5 stars', { n: p.rating })">
                 <v-icon size="14">mdi-star</v-icon>{{ $num(p.rating) }}<small>({{ $num(p.reviews) }})</small>
             </span>
             <div class="tt-pcard-price">
                 <b>{{ $money(p.final_price) }}</b>
                 <s v-if="p.on_sale">{{ $money(p.price) }}</s>
             </div>
-            <span v-if="p.in_stock && p.stock_qty <= 3" class="tt-pcard-low">{{ $tn(p.stock_qty, "Only {n} left", "Only {n} left") }}</span>
+            <span v-if="p.in_stock && p.stock_qty <= show.stockLeftUnder" class="tt-pcard-low">{{ $tn(p.stock_qty, "Only {n} left", "Only {n} left") }}</span>
         </div>
 
         <div class="tt-pcard-actions">
@@ -64,6 +66,12 @@ export default {
         p: { type: Object, required: true },
     },
     computed: {
+        // Settings › Header & Display
+        show() {
+            const s = this.$store.state.prefs.settings;
+            const on = (k) => s[k] !== false;
+            return { wishlist: on("display.show_wishlist"), compare: on("display.show_compare"), ratings: on("display.show_ratings"), stockLeftUnder: Number(s["display.stock_left_under"] ?? 3) };
+        },
         link() {
             return `/product/${this.p.slug}`;
         },

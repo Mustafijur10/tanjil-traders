@@ -17,6 +17,8 @@ export default {
         isStaff: (s) => !!s.user && ["admin", "staff"].includes(s.user.role),
         isAdmin: (s) => s.user?.role === "admin",
         isCustomer: (s) => !!s.token && s.user?.role === "customer",
+        // Admins: everything. Staff: the areas on their account (no list = all).
+        canAccess: (s) => (area) => s.user?.role === "admin" || (s.user?.role === "staff" && (!Array.isArray(s.user.permissions) || s.user.permissions.includes(area))),
         user: (s) => s.user,
     },
 

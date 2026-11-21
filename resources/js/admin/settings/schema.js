@@ -124,6 +124,29 @@ export default {
         ],
     },
 
+    display: {
+        title: "Header & Display",
+        subtitle: "What product cards and pages show on the website. Your own admin header (clock, prayer times, layout) is set in the header settings sidebar.",
+        panels: [
+            {
+                title: "Product lists",
+                fields: [
+                    { key: "display.products_per_page", label: "Products per page", type: "select", options: [12, 24, 36, 48].map((n) => ({ value: n, title: String(n) })) },
+                    { key: "display.stock_left_under", label: "Show “Only N left” at", type: "number", suffix: "units or fewer", hint: "Creates urgency when stock is low. 0 turns it off." },
+                    { key: "display.show_ratings", label: "Star ratings on product cards", type: "switch" },
+                ],
+            },
+            {
+                title: "Buttons",
+                fields: [
+                    { key: "display.show_wishlist", label: "Wishlist (heart) button", type: "switch" },
+                    { key: "display.show_compare", label: "Compare button", type: "switch" },
+                    { key: "display.show_whatsapp", label: "“Ask on WhatsApp” on product pages", type: "switch", hint: "Needs your WhatsApp number in Store Information." },
+                ],
+            },
+        ],
+    },
+
     integrations: {
         title: "Integrations & SEO",
         subtitle: "Search engine defaults and Google services.",

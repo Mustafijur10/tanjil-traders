@@ -107,7 +107,8 @@ export default {
         // Staff do not see admin-only pages; a section label is dropped when nothing under it is visible.
         menu() {
             const isAdmin = this.$store.getters["auth/isAdmin"];
-            const visible = (i) => !i.admin || isAdmin;
+            const can = this.$store.getters["auth/canAccess"];
+            const visible = (i) => (!i.admin || isAdmin) && (!i.area || can(i.area));
             const items = menu
                 .filter((i) => i.section || visible(i))
                 .map((i) => (i.children ? { ...i, children: i.children.filter(visible) } : i))

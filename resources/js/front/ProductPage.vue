@@ -117,13 +117,13 @@
                     <p v-else-if="inCart && stock > 0" class="tt-muted tt-small">{{ $tn(inCart, "{n} already in your cart.", "{n} already in your cart.") }}</p>
 
                     <div class="tt-pdp-actions">
-                        <v-btn-tertiary :prepend-icon="saved ? 'mdi-heart' : 'mdi-heart-outline'" :color="saved ? 'error' : undefined" @click="$store.dispatch('wishlist/toggle', p.id)">
+                        <v-btn-tertiary v-if="settings['display.show_wishlist'] !== false" :prepend-icon="saved ? 'mdi-heart' : 'mdi-heart-outline'" :color="saved ? 'error' : undefined" @click="$store.dispatch('wishlist/toggle', p.id)">
                             {{ $t(saved ? "Saved" : "Save") }}
                         </v-btn-tertiary>
-                        <v-btn-tertiary :prepend-icon="inCompare ? 'mdi-check' : 'mdi-compare-horizontal'" :color="inCompare ? 'primary' : undefined" @click="toggleCompare">
+                        <v-btn-tertiary v-if="settings['display.show_compare'] !== false" :prepend-icon="inCompare ? 'mdi-check' : 'mdi-compare-horizontal'" :color="inCompare ? 'primary' : undefined" @click="toggleCompare">
                             {{ $t(inCompare ? "Added to compare" : "Compare") }}
                         </v-btn-tertiary>
-                        <v-btn-tertiary v-if="whatsapp" prepend-icon="mdi-whatsapp" :href="whatsappLink" target="_blank" rel="noopener">{{ $t("Ask on WhatsApp") }}</v-btn-tertiary>
+                        <v-btn-tertiary v-if="whatsapp && settings['display.show_whatsapp'] !== false" prepend-icon="mdi-whatsapp" :href="whatsappLink" target="_blank" rel="noopener">{{ $t("Ask on WhatsApp") }}</v-btn-tertiary>
                         <v-btn-tertiary v-if="phone" prepend-icon="mdi-phone-outline" :href="`tel:${phone}`">{{ $t("Call to order") }}</v-btn-tertiary>
                     </div>
 

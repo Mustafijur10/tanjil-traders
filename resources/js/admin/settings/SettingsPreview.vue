@@ -79,6 +79,28 @@
 
             <!-- Integrations & SEO: the home page in Google -->
             <GooglePreview v-else-if="section === 'integrations'" :title="v['seo.meta_title']" :description="v['seo.meta_description']" path="/" />
+            <!-- Header & Display: a product card with the chosen options -->
+            <div v-else-if="section === 'display'" class="tt-pv-display">
+                <article class="tt-pcard tt-pv-pcard">
+                    <div class="tt-pcard-media"><span class="tt-pcard-noimg"><v-icon size="34">mdi-cellphone</v-icon></span></div>
+                    <div class="tt-pcard-tools">
+                        <span v-if="v['display.show_wishlist']" class="tt-pcard-tool is-wish"><v-icon size="18">mdi-heart-outline</v-icon></span>
+                        <span v-if="v['display.show_compare']" class="tt-pcard-tool"><v-icon size="18">mdi-compare-horizontal</v-icon></span>
+                    </div>
+                    <div class="tt-pcard-body">
+                        <span class="tt-pcard-brand">SAMSUNG</span>
+                        <span class="tt-pcard-name">Galaxy A55 5G</span>
+                        <span v-if="v['display.show_ratings']" class="tt-pcard-rating"><v-icon size="14">mdi-star</v-icon>4.6<small>(12)</small></span>
+                        <div class="tt-pcard-price"><b>{{ $money(52999) }}</b></div>
+                        <span v-if="Number(v['display.stock_left_under']) >= 2" class="tt-pcard-low">{{ $t("Only {n} left", { n: 2 }) }}</span>
+                    </div>
+                </article>
+                <div class="tt-pv-header-note">
+                    <v-icon size="20">mdi-page-layout-header</v-icon>
+                    <span>{{ $t("Your admin header has its own settings: clock, prayer times, accent colour and which buttons show. They are saved to your account.") }}</span>
+                    <v-btn-secondary size="small" prepend-icon="mdi-tune-variant" @click="openHeaderSettings">{{ $t("Open header settings") }}</v-btn-secondary>
+                </div>
+            </div>
         </div>
     </section>
 </template>
@@ -95,6 +117,7 @@ const META = {
     appearance: { title: "Website preview", icon: "mdi-palette-outline" },
     payments: { title: "Checkout preview", icon: "mdi-credit-card-outline" },
     integrations: { title: "Your home page in Google", icon: "mdi-google" },
+    display: { title: "Product card preview", icon: "mdi-card-text-outline" },
 };
 
 export default {
@@ -142,6 +165,10 @@ export default {
     },
     methods: {
         url: fileUrl,
+        // The header opens its settings sidebar on Ctrl + , (its own shortcut), so we send that
+        openHeaderSettings() {
+            window.dispatchEvent(new KeyboardEvent("keydown", { key: ",", ctrlKey: true, bubbles: true }));
+        },
     },
 };
 </script>

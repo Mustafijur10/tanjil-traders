@@ -2770,6 +2770,57 @@ a.tt-path:hover { color: var(--tt-primary); }
 .tt-psi-tips ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
 @media (max-width: $bp-sm) { .tt-psi { grid-template-columns: 1fr; } }
 
+// ── Staff & Roles ──
+.tt-staff-list { list-style: none; margin: 0; padding: 0; }
+.tt-staff-list li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 16px; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--tt-line); }
+.tt-staff-list li:last-child { border-bottom: 0; }
+.tt-staff-list li.is-off { opacity: 0.6; }
+.tt-staff-main { display: grid; gap: 3px; min-width: 0; }
+.tt-staff-main b { font-size: 15px; }
+.tt-staff-areas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.tt-area-chip { padding: 2px 9px; border-radius: 99px; background: var(--tt-field); border: 1px solid var(--tt-line); font-size: 12px; font-weight: 500; color: var(--tt-ink-2); }
+.tt-area-chip.is-all { background: var(--tt-soft); border-color: transparent; color: var(--tt-primary); }
+.tt-area-chip.is-none { background: var(--tt-amber-soft); border-color: transparent; color: #92400e; }
+.tt-staff-side { display: grid; justify-items: end; gap: 4px; }
+.tt-staff-actions { display: flex; gap: 2px; }
+@media (max-width: $bp-sm) { .tt-staff-list li { grid-template-columns: auto minmax(0, 1fr) auto; } .tt-staff-side { grid-column: 2; justify-items: start; } }
+.tt-area-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: $bp-sm) { .tt-area-grid { grid-template-columns: 1fr; } }
+.tt-area-option { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--tt-line); border-radius: 12px; cursor: pointer; }
+.tt-area-option input { width: 17px; height: 17px; margin-top: 3px; accent-color: var(--tt-primary); flex: none; }
+.tt-area-option > .v-icon { color: var(--tt-muted); margin-top: 1px; }
+.tt-area-option span { display: grid; gap: 1px; font-size: 14px; }
+.tt-area-option small { font-size: 12px; color: var(--tt-muted); }
+.tt-area-option.is-on { border-color: var(--tt-primary); background: var(--tt-hover); }
+.tt-area-option.is-on > .v-icon { color: var(--tt-primary); }
+
+// ── SMS & Notifications ──
+.tt-sms-test { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-start !important; }
+.tt-sms-test .v-input { flex: 0 1 240px; }
+.tt-sms-events { display: grid; gap: 16px; }
+.tt-sms-event { display: grid; gap: 6px; padding-bottom: 16px; border-bottom: 1px dashed var(--tt-line); }
+.tt-sms-event-head { display: flex; align-items: center; gap: 8px; }
+.tt-sms-event-head .v-icon { color: var(--tt-primary); }
+.tt-sms-event-head b { flex: 1; font-size: 14.5px; }
+.tt-sms-event.is-off .tt-sms-event-head .v-icon, .tt-sms-event.is-off .tt-sms-sample { opacity: 0.45; }
+.tt-sms-sample { margin: 0; padding: 10px 12px; border-radius: 14px 14px 14px 4px; background: var(--tt-surface-2); border: 1px solid var(--tt-line); font-size: 13px; color: var(--tt-ink-2); max-width: 440px; }
+.tt-sms-events code { margin: 0 3px; padding: 1px 6px; border-radius: 6px; background: var(--tt-field); font-size: 12px; }
+.tt-sms-log { list-style: none; margin: 0; padding: 4px 20px 12px; }
+.tt-sms-log li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--tt-line); font-size: 13.5px; }
+.tt-sms-log li:last-child { border-bottom: 0; }
+.tt-sms-log li > span { display: grid; gap: 2px; min-width: 0; }
+.tt-sms-log li.is-sent > .v-icon { color: var(--tt-primary); }
+.tt-sms-log li.is-failed > .v-icon { color: var(--tt-danger); }
+
+// ── Header & Display preview ──
+.tt-pv-display { display: grid; gap: 16px; }
+.tt-pv-pcard { max-width: 230px; margin: 0 auto; }
+.tt-pv-pcard .tt-pcard-tool { opacity: 1; }
+.tt-pv-pcard .tt-pcard-media { aspect-ratio: 1.3; }
+.tt-pv-header-note { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: start; padding: 14px; border-radius: 12px; background: var(--tt-surface-2); font-size: 13px; color: var(--tt-ink-2); }
+.tt-pv-header-note > .v-icon { color: var(--tt-primary); }
+.tt-pv-header-note .v-btn { grid-column: 2; justify-self: start; }
+
 // Footer
 .tt-footer { margin-top: 40px; background: var(--tt-forest); color: #cfeee2; }
 .tt-footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.2fr; gap: 32px; padding-top: 44px; padding-bottom: 36px; }

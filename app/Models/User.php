@@ -15,7 +15,10 @@ class User extends Authenticatable
 
     public const ROLES = ['admin', 'staff', 'customer'];
 
-    protected $fillable = ['name', 'email', 'phone', 'password', 'role', 'is_active', 'preferences'];
+    /** Parts of the admin a staff account can be allowed into. Settings are for admins only. */
+    public const AREAS = ['catalog', 'inventory', 'orders', 'customers', 'promotions', 'content', 'analytics'];
+
+    protected $fillable = ['name', 'email', 'phone', 'password', 'role', 'permissions', 'is_active', 'preferences'];
 
     protected $hidden = ['password'];
 
@@ -28,7 +31,21 @@ class User extends Authenticatable
             'password'    => 'hashed',
             'is_active'   => 'boolean',
             'preferences' => 'array',
+            'permissions' => 'array',
         ];
+    }
+
+    /** Admins can open everything; staff only the areas on their account (no list = every area). */
+    public function canAccess(string $area): bool
+    {
+        if (! $this->is_active || ! $this->isStaff()) {
+            return false;
+        }
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->permissions === null || in_array($area, $this->permissions, true);
     }
 
     public function isStaff(): bool

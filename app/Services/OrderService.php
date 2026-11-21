@@ -209,6 +209,11 @@ class OrderService
                 'user_id' => $staff?->id,
             ]);
 
+            // SMS to the customer and an alert to the shop (sent after the order is saved)
+            if ($source === 'web') {
+                app(OrderNotifier::class)->orderEvent($order, 'placed');
+            }
+
             if (($data['status'] ?? 'pending') === 'confirmed') {
                 $this->changeStatus($order, 'confirmed', null, $staff);
             }
@@ -244,6 +249,7 @@ class OrderService
 
             $order->update($changes);
             $order->history()->create(['status' => $status, 'note' => $note, 'user_id' => $by?->id]);
+            app(OrderNotifier::class)->orderEvent($order, $status);
 
             return $order;
         });

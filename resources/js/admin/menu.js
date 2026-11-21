@@ -5,6 +5,7 @@
  *   { title, icon, children: [{ title, to }] }   group
  * `ready: false` shows the item greyed out with "Soon" until its page is built.
  * `admin: true` hides the item from staff accounts.
+ * `area` (on a group or item) hides it from staff whose account does not allow that area (Settings › Staff & Roles).
  * Page headers take their icon and breadcrumb from here, so keep titles in sync with the pages.
  */
 export default [
@@ -14,6 +15,7 @@ export default [
     { section: "Store" },
     {
         title: "Catalog",
+        area: "catalog",
         icon: "mdi-package-variant-closed",
         children: [
             { title: "All Products", to: "/admin/products", exact: true, ready: true },
@@ -28,6 +30,7 @@ export default [
     },
     {
         title: "Inventory",
+        area: "inventory",
         icon: "mdi-warehouse",
         children: [
             { title: "Stock Overview", to: "/admin/inventory", exact: true, ready: true },
@@ -38,6 +41,7 @@ export default [
     { section: "Sales" },
     {
         title: "Orders",
+        area: "orders",
         icon: "mdi-receipt-text-outline",
         children: [
             { title: "All Orders", to: "/admin/orders", exact: true, ready: true },
@@ -46,9 +50,10 @@ export default [
             { title: "Couriers", to: "/admin/couriers", ready: true },
         ],
     },
-    { title: "Customers", icon: "mdi-account-group-outline", to: "/admin/customers", ready: true },
+    { title: "Customers", icon: "mdi-account-group-outline", to: "/admin/customers", area: "customers", ready: true },
     {
         title: "Promotions",
+        area: "promotions",
         icon: "mdi-ticket-percent-outline",
         children: [
             { title: "Coupons", to: "/admin/coupons", ready: true },
@@ -79,6 +84,7 @@ export default [
     { section: "Website" },
     {
         title: "Content",
+        area: "content",
         icon: "mdi-web",
         children: [
             { title: "Carousel & Banners", to: "/admin/banners", ready: true },
@@ -92,6 +98,7 @@ export default [
     { section: "Insights" },
     {
         title: "Analytics",
+        area: "analytics",
         icon: "mdi-chart-box-outline",
         children: [
             { title: "Sales", to: "/admin/analytics/sales", ready: true },
@@ -113,12 +120,12 @@ export default [
             { title: "Store Information", to: "/admin/settings/store", ready: true, admin: true },
             { title: "Appearance & Language", to: "/admin/settings/appearance", ready: true, admin: true },
             { title: "Language & Translations", to: "/admin/settings/translations", ready: true },
-            { title: "Header & Display", to: "/admin/settings/header", ready: false },
+            { title: "Header & Display", to: "/admin/settings/header", ready: true, admin: true },
             { title: "Shipping", to: "/admin/settings/shipping", ready: true, admin: true },
             { title: "Payments", to: "/admin/settings/payments", ready: true, admin: true },
-            { title: "SMS & Notifications", to: "/admin/settings/sms", ready: false, admin: true },
+            { title: "SMS & Notifications", to: "/admin/settings/sms", ready: true, admin: true },
             { title: "Integrations & SEO", to: "/admin/settings/integrations", ready: true, admin: true },
-            { title: "Staff & Roles", to: "/admin/settings/staff", ready: false, admin: true },
+            { title: "Staff & Roles", to: "/admin/settings/staff", ready: true, admin: true },
             { title: "My Profile", to: "/admin/profile", ready: true },
         ],
     },

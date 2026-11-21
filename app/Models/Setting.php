@@ -21,7 +21,7 @@ class Setting extends Model
     private const CACHE_KEY = 'settings.all';
 
     /** Keys that may be sent to the storefront. Everything else (API keys ...) stays private. */
-    public const PUBLIC_PREFIXES = ['store.', 'appearance.', 'language.', 'social.', 'checkout.', 'seo.'];
+    public const PUBLIC_PREFIXES = ['store.', 'appearance.', 'language.', 'social.', 'checkout.', 'seo.', 'display.'];
 
     /** Defaults from config/store.php, overridden by saved values. */
     public static function cached(): array
