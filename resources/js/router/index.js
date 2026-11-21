@@ -40,6 +40,15 @@ const routes = [
     admin("/attributes", () => import("@/admin/catalog/Attributes.vue"), "Attributes & Specs"),
     admin("/reviews", () => import("@/admin/catalog/Reviews.vue"), "Reviews"),
 
+    // Website content
+    admin("/banners", () => import("@/admin/content/Banners.vue"), "Carousel & Banners"),
+    admin("/announcements", () => import("@/admin/content/Announcements.vue"), "Announcement Bar"),
+    admin("/home-sections", () => import("@/admin/content/HomeSections.vue"), "Homepage Sections"),
+    admin("/pages", () => import("@/admin/content/Pages.vue"), "Pages"),
+    admin("/pages/new", () => import("@/admin/content/PageEditor.vue"), "Add page"),
+    admin("/pages/:id(\\d+)", () => import("@/admin/content/PageEditor.vue"), "Edit page"),
+    admin("/messages", () => import("@/admin/content/Messages.vue"), "Contact Messages"),
+
     admin("/settings/store", settingsPage, "Store Information", { admin: true, section: "store" }),
     admin("/settings/appearance", settingsPage, "Appearance & Language", { admin: true, section: "appearance" }),
     admin("/settings/payments", settingsPage, "Payments", { admin: true, section: "payments" }),

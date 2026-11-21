@@ -81,11 +81,11 @@ export default [
         title: "Content",
         icon: "mdi-web",
         children: [
-            { title: "Carousel & Banners", to: "/admin/banners", ready: false },
-            { title: "Announcement Bar", to: "/admin/announcements", ready: false },
-            { title: "Homepage Sections", to: "/admin/home-sections", ready: false },
-            { title: "Pages", to: "/admin/pages", ready: false },
-            { title: "Contact Messages", to: "/admin/messages", ready: false },
+            { title: "Carousel & Banners", to: "/admin/banners", ready: true },
+            { title: "Announcement Bar", to: "/admin/announcements", ready: true },
+            { title: "Homepage Sections", to: "/admin/home-sections", ready: true },
+            { title: "Pages", to: "/admin/pages", ready: true },
+            { title: "Contact Messages", to: "/admin/messages", ready: true },
         ],
     },
 

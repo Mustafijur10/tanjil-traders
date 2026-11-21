@@ -241,6 +241,7 @@ import api, { fieldErrors, fileUrl } from "@/api";
 import ProductImages from "@/components/catalog/ProductImages.vue";
 import ProductVariants from "@/components/catalog/ProductVariants.vue";
 import GooglePreview from "@/components/ui/GooglePreview.vue";
+import { toLocalInput, fromLocalInput } from "@/utils/datetime";
 
 const slugify = (s) => String(s || "").toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, "").trim().replace(/[\s_]+/g, "-").replace(/-+/g, "-");
 let keySeq = 0;
@@ -378,7 +379,7 @@ export default {
                 // With variants the server sets the real price from the cheapest one; this just passes validation.
                 price: this.hasVariants ? (variants.length ? Math.min(...variants.map((v) => v.price)) : 0) : this.form.price,
                 sale_price: this.hasVariants ? null : this.form.sale_price || null,
-                sale_ends_at: this.form.sale_price ? this.form.sale_ends_at || null : null,
+                sale_ends_at: this.form.sale_price ? fromLocalInput(this.form.sale_ends_at) : null,
                 cost_price: this.form.cost_price === "" ? null : this.form.cost_price,
                 sku: this.form.sku || null,
                 brand_id: this.form.brand_id || null,
@@ -441,7 +442,7 @@ export default {
             this.form = {
                 ...blank(),
                 ...Object.fromEntries(Object.keys(blank()).map((k) => [k, p[k] ?? blank()[k]])),
-                sale_ends_at: p.sale_ends_at ? p.sale_ends_at.slice(0, 16) : null,
+                sale_ends_at: toLocalInput(p.sale_ends_at),
                 images: p.images.map(({ path, alt }) => ({ path, alt })),
                 variants: p.variants.map((v) => ({
                     key: `v${++keySeq}`, id: v.id, sku: v.sku || "", price: v.price, sale_price: v.sale_price, stock_qty: v.stock_qty, is_active: v.is_active,
