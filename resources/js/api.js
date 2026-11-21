@@ -11,6 +11,7 @@ import axios from "axios";
 import store from "@/store";
 import router from "@/router";
 import { t } from "@/plugins/i18n";
+import { storage } from "@/store/storage";
 
 const api = axios.create({
     baseURL: "/api",
@@ -21,6 +22,9 @@ api.interceptors.request.use((config) => {
     const token = store.state.auth.token;
     if (token) config.headers.Authorization = `Bearer ${token}`;
     config.headers["Accept-Language"] = store.state.prefs.locale;
+    // Random browser id: links searches and orders to visits for Analytics (no personal data)
+    const vid = storage.get("tt_vid");
+    if (vid) config.headers["X-Visitor"] = vid;
     return config;
 });
 

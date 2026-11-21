@@ -97,7 +97,10 @@ class CheckoutController extends Controller
             'shipping_method_id.required'    => 'Choose a delivery option.',
         ]);
 
+        // Credit the order to the traffic source that brought this visitor (Analytics › Traffic)
+        $visitor = preg_match('/^[a-z0-9]{16,32}$/i', (string) $request->header('X-Visitor')) ? $request->header('X-Visitor') : null;
         $order = $this->orders->place($data, $user);
+        $order->forceFill(['visitor_id' => $visitor, 'traffic_source' => TrackController::sourceFor($visitor)])->saveQuietly();
 
         return response()->json(['number' => $order->order_number, 'phone' => $order->phone, 'total' => $order->total], 201);
     }

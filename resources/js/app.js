@@ -12,6 +12,7 @@ import router from "@/router";
 import store from "@/store";
 import vuetify from "@/plugins/vuetify";
 import i18n from "@/plugins/i18n";
+import tracker from "@/plugins/tracker";
 
 // Shared UI building blocks, available in every template without importing
 import PageHeader from "@/components/ui/PageHeader.vue";
@@ -31,6 +32,7 @@ app.use(store);
 app.use(router);
 app.use(vuetify);
 app.use(i18n);
+app.use(tracker, { router }); // storefront visits and Core Web Vitals for Analytics
 // Charts (vue3-apexcharts) are registered by the pages that use them, so other pages stay light.
 
 app.component("PageHeader", PageHeader);

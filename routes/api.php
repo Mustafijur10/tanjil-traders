@@ -22,6 +22,10 @@ Route::get('/product-cards', [Store\ShopController::class, 'cards']);
 Route::get('/pages/{slug}', [Store\PageController::class, 'show']);
 Route::post('/contact', [Store\PageController::class, 'contact'])->middleware('throttle:5,10');
 
+// Visit tracking for Analytics
+Route::post('/track', [Store\TrackController::class, 'view'])->middleware('throttle:120,1');
+Route::post('/track/{visit}', [Store\TrackController::class, 'ping'])->middleware('throttle:240,1');
+
 // Cart and checkout (guests allowed; a sign-in token is used when present)
 Route::post('/cart', [Store\CheckoutController::class, 'cart'])->middleware('throttle:60,1');
 Route::get('/checkout', [Store\CheckoutController::class, 'options']);
@@ -107,6 +111,13 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     Route::get('/flash-sales/{flashSale}', [Admin\PromotionController::class, 'showFlashSale']);
     Route::put('/flash-sales/{flashSale}', [Admin\PromotionController::class, 'updateFlashSale']);
     Route::delete('/flash-sales/{flashSale}', [Admin\PromotionController::class, 'destroyFlashSale']);
+
+    // Analytics
+    Route::get('/analytics/live', [Admin\AnalyticsController::class, 'live']);
+    Route::post('/analytics/pagespeed', [Admin\AnalyticsController::class, 'pagespeed'])->middleware('throttle:10,1');
+    foreach (['sales', 'products', 'customers', 'inventory', 'traffic', 'search', 'seo'] as $report) {
+        Route::get("/analytics/{$report}", [Admin\AnalyticsController::class, $report]);
+    }
 
     // Customers and stock
     Route::apiResource('customers', Admin\CustomerController::class)->only(['index', 'show', 'update']);

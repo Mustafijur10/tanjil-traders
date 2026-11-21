@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SeoPageController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -8,6 +9,8 @@ use Illuminate\Support\Facades\Route;
  * with their real title, description, image and structured data, so search engines and
  * link previews (Facebook, WhatsApp) see them without running JavaScript.
  */
+Route::get('/sitemap.xml', [SitemapController::class, 'sitemap']);
+Route::get('/robots.txt', [SitemapController::class, 'robots']);
 Route::get('/product/{slug}', [SeoPageController::class, 'product']);
 Route::get('/category/{slug}', [SeoPageController::class, 'category']);
 Route::get('/brand/{slug}', [SeoPageController::class, 'brand']);

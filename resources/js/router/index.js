@@ -81,6 +81,16 @@ const routes = [
     admin("/coupons", () => import("@/admin/promotions/Coupons.vue"), "Coupons"),
     admin("/flash-sales", () => import("@/admin/promotions/FlashSales.vue"), "Flash Sales"),
     admin("/customers", () => import("@/admin/customers/Customers.vue"), "Customers"),
+
+    // Analytics
+    admin("/analytics/sales", () => import("@/admin/analytics/SalesReport.vue"), "Sales"),
+    admin("/analytics/products", () => import("@/admin/analytics/ProductsReport.vue"), "Product Performance"),
+    admin("/analytics/customers", () => import("@/admin/analytics/CustomersReport.vue"), "Customer Insights"),
+    admin("/analytics/inventory", () => import("@/admin/analytics/InventoryReport.vue"), "Inventory Insights"),
+    admin("/analytics/traffic", () => import("@/admin/analytics/TrafficReport.vue"), "Traffic"),
+    admin("/analytics/search", () => import("@/admin/analytics/SearchReport.vue"), "Search & Wishlist"),
+    admin("/analytics/seo", () => import("@/admin/analytics/SeoReport.vue"), "SEO"),
+    admin("/analytics/live", () => import("@/admin/analytics/LiveReport.vue"), "Live Performance"),
     admin("/customers/:id(\\d+)", () => import("@/admin/customers/CustomerDetail.vue"), "Customer"),
     admin("/profile", () => import("@/admin/Profile.vue"), "My Profile"),
 
