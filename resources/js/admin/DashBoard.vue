@@ -68,8 +68,17 @@
                     <div class="tt-kpi-value" :class="{ 'is-loading': kpiLoading }">{{ kpiLoading ? "—" : k.value }}</div>
                     <div class="tt-kpi-vs">{{ k.compare }}</div>
                     <div class="tt-kpi-chart">
-                        <apexchart v-if="k.spark.length > 1 && k.spark.some((v) => v)" type="area" width="100%" height="56" :options="sparkOptions(k.color)" :series="[{ name: $t(k.label), data: k.spark }]" />
-                        <div v-else class="tt-kpi-flat"><span></span></div>
+                        <apexchart
+                            v-if="k.spark.length > 1 && k.spark.some((v) => v)"
+                            :key="k.key + range + k.spark.length"
+                            type="bar"
+                            width="100%"
+                            height="64"
+                            :options="barOptions(k)"
+                            :series="[{ name: $t(k.label), data: k.spark }]"
+                        />
+                        <!-- No data yet: faint placeholder bars -->
+                        <div v-else class="tt-kpi-ghost" aria-hidden="true"><span v-for="n in 12" :key="n"></span></div>
                     </div>
                     <div class="tt-kpi-foot">
                         <v-icon size="15">{{ k.footIcon }}</v-icon><span class="tt-ellipsis">{{ k.foot }}</span>
@@ -1680,7 +1689,31 @@ export default {
                 this.kpiLoading = false;
             }
         },
-        // Daily data has many empty days, which draws spikes; group it into about 10 points for a calm trend line.
+        // Mini bar chart for a KPI card: rounded columns, the latest one in full colour, earlier ones lighter.
+        barOptions(k) {
+            const last = k.spark.length - 1;
+            const isMoney = ["revenue", "aov"].includes(k.key);
+            const isPct = ["conversion", "returns"].includes(k.key);
+            return {
+                chart: { sparkline: { enabled: true }, animations: { enabled: true, speed: 450 }, parentHeightOffset: 0 },
+                // A soft track behind every bar keeps the chart readable when some periods are empty
+                plotOptions: { bar: { columnWidth: "58%", borderRadius: 4, borderRadiusApplication: "end", distributed: true, colors: { backgroundBarColors: [k.color], backgroundBarOpacity: 0.07, backgroundBarRadius: 4 } } },
+                colors: k.spark.map((_, i) => (i === last ? k.color : k.color + "59")),
+                states: { hover: { filter: { type: "darken", value: 0.85 } }, active: { filter: { type: "none" } } },
+                grid: { padding: { left: 2, right: 2, top: 6, bottom: 0 } },
+                legend: { show: false },
+                tooltip: {
+                    enabled: true,
+                    x: { show: false },
+                    marker: { show: false },
+                    y: {
+                        title: { formatter: () => "" },
+                        formatter: (v) => (isMoney ? this.$money(v) : isPct ? this.$num(v) + "%" : this.$num(v)),
+                    },
+                },
+            };
+        },
+        // Daily data has many empty days; group it into about 10 bars so each bar means something.
         smooth(series, mode = "sum", points = 10) {
             if (series.length <= points) return series;
             const size = Math.ceil(series.length / points);

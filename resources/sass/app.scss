@@ -1755,9 +1755,13 @@ body.tt-drawer-lock { overflow: hidden; }
 .tt-dash .tt-kpi-card .tt-kpi-value { margin-top: 16px; }
 .tt-dash .tt-kpi-card .tt-kpi-value.is-loading { opacity: 0.35; }
 .tt-dash .tt-kpi-card .tt-kpi-vs { min-height: 18px; }
-.tt-dash .tt-kpi-chart { height: 56px; margin: 8px -20px 0; }
-.tt-dash .tt-kpi-flat { height: 56px; display: flex; align-items: flex-end; padding: 0 20px 12px; }
-.tt-dash .tt-kpi-flat span { width: 100%; height: 2px; background: repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 12px); opacity: 0.35; }
+.tt-dash .tt-kpi-chart { height: 64px; margin: 10px -2px 12px; }
+.tt-dash .tt-kpi-chart .apexcharts-tooltip { box-shadow: 0 10px 24px -12px rgba(5, 61, 53, 0.45) !important; border-radius: 8px !important; }
+.tt-dash .tt-kpi-ghost { height: 64px; display: flex; align-items: flex-end; gap: 6px; padding: 0 2px; }
+.tt-dash .tt-kpi-ghost span { flex: 1; border-radius: 4px 4px 2px 2px; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.tt-dash .tt-kpi-ghost span:nth-child(3n + 1) { height: 34%; }
+.tt-dash .tt-kpi-ghost span:nth-child(3n + 2) { height: 52%; }
+.tt-dash .tt-kpi-ghost span:nth-child(3n) { height: 24%; }
 .tt-dash .tt-kpi-foot {
     display: flex; align-items: center; gap: 7px; margin: auto -20px 0; padding: 10px 20px; min-height: 42px;
     border-top: 1px solid color-mix(in srgb, var(--accent) 14%, var(--line));
