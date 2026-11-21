@@ -8,10 +8,13 @@
         <div class="tt-context">
             <span class="tt-page-tile" aria-hidden="true"><v-icon size="22" color="white">{{ pageIcon }}</v-icon></span>
             <div class="tt-title-row">
-                <template v-for="c in parentCrumbs" :key="c.to">
-                    <router-link :to="c.to" class="tt-title-parent">{{ c.label }}</router-link>
-                    <span class="tt-title-parent">/</span>
-                </template>
+                <!-- Breadcrumb on a small line above the page title -->
+                <nav v-if="parentCrumbs.length" class="tt-title-crumbs" :aria-label="$t('Breadcrumb')">
+                    <template v-for="(c, i) in parentCrumbs" :key="c.to">
+                        <router-link :to="c.to" class="tt-title-parent">{{ c.label }}</router-link>
+                        <v-icon v-if="i < parentCrumbs.length - 1" size="13" class="tt-title-sep">mdi-chevron-right</v-icon>
+                    </template>
+                </nav>
                 <h1 class="tt-page-title">{{ pageTitle }}</h1>
             </div>
         </div>

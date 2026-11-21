@@ -55,20 +55,27 @@
         <!-- ═════════ Key metrics ═════════ -->
         <div class="tt-chapter" id="ch-overview"><div class="tt-ch-ic"><v-icon size="22">{{ chapters.overview.icon }}</v-icon></div><div class="tt-ch-main"><div class="tt-ch-title">{{ chapters.overview.title }}</div><div class="tt-ch-insight">{{ chapters.overview.insight }}</div></div><div class="tt-ch-chips"><span v-for="c in chapters.overview.chips" :key="c.k" class="tt-ch-chip"><small>{{ c.k }}</small><b>{{ c.v }}</b><em v-if="c.sub" :class="c.tone">{{ c.sub }}</em></span></div></div>
         <v-row dense>
-            <v-col v-for="k in kpis" :key="k.label" cols="12" sm="6" lg="4">
-                <v-card flat class="tt-card tt-kpi" :style="{ '--accent': k.color, '--tint': k.tint }">
-                    <div class="d-flex align-center">
-                        <div class="tt-kpi-icon"><v-icon :icon="k.icon" size="20" /></div>
-                        <div class="tt-kpi-label ml-3">{{ k.label }}</div>
-                        <v-spacer />
-                        <span class="tt-delta" :class="(k.change >= 0) !== !!k.inverse ? 'up' : 'down'">
-                            <v-icon size="13">{{ k.change >= 0 ? "mdi-arrow-up" : "mdi-arrow-down" }}</v-icon>{{ Math.abs(k.change) }}%
+            <!-- Real numbers from GET /api/admin/dashboard/kpis for the chosen period -->
+            <v-col v-for="k in kpiCards" :key="k.key" cols="12" sm="6" lg="4">
+                <component :is="k.to ? 'router-link' : 'div'" :to="k.to" class="tt-card tt-kpi tt-kpi-card" :class="{ 'is-link': k.to }" :style="{ '--accent': k.color }">
+                    <div class="tt-kpi-top">
+                        <div class="tt-kpi-icon"><v-icon :icon="k.icon" size="21" /></div>
+                        <div class="tt-kpi-label">{{ $t(k.label) }}</div>
+                        <span v-if="k.delta" class="tt-delta" :class="k.delta.tone">
+                            <v-icon v-if="k.delta.icon" size="13">{{ k.delta.icon }}</v-icon>{{ k.delta.text }}
                         </span>
                     </div>
-                    <div class="tt-kpi-value">{{ k.value }}</div>
-                    <div class="tt-kpi-vs">vs previous period</div>
-                    <apexchart class="tt-kpi-spark" type="area" width="100%" height="64" :options="sparkOptions(k.color)" :series="[{ data: k.spark }]" />
-                </v-card>
+                    <div class="tt-kpi-value" :class="{ 'is-loading': kpiLoading }">{{ kpiLoading ? "—" : k.value }}</div>
+                    <div class="tt-kpi-vs">{{ k.compare }}</div>
+                    <div class="tt-kpi-chart">
+                        <apexchart v-if="k.spark.length > 1 && k.spark.some((v) => v)" type="area" width="100%" height="56" :options="sparkOptions(k.color)" :series="[{ name: $t(k.label), data: k.spark }]" />
+                        <div v-else class="tt-kpi-flat"><span></span></div>
+                    </div>
+                    <div class="tt-kpi-foot">
+                        <v-icon size="15">{{ k.footIcon }}</v-icon><span class="tt-ellipsis">{{ k.foot }}</span>
+                        <v-icon v-if="k.to" size="16" class="tt-kpi-go">mdi-arrow-right</v-icon>
+                    </div>
+                </component>
             </v-col>
         </v-row>
 
@@ -539,6 +546,7 @@
 
 <script>
 import VueApexCharts from "vue3-apexcharts";
+import api from "@/api";
 
 /* ───────────────── Design tokens ─────────────────
    Identity: deep navy + warm cream, with a disciplined set of colourful accents. */
@@ -738,7 +746,9 @@ export default {
         const days7 = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 
         return {
-            range: "12",
+            range: "30",
+            kpiData: null,
+            kpiLoading: true,
             activeChapter: "overview",
             navItems: [
                 { id: "overview", label: "Overview" }, { id: "health", label: "Health" }, { id: "revenue", label: "Revenue" }, { id: "orders", label: "Orders" },
@@ -994,6 +1004,83 @@ export default {
     },
 
     computed: {
+        // ── Key metrics band, from the real KPI data ──
+        overviewChapter() {
+            const cards = Object.fromEntries(this.kpiCards.map((k) => [k.key, k]));
+            const chip = (key, label) => ({ k: this.$t(label), v: cards[key].value, sub: cards[key].delta?.text || "", tone: cards[key].delta?.tone === "down" ? "down" : "up" });
+            const period = { 7: "last 7 days", 30: "last 30 days", 12: "last 12 months" }[this.range];
+            const c = this.kpiData?.cards;
+            let insight = this.$t("Loading the latest numbers…");
+            if (c) {
+                insight = c.orders.value
+                    ? this.$t("{orders} worth {revenue} in the {period}. {waiting} waiting for confirmation.", {
+                          orders: this.$tn(c.orders.value, "{n} order", "{n} orders"),
+                          revenue: this.$money(c.revenue.value),
+                          period: this.$t(period),
+                          waiting: this.$tn(c.pending.value, "{n} order is", "{n} orders are"),
+                      })
+                    : this.$t("No orders in the {period} yet. Numbers appear here as soon as customers start ordering.", { period: this.$t(period) });
+            }
+            return {
+                icon: "mdi-view-dashboard-outline",
+                title: this.$t("Key metrics"),
+                insight,
+                chips: [chip("revenue", "Revenue"), chip("orders", "Orders"), chip("aov", "Avg. order"), chip("pending", "Waiting")],
+            };
+        },
+        // ── Real KPI cards ──
+        kpiCards() {
+            const c = this.kpiData?.cards || {};
+            const get = (k) => c[k] || { value: 0, previous: null, series: [], meta: {} };
+            const period = { 7: "the previous 7 days", 30: "the previous 30 days", 12: "the previous 12 months" }[this.range];
+            const money = (v) => this.$money(v);
+            const num = (v) => this.$num(v);
+            const pct = (v) => this.$num(v) + "%";
+            const vs = (prev, fmt) => (prev === null || prev === undefined ? "" : this.$t("vs {value} in {period}", { value: fmt(prev), period: this.$t(period) }));
+
+            const defs = [
+                { key: "revenue", label: "Revenue", icon: "mdi-cash-multiple", color: "#0f9d6b", fmt: money,
+                    foot: (m) => this.$t("Today: {value}", { value: money(m.today || 0) }), footIcon: "mdi-calendar-today" },
+                { key: "orders", label: "Orders", icon: "mdi-receipt-text-outline", color: "#2f6fe0", fmt: num,
+                    foot: (m) => this.$tn(m.today || 0, "{n} order today", "{n} orders today"), footIcon: "mdi-calendar-today" },
+                { key: "aov", label: "Average order value", icon: "mdi-basket-outline", color: "#d97706", fmt: money,
+                    foot: (m) => this.$t("Largest order: {value}", { value: money(m.highest || 0) }), footIcon: "mdi-trophy-outline" },
+                { key: "customers", label: "Customers", icon: "mdi-account-group-outline", color: "#db2777", fmt: num, to: null,
+                    compare: (d) => this.$tn(d.meta.new || 0, "{n} new in this period", "{n} new in this period"),
+                    delta: (d) => this.deltaOf(d.meta.new || 0, d.meta.new_previous || 0),
+                    foot: () => this.$t("Registered accounts"), footIcon: "mdi-account-plus-outline" },
+                { key: "products", label: "Products", icon: "mdi-package-variant-closed", color: "#7c3aed", fmt: num, to: "/admin/products?tab=active",
+                    compare: (d) => this.$tn(d.meta.added || 0, "{n} added in this period", "{n} added in this period"),
+                    foot: (m) => this.$tn(m.drafts || 0, "{n} draft", "{n} drafts"), footIcon: "mdi-file-document-edit-outline" },
+                { key: "conversion", label: "Conversion rate", icon: "mdi-percent-outline", color: "#ea580c", fmt: pct,
+                    foot: (m) => this.$tn(m.visitors || 0, "{n} visitor", "{n} visitors"), footIcon: "mdi-account-eye-outline" },
+                { key: "pending", label: "Orders waiting", icon: "mdi-clock-outline", color: "#0891b2", fmt: num, inverse: true,
+                    compare: () => this.$t("Pending confirmation right now"),
+                    foot: (m) => (m.oldest_hours === null || m.oldest_hours === undefined ? this.$t("Nothing is waiting") : this.$t("Oldest has waited {n} hours", { n: num(m.oldest_hours) })), footIcon: "mdi-timer-sand" },
+                { key: "returns", label: "Return rate", icon: "mdi-backup-restore", color: "#c2410c", fmt: pct, inverse: true,
+                    foot: (m) => this.$tn(m.returned || 0, "{n} order returned", "{n} orders returned"), footIcon: "mdi-package-variant-remove" },
+                { key: "low_stock", label: "Low stock", icon: "mdi-alert-outline", color: "#0f766e", fmt: num, inverse: true, to: "/admin/products?tab=low",
+                    compare: (d) => this.$t("At or below {n} in stock", { n: num(d.meta.threshold || 5) }),
+                    foot: (m) => this.$tn(m.out || 0, "{n} product out of stock", "{n} products out of stock"), footIcon: "mdi-package-variant-closed-remove" },
+            ];
+
+            return defs.map((def) => {
+                const d = get(def.key);
+                return {
+                    key: def.key,
+                    label: def.label,
+                    icon: def.icon,
+                    color: def.color,
+                    to: def.to || null,
+                    value: def.fmt(d.value || 0),
+                    compare: def.compare ? def.compare(d) : vs(d.previous, def.fmt),
+                    delta: this.kpiLoading ? null : def.delta ? def.delta(d) : d.previous === null ? null : this.deltaOf(d.value, d.previous, def.inverse),
+                    spark: this.smooth(d.series || [], def.key === "aov" || def.key === "conversion" ? "avg" : "sum"),
+                    foot: this.kpiLoading ? "" : def.foot(d.meta || {}),
+                    footIcon: def.footIcon,
+                };
+            });
+        },
         today() {
             return new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
         },
@@ -1080,11 +1167,8 @@ export default {
             const oc = this.orderStatusCounts;
             const periodOrders = this.current.orders.reduce((a, b) => a + b, 0);
             return {
-                overview: {
-                    icon: "mdi-view-dashboard-outline", title: "Key metrics",
-                    insight: `Orders are ${trend(kpi("Orders").change)} and the customer count is ${trend(kpi("Customers").change)}. Pending orders are ${trend(kpi("Pending orders").change)}.`,
-                    chips: [kc("Revenue this month", "Revenue"), kc("Orders"), kc("Customers"), kc("Conversion rate", "Conversion")],
-                },
+                // Uses the same real numbers as the cards below it
+                overview: this.overviewChapter,
                 health: {
                     icon: "mdi-heart-pulse", title: "Customer, inventory and operational health",
                     insight: `Stock health is ${this.healthSummary.stats[2].value} and customer satisfaction is ${this.satisfaction.score} out of 5. Delivery takes ${this.fulfillment.days} days on average.`,
@@ -1553,6 +1637,16 @@ export default {
         },
     },
 
+    watch: {
+        range() {
+            this.loadKpis();
+        },
+    },
+
+    created() {
+        this.loadKpis();
+    },
+
     mounted() {
         if (typeof IntersectionObserver === "undefined") return;
         this.$nextTick(() => {
@@ -1578,6 +1672,37 @@ export default {
     methods: {
         money: fullMoney,
 
+        async loadKpis() {
+            this.kpiLoading = true;
+            try {
+                this.kpiData = (await api.get("/admin/dashboard/kpis", { params: { range: this.range } })).data;
+            } finally {
+                this.kpiLoading = false;
+            }
+        },
+        // Daily data has many empty days, which draws spikes; group it into about 10 points for a calm trend line.
+        smooth(series, mode = "sum", points = 10) {
+            if (series.length <= points) return series;
+            const size = Math.ceil(series.length / points);
+            const out = [];
+            for (let i = 0; i < series.length; i += size) {
+                const part = series.slice(i, i + size);
+                const total = part.reduce((a, b) => a + b, 0);
+                const filled = part.filter((v) => v).length;
+                out.push(mode === "avg" ? (filled ? Math.round(total / filled) : 0) : total);
+            }
+            return out;
+        },
+        // Change against the previous period. "inverse" cards (returns, low stock) are good when they go down.
+        deltaOf(value, previous, inverse = false) {
+            if (!previous && !value) return null;
+            if (!previous) return { text: this.$t("New"), tone: "flat", icon: "mdi-creation" };
+            const change = ((value - previous) / previous) * 100;
+            if (Math.abs(change) < 0.05) return { text: "0%", tone: "flat", icon: "mdi-minus" };
+            const good = change > 0 !== inverse;
+            return { text: this.$num(Math.abs(change), { maximumFractionDigits: 1 }) + "%", tone: good ? "up" : "down", icon: change > 0 ? "mdi-arrow-up" : "mdi-arrow-down" };
+        },
+
         goTo(id) {
             const el = document.getElementById("ch-" + id);
             if (!el) return;
@@ -1597,7 +1722,8 @@ export default {
                 stroke: { curve: "smooth", width: 2.5 },
                 colors: [color],
                 fill: { type: "gradient", gradient: { opacityFrom: 0.38, opacityTo: 0.02 } },
-                tooltip: { enabled: false },
+                // Hover shows the value for that day or month
+                tooltip: { enabled: true, x: { show: false }, marker: { show: false }, y: { title: { formatter: () => "" }, formatter: (v) => this.$num(v) } },
             };
         },
 

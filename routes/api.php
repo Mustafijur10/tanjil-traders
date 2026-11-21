@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
 */
 Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(function () {
     Route::post('/uploads', [Admin\UploadController::class, 'store']);
+    Route::get('/dashboard/kpis', [Admin\DashboardController::class, 'kpis']);
 
     // Catalog
     Route::post('/categories/reorder', [Admin\CategoryController::class, 'reorder']);

@@ -56,7 +56,8 @@ export function tn(count, singular, plural) {
     return t(Number(count) === 1 ? singular : plural, { n: num(count) });
 }
 
-const numberLocale = () => (store.state.prefs.locale === "bn" ? "bn-BD" : "en-US");
+// Bangladeshi grouping in both languages: 12,49,000 (en-IN) and ১২,৪৯,০০০ (bn-BD)
+const numberLocale = () => (store.state.prefs.locale === "bn" ? "bn-BD" : "en-IN");
 
 export function num(value, options = {}) {
     const n = Number(value || 0);

@@ -841,8 +841,8 @@ $drawer-time: 0.32s;
 .tt-header-line { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none; background: linear-gradient(90deg, var(--h-green), transparent 38%); opacity: 0.85; }
 
 /* Child components render their roots in separate files, so the visual order is fixed here */
-.tt-left { order: 1; display: flex; align-items: center; gap: 14px; min-width: 0; min-height: 64px; flex: 1 1 0; }
-.tt-right { order: 2; display: flex; align-items: center; gap: 8px; flex: 0 0 auto; min-height: 64px; justify-content: flex-end; }
+.tt-left { order: 1; display: flex; align-items: center; gap: 14px; min-width: 0; min-height: 64px; flex: 0 0 auto; max-width: 60%; }
+.tt-right { order: 2; display: flex; align-items: center; gap: 8px; flex: 1 1 0; min-width: 0; min-height: 64px; justify-content: flex-end; }
 .tt-row2 { order: 3; }
 
 .tt-header.is-compact {
@@ -854,12 +854,14 @@ $drawer-time: 0.32s;
 }
 
 /* ───────── 4. Title and breadcrumbs ───────── */
-.tt-context { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 0 1 auto; max-width: 260px; }
-.tt-page-tile { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, var(--h-green), color-mix(in srgb, var(--h-green) 55%, #000)); box-shadow: 0 8px 16px -8px var(--h-green), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
-.tt-title-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.tt-title-parent { font-size: 13px; font-weight: 500; color: var(--h-muted); text-decoration: none; white-space: nowrap; }
+.tt-context { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 0 1 auto; max-width: 300px; }
+.tt-page-tile { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--h-green), color-mix(in srgb, var(--h-green) 55%, #000)); box-shadow: 0 8px 16px -8px var(--h-green), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.tt-title-row { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; }
+.tt-title-crumbs { display: flex; align-items: center; gap: 2px; min-width: 0; line-height: 1.2; }
+.tt-title-sep { color: var(--h-muted); opacity: 0.7; }
+.tt-title-parent { font-size: 11.5px; font-weight: 500; letter-spacing: 0.01em; color: var(--h-muted); text-decoration: none; white-space: nowrap; }
 a.tt-title-parent:hover { color: var(--h-green); }
-.tt-page-title { font-size: 18px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--h-ink); }
+.tt-page-title { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--h-ink); }
 
 /* ───────── 5. Clock chip (left, next to the title) ───────── */
 .tt-time { flex: none; display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px 0 6px; border-radius: 12px; border: 1px solid var(--h-line); background: linear-gradient(135deg, var(--h-glow), transparent 65%), var(--h-bg); font-family: inherit; color: var(--h-ink); cursor: pointer; text-align: left; transition: border-color 0.15s, box-shadow 0.15s; }
@@ -1128,10 +1130,13 @@ a.tt-title-parent:hover { color: var(--h-green); }
 .tt-kv b { font-weight: 600; color: var(--h-ink); text-align: right; }
 
 /* ───────── 10. Right cluster (search, create, tools, user) ───────── */
-.tt-search { display: flex; align-items: center; gap: 8px; width: 190px; height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--h-line); background: var(--h-field); color: var(--h-muted); font-family: inherit; font-size: 13px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
+.tt-search { display: flex; align-items: center; gap: 8px; flex: 1 1 0; width: auto; min-width: 150px; max-width: 440px; margin-right: auto; margin-left: 12px; height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--h-line); background: var(--h-field); color: var(--h-muted); font-family: inherit; font-size: 13px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
 .tt-search:hover { border-color: var(--h-green); background: var(--h-bg); box-shadow: 0 0 0 4px var(--h-glow); }
 .tt-search-icon { color: var(--h-green); flex: none; }
 .tt-search-text { flex: 1; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-search-keys { display: inline-flex; align-items: center; flex: none; }
+// Small screens: the search shrinks to its icon
+@container tth (max-width: 899px) { .tt-search { flex: none; width: 40px; min-width: 0; margin-left: 0; padding: 0; justify-content: center; } .tt-search-text, .tt-search-keys { display: none; } }
 .tt-hint { display: inline-block; font-weight: 600; color: var(--h-ink); }
 .tt-fade-enter-active, .tt-fade-leave-active { transition: opacity 0.22s ease, transform 0.22s ease; }
 .tt-fade-enter-from { opacity: 0; transform: translateY(6px); }
@@ -1363,8 +1368,8 @@ body.tt-drawer-lock { overflow: hidden; }
 @container tth (max-width: 1699px) {
     .tt-hide-md { display: none !important; }
     .tt-today .tt-delta { display: none; }
-    .tt-search { width: 40px; padding: 0; justify-content: center; }
-    .tt-search-text { display: none; }
+    .tt-search-keys { display: none; }
+
 }
 @container tth (max-width: 1499px) {
     .tt-time-full, .tt-d-long { display: none; }
@@ -1417,7 +1422,7 @@ body.tt-drawer-lock { overflow: hidden; }
     --surface: #ffffff;
     --navy-a: #0b6150;
     --navy-b: #053d35;
-    font-family: Poppins, "Segoe UI", sans-serif;
+    font-family: Poppins, "Noto Sans Bengali", "Segoe UI", sans-serif;
     color: var(--ink);
     background: var(--bg);
     padding-bottom: 36px;
@@ -1493,9 +1498,9 @@ body.tt-drawer-lock { overflow: hidden; }
 /* navy cards */
 
 /* chart tooltips (rendered by ApexCharts, so reach in with :deep) */
-.tt-dash .apexcharts-tooltip { border-radius: 10px !important; border: 1px solid var(--line) !important; box-shadow: 0 14px 30px -14px rgba(5, 61, 53, 0.45) !important; font-family: Poppins, "Segoe UI", sans-serif !important; }
+.tt-dash .apexcharts-tooltip { border-radius: 10px !important; border: 1px solid var(--line) !important; box-shadow: 0 14px 30px -14px rgba(5, 61, 53, 0.45) !important; font-family: Poppins, "Noto Sans Bengali", "Segoe UI", sans-serif !important; }
 .tt-dash .apexcharts-tooltip-title { font-weight: 600 !important; }
-.tt-dash .apexcharts-legend-text { font-family: Poppins, "Segoe UI", sans-serif !important; }
+.tt-dash .apexcharts-legend-text { font-family: Poppins, "Noto Sans Bengali", "Segoe UI", sans-serif !important; }
 
 /* ───────── KPI cards ───────── */
 .tt-dash .tt-kpi { padding: 16px 18px; }
@@ -1742,6 +1747,30 @@ body.tt-drawer-lock { overflow: hidden; }
     .tt-dash .tt-card.tt-kpi { padding: 16px 16px 78px; }
     .tt-dash .tt-kpi .tt-kpi-value { font-size: 26px; margin-top: 12px; }
 }
+
+/* ── KPI cards with real data: header, value, comparison, trend, footer fact ── */
+.tt-dash .tt-card.tt-kpi.tt-kpi-card { display: flex; flex-direction: column; height: 100%; padding: 18px 20px 0; text-decoration: none; color: inherit; }
+.tt-dash .tt-kpi-top { display: flex; align-items: center; gap: 12px; }
+.tt-dash .tt-kpi-top .tt-kpi-label { flex: 1; min-width: 0; }
+.tt-dash .tt-kpi-card .tt-kpi-value { margin-top: 16px; }
+.tt-dash .tt-kpi-card .tt-kpi-value.is-loading { opacity: 0.35; }
+.tt-dash .tt-kpi-card .tt-kpi-vs { min-height: 18px; }
+.tt-dash .tt-kpi-chart { height: 56px; margin: 8px -20px 0; }
+.tt-dash .tt-kpi-flat { height: 56px; display: flex; align-items: flex-end; padding: 0 20px 12px; }
+.tt-dash .tt-kpi-flat span { width: 100%; height: 2px; background: repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 12px); opacity: 0.35; }
+.tt-dash .tt-kpi-foot {
+    display: flex; align-items: center; gap: 7px; margin: auto -20px 0; padding: 10px 20px; min-height: 42px;
+    border-top: 1px solid color-mix(in srgb, var(--accent) 14%, var(--line));
+    background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+    font-size: 12.5px; font-weight: 500; color: var(--muted);
+}
+.tt-dash .tt-kpi-foot > .v-icon:first-child { color: var(--accent); }
+.tt-dash .tt-kpi-go { margin-left: auto; color: var(--accent); transition: transform 0.2s; }
+.tt-dash .tt-kpi-card.is-link { cursor: pointer; }
+.tt-dash .tt-kpi-card.is-link:hover .tt-kpi-go { transform: translateX(3px); }
+.tt-dash .tt-kpi-card.is-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tt-dash .tt-delta.flat { background: var(--bg2); color: var(--muted); }
+:root[data-theme="dark"] .tt-dash .tt-delta.flat { background: rgba(255, 255, 255, 0.06); }
 
 /* ───────── 11. Storefront ───────── */
 .tt-front { --tt-wrap: 1320px; min-height: 100vh; display: flex; flex-direction: column; background: var(--tt-bg); }

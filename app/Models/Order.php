@@ -30,8 +30,12 @@ class Order extends Model
     protected static function booted(): void
     {
         // TT-2611-0001 style numbers: prefix, year+month, running number.
+        // The id is only known after saving, so a temporary unique value is stored first.
+        static::creating(function (Order $order) {
+            $order->order_number ??= 'TMP-' . bin2hex(random_bytes(6));
+        });
         static::created(function (Order $order) {
-            if (! $order->order_number) {
+            if (str_starts_with($order->order_number, 'TMP-')) {
                 $order->forceFill([
                     'order_number' => 'TT-' . now()->format('ym') . '-' . str_pad((string) $order->id, 4, '0', STR_PAD_LEFT),
                 ])->saveQuietly();

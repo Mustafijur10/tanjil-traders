@@ -3,8 +3,9 @@
     <div class="tt-right">
         <button v-if="s.showSearch" type="button" class="tt-search" aria-label="Open search" @click="hdr.openPalette()">
             <v-icon size="18" class="tt-search-icon">mdi-magnify</v-icon>
-            <span class="tt-search-text">Search <transition name="tt-fade" mode="out-in"><b :key="hintIndex" class="tt-hint">{{ searchHints[hintIndex] }}</b></transition>…</span>
-            <v-tooltip activator="parent" location="bottom">Search · Ctrl K</v-tooltip>
+            <span class="tt-search-text">{{ $t("Search") }} <transition name="tt-fade" mode="out-in"><b :key="hintIndex" class="tt-hint">{{ $t(searchHints[hintIndex]) }}</b></transition>…</span>
+            <span class="tt-search-keys"><kbd class="tt-kbd">Ctrl</kbd><kbd class="tt-kbd">K</kbd></span>
+            <v-tooltip activator="parent" location="bottom">{{ $t("Search") }} · Ctrl K</v-tooltip>
         </button>
 
         <!-- Today at a glance -->
