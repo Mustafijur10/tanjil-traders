@@ -1,6 +1,8 @@
 <template>
     <div>
-        <PageHeader title="Returns & Refunds" subtitle="Approve a return, receive the items back into stock, then record the refund." />
+        <PageHeader title="Returns & Refunds" subtitle="Approve a return, receive the items back into stock, then record the refund.">
+            <ExportMenu :build="exportSpec" />
+        </PageHeader>
 
         <section class="tt-box">
             <div class="tt-toolbar">
@@ -84,7 +86,7 @@
 </template>
 
 <script>
-import api, { fieldErrors } from "@/api";
+import api, { fieldErrors, fetchAll } from "@/api";
 import { RETURN_STATUS, RETURN_REASONS, REFUND_METHODS, PAYMENT_METHOD, options } from "@/utils/orders";
 
 const STEP = {
@@ -154,6 +156,35 @@ export default {
     methods: {
         rs: (s) => RETURN_STATUS[s] || { label: s, tone: "grey" },
         methodLabel: (m) => PAYMENT_METHOD[m] || m || "",
+        async exportSpec() {
+            const rows = await fetchAll("/admin/returns", { status: this.status, search: this.search || undefined });
+            return {
+                title: "Returns and refunds",
+                filename: "returns",
+                subtitle: this.$t(this.tabs.find((t) => t.value === this.status)?.label || ""),
+                kpis: [
+                    { label: "Returns", value: rows.length, type: "number" },
+                    { label: "Refunded", value: rows.filter((r) => r.status === "refunded").reduce((n, r) => n + Number(r.refund_amount || 0), 0), type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Returns",
+                        columns: [
+                            { text: "Return", value: "id" },
+                            { text: "Date", value: "created_at", type: "date" },
+                            { text: "Order", value: "order", get: (r) => r.order?.order_number },
+                            { text: "Customer", value: "customer", get: (r) => [r.order?.name, r.order?.phone].filter(Boolean).join(" · ") },
+                            { text: "Items", value: "items", get: (r) => r.items.map((i) => `${i.order_item?.name} × ${i.qty}`).join(", ") },
+                            { text: "Reason", value: "reason", get: (r) => this.$t(this.reasons[r.reason] || r.reason) },
+                            { text: "Status", value: "status", get: (r) => this.$t(this.rs(r.status).label) },
+                            { text: "Amount", value: "refund_amount", type: "money" },
+                            { text: "Refunded by", value: "refund_method", get: (r) => (r.refund_method ? this.$t(this.refundMethods[r.refund_method]) : "") },
+                        ],
+                        rows,
+                    },
+                ],
+            };
+        },
         setStatus(v) {
             this.status = v;
             this.page = 1;

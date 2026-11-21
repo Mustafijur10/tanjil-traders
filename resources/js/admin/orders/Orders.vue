@@ -1,6 +1,7 @@
 <template>
     <div>
         <PageHeader title="All Orders" subtitle="Confirm new orders, pack them, hand them to a courier and follow them to the door.">
+            <ExportMenu :build="exportSpec" />
             <v-btn-secondary prepend-icon="mdi-truck-outline" to="/admin/couriers">{{ $t("Couriers") }}</v-btn-secondary>
             <v-btn-primary prepend-icon="mdi-plus" to="/admin/orders/new">{{ $t("Create order") }}</v-btn-primary>
         </PageHeader>
@@ -130,7 +131,7 @@
 </template>
 
 <script>
-import api from "@/api";
+import api, { fetchAll } from "@/api";
 import { ORDER_STATUS, PAYMENT_STATUS, PAYMENT_METHOD, options } from "@/utils/orders";
 
 const TABS = [
@@ -287,6 +288,39 @@ export default {
             } finally {
                 this.busy = false;
             }
+        },
+        /** Every order matching the current tab, search and filters. */
+        async exportSpec() {
+            const rows = await fetchAll("/admin/orders", { ...this.params, page: undefined, per_page: undefined });
+            const tab = TABS.find((t) => t.value === this.tab);
+            return {
+                title: "Orders",
+                filename: "orders",
+                subtitle: [this.$t(tab?.label || "All"), this.filters.from && this.filters.to ? `${this.$date(this.filters.from)} – ${this.$date(this.filters.to)}` : "", this.search].filter(Boolean).join(" · "),
+                kpis: [
+                    { label: "Orders", value: rows.length, type: "number" },
+                    { label: "Total value", value: rows.reduce((n, r) => n + Number(r.total), 0), type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Orders",
+                        columns: [
+                            { text: "Order", value: "order_number" },
+                            { text: "Date", value: "created_at", type: "datetime" },
+                            { text: "Customer", value: "name" },
+                            { text: "Phone", value: "phone" },
+                            { text: "City", value: "city" },
+                            { text: "Items", value: "units", type: "number" },
+                            { text: "Total", value: "total", type: "money" },
+                            { text: "Payment", value: "payment_method", get: (r) => this.$t(this.methodLabel(r.payment_method)) },
+                            { text: "Paid", value: "payment_status", get: (r) => this.$t(this.pay(r.payment_status).label) },
+                            { text: "Status", value: "status", get: (r) => this.$t(this.st(r.status).label) },
+                            { text: "Courier", value: "courier", get: (r) => [r.courier?.name, r.tracking_code].filter(Boolean).join(" · ") },
+                        ],
+                        rows,
+                    },
+                ],
+            };
         },
         printSelected(type) {
             window.open(`/admin/orders/print?ids=${this.selected.map((o) => o.id).join(",")}&type=${type}`, "_blank");

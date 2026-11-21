@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="SEO" subtitle="How well your products are set up for Google, visits from search engines, and Google Search Console results.">
             <RangeTabs v-model="days" :options="[7, 30, 90]" />
+            <ExportMenu :build="exportSpec" :disabled="!d" />
         </PageHeader>
 
         <div class="tt-an-grid">
@@ -97,6 +98,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import RangeTabs from "@/components/analytics/RangeTabs.vue";
 import MetricTiles from "@/components/analytics/MetricTiles.vue";
 import ShareRows from "@/components/analytics/ShareRows.vue";
@@ -162,6 +164,52 @@ export default {
     watch: { days: { immediate: true, handler: "load" } },
     methods: {
         shortUrl: (u) => String(u || "").replace(/^https?:\/\/[^/]+/, "") || "/",
+        exportSpec() {
+            const d = this.d;
+            const g = this.gsc;
+            const tables = [
+                {
+                    title: "Product page health",
+                    columns: [
+                        { text: "Check", value: "key", get: (r) => this.$t(LABELS[r.key].title) },
+                        { text: "Products", value: "count", type: "number" },
+                        { text: "Examples", value: "items", get: (r) => r.items.map((p) => p.name).join(", ") },
+                        { text: "How to fix", value: "fix", get: (r) => this.$t(LABELS[r.key].fix) },
+                    ],
+                    rows: d.issues,
+                },
+                { title: "Visits from search engines", columns: [{ text: "Date", value: "key" }, { text: "Visits", value: "sessions", type: "number" }], rows: d.organic.series },
+                { title: "Landing pages from search", columns: [{ text: "Page", value: "path" }, { text: "Visits", value: "sessions", type: "number" }], rows: d.organic.landing },
+            ];
+            if (g.configured && !g.error) {
+                const cols = (first) => [
+                    { text: first, value: "key" },
+                    { text: "Clicks", value: "clicks", type: "number" },
+                    { text: "Shown", value: "impressions", type: "number" },
+                    { text: "Click rate", value: "ctr", type: "percent" },
+                    { text: "Position", value: "position", type: "number" },
+                ];
+                tables.push({ title: "Google searches", columns: cols("Search on Google"), rows: g.queries }, { title: "Google pages", columns: cols("Page"), rows: g.pages });
+            }
+            return {
+                title: "SEO report",
+                filename: "seo",
+                subtitle: periodLabel(d.period),
+                kpis: [
+                    { label: "Product page health score", value: d.score, type: "number" },
+                    { label: "Published products", value: d.products, type: "number" },
+                    { label: "Visits from search engines", value: d.organic.sessions, type: "number" },
+                    ...(g.configured && !g.error
+                        ? [
+                              { label: "Clicks from Google", value: g.totals.clicks, type: "number" },
+                              { label: "Shown on Google", value: g.totals.impressions, type: "number" },
+                              { label: "Average position", value: g.totals.position, type: "number" },
+                          ]
+                        : []),
+                ],
+                tables,
+            };
+        },
         async load() {
             this.$router.replace({ query: this.days !== 30 ? { days: this.days } : {} });
             this.d = (await api.get("/admin/analytics/seo", { params: { days: this.days } })).data;

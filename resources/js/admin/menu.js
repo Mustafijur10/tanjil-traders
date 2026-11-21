@@ -25,7 +25,7 @@ export default [
             { title: "Attributes & Specs", to: "/admin/attributes", ready: true },
             { title: "Reviews", to: "/admin/reviews", ready: true },
             { title: "Product Q&A", to: "/admin/questions", ready: false },
-            { title: "Import / Export", to: "/admin/products/import", ready: false },
+            { title: "Import / Export", to: "/admin/products/import", ready: true },
         ],
     },
     {

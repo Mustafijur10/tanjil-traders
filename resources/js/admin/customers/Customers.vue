@@ -1,6 +1,8 @@
 <template>
     <div>
-        <PageHeader title="Customers" subtitle="People with an account on your website, with how much they buy. Guests who order without an account are found by phone in Orders." />
+        <PageHeader title="Customers" subtitle="People with an account on your website, with how much they buy. Guests who order without an account are found by phone in Orders.">
+            <ExportMenu :build="exportSpec" />
+        </PageHeader>
 
         <div class="tt-stat-tiles">
             <button v-for="s in stats" :key="s.key" type="button" class="tt-stat-tile" :class="['is-' + s.tone, { 'is-on': s.tab && tab === s.tab }]" :disabled="!s.tab" @click="s.tab && setTab(s.tab)">
@@ -60,7 +62,7 @@
 </template>
 
 <script>
-import api from "@/api";
+import api, { fetchAll } from "@/api";
 
 export default {
     name: "Customers",
@@ -121,6 +123,31 @@ export default {
     },
     methods: {
         initials: (n) => (n || "?").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase(),
+        async exportSpec() {
+            const rows = await fetchAll("/admin/customers", { ...this.params, page: undefined, per_page: undefined });
+            return {
+                title: "Customers",
+                filename: "customers",
+                subtitle: this.$t(this.tabs.find((t) => t.value === this.tab)?.label || "All"),
+                kpis: [{ label: "Customers", value: rows.length, type: "number" }],
+                tables: [
+                    {
+                        title: "Customers",
+                        columns: [
+                            { text: "Name", value: "name" },
+                            { text: "Phone", value: "phone" },
+                            { text: "Email", value: "email" },
+                            { text: "Orders", value: "orders_count", type: "number" },
+                            { text: "Spent", value: "spent", type: "money" },
+                            { text: "Last order", value: "last_order_at", type: "date" },
+                            { text: "Joined", value: "created_at", type: "date" },
+                            { text: "Status", value: "is_active", get: (r) => this.$t(r.is_active ? "Active" : "Disabled") },
+                        ],
+                        rows,
+                    },
+                ],
+            };
+        },
         setTab(v) {
             this.tab = v;
             this.serverOptions = { ...this.serverOptions, page: 1 };

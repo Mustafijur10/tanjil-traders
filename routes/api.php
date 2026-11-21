@@ -75,6 +75,10 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:staff'])->group(functi
     // Read-only lists other pages need (products picker, delivery options)
     Route::get('/orders/products', [Admin\OrderController::class, 'products']);
     Route::get('/shipping-methods', [Admin\DeliveryController::class, 'shipping']);
+    // Excel import (the area is checked per type: catalog, or inventory for stock)
+    Route::get('/import/types', [Admin\ImportController::class, 'types']);
+    Route::get('/import/{type}/rows', [Admin\ImportController::class, 'export']);
+    Route::post('/import/{type}', [Admin\ImportController::class, 'run'])->middleware('throttle:30,1');
 
     // Catalog
     Route::middleware('area:catalog')->group(function () {

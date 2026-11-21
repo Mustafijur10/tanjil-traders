@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="Product Performance" subtitle="Best sellers, most viewed products, and the ones that need attention.">
             <RangeTabs v-model="days" />
+            <ExportMenu :build="exportSpec" :disabled="!d" />
         </PageHeader>
 
         <div class="tt-an-grid">
@@ -93,6 +94,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import RangeTabs from "@/components/analytics/RangeTabs.vue";
 import ChartOrEmpty from "@/components/analytics/ChartOrEmpty.vue";
 import { rankChart, fmt } from "@/utils/charts";
@@ -129,6 +131,46 @@ export default {
     },
     watch: { days: { immediate: true, handler: "load" } },
     methods: {
+        exportSpec() {
+            const d = this.d;
+            return {
+                title: "Product performance",
+                filename: "product-performance",
+                subtitle: periodLabel(d.period),
+                kpis: [
+                    { label: "In stock but not sold", value: d.unsold.count, type: "number" },
+                    { label: "Value of unsold stock", value: d.unsold.value, type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Best sellers",
+                        columns: [
+                            { text: "Product", value: "name" },
+                            { text: "Units", value: "units", type: "number" },
+                            { text: "Orders", value: "orders", type: "number" },
+                            { text: "Sales", value: "revenue", type: "money" },
+                            { text: "Profit", value: "profit", type: "money" },
+                            { text: "Margin", value: "margin", type: "percent" },
+                        ],
+                        rows: d.top,
+                    },
+                    {
+                        title: "Most viewed",
+                        columns: [
+                            { text: "Product", value: "name" },
+                            { text: "Views", value: "views", type: "number" },
+                            { text: "Visitors", value: "visitors", type: "number" },
+                            { text: "Orders", value: "orders", type: "number" },
+                            { text: "Ordered", value: "conversion", type: "percent" },
+                        ],
+                        rows: d.viewed,
+                    },
+                    { title: "Sales by brand", columns: [{ text: "Brand", value: "name" }, { text: "Sales", value: "revenue", type: "money" }, { text: "Units", value: "units", type: "number" }], rows: d.by_brand },
+                    { title: "In stock but not sold", columns: [{ text: "Product", value: "name" }, { text: "In stock", value: "stock_qty", type: "number" }, { text: "Price", value: "price", type: "money" }], rows: d.unsold.items },
+                    { title: "Low ratings", columns: [{ text: "Product", value: "name" }, { text: "Rating", value: "rating_avg", type: "number" }, { text: "Reviews", value: "review_count", type: "number" }], rows: d.low_rated },
+                ],
+            };
+        },
         async load() {
             this.$router.replace({ query: this.days !== 30 ? { days: this.days } : {} });
             this.d = null;

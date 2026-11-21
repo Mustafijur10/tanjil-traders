@@ -1,6 +1,7 @@
 <template>
     <div>
         <PageHeader title="Coupons" subtitle="Discount codes customers type at checkout. See how many orders each one brought in.">
+            <ExportMenu :build="exportSpec" :disabled="!items.length" />
             <v-btn-primary prepend-icon="mdi-plus" @click="openForm()">{{ $t("Add coupon") }}</v-btn-primary>
         </PageHeader>
 
@@ -126,6 +127,36 @@ export default {
             } finally {
                 this.loading = false;
             }
+        },
+        exportSpec() {
+            const s = this.stats;
+            return {
+                title: "Coupons",
+                filename: "coupons",
+                kpis: [
+                    { label: "Active coupons", value: s.active, type: "number" },
+                    { label: "Orders with a coupon", value: s.orders, type: "number" },
+                    { label: "Sales from coupons", value: s.revenue, type: "money" },
+                    { label: "Discount given", value: s.discount, type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Coupons",
+                        columns: [
+                            { text: "Code", value: "code" },
+                            { text: "Offer", value: "offer", get: (c) => this.describe(c) },
+                            { text: "Status", value: "state", get: (c) => this.$t(this.states[c.state].label) },
+                            { text: "Used", value: "used_count", type: "number" },
+                            { text: "Limit", value: "usage_limit", type: "number" },
+                            { text: "Orders", value: "orders", type: "number" },
+                            { text: "Sales", value: "revenue", type: "money" },
+                            { text: "Discount given", value: "discount", type: "money" },
+                            { text: "Valid", value: "valid", get: (c) => this.period(c) },
+                        ],
+                        rows: this.items,
+                    },
+                ],
+            };
         },
         describe(c) {
             const off = c.type === "percent" ? `${this.$num(c.value)}%` : this.$money(c.value || 0);

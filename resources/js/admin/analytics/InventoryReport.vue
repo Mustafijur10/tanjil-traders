@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="Inventory Insights" subtitle="What will run out soon, what is not selling, and where your money sits in stock.">
             <RangeTabs v-model="days" :options="[7, 30, 90, 365]" />
+            <ExportMenu :build="exportSpec" :disabled="!d" />
             <v-btn-secondary prepend-icon="mdi-warehouse" to="/admin/inventory">{{ $t("Stock overview") }}</v-btn-secondary>
         </PageHeader>
 
@@ -70,6 +71,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import RangeTabs from "@/components/analytics/RangeTabs.vue";
 import MetricTiles from "@/components/analytics/MetricTiles.vue";
 import ChartOrEmpty from "@/components/analytics/ChartOrEmpty.vue";
@@ -109,6 +111,64 @@ export default {
     },
     watch: { days: { immediate: true, handler: "load" } },
     methods: {
+        exportSpec() {
+            const d = this.d;
+            const t = d.totals;
+            return {
+                title: "Inventory insights",
+                filename: "inventory",
+                subtitle: periodLabel(d.period),
+                kpis: [
+                    { label: "Units in stock", value: t.units, type: "number" },
+                    { label: "Stock value (cost)", value: t.cost, type: "money" },
+                    { label: "Units sold in this period", value: t.sold_units, type: "number" },
+                    { label: "Low stock products", value: t.low, type: "number" },
+                    { label: "Out of stock products", value: t.out, type: "number" },
+                    { label: "Not sold in 60 days (value)", value: t.dead_value, type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Running out soon",
+                        columns: [
+                            { text: "Product", value: "name" },
+                            { text: "In stock", value: "stock", type: "number" },
+                            { text: "Sold per day", value: "per_day", type: "number" },
+                            { text: "Days left", value: "days", type: "number" },
+                        ],
+                        rows: d.running_out,
+                    },
+                    {
+                        title: "Not sold in 60 days",
+                        columns: [
+                            { text: "Product", value: "name" },
+                            { text: "In stock", value: "stock", type: "number" },
+                            { text: "Value", value: "value", type: "money" },
+                            { text: "Last sold", value: "last_sale", type: "date" },
+                        ],
+                        rows: d.dead,
+                    },
+                    {
+                        title: "Stock by category",
+                        columns: [
+                            { text: "Category", value: "name", get: (r) => this.$t(r.name) },
+                            { text: "Units", value: "units", type: "number" },
+                            { text: "Cost value", value: "cost", type: "money" },
+                            { text: "Sale value", value: "retail", type: "money" },
+                        ],
+                        rows: d.by_category,
+                    },
+                    {
+                        title: "Stock in and out",
+                        columns: [
+                            { text: "Type", value: "name", get: (r) => this.$t(this.reasons[r.name]?.label || r.name) },
+                            { text: "Units", value: "units", type: "number" },
+                            { text: "Changes", value: "moves", type: "number" },
+                        ],
+                        rows: d.movements,
+                    },
+                ],
+            };
+        },
         async load() {
             this.$router.replace({ query: this.days !== 30 ? { days: this.days } : {} });
             this.d = (await api.get("/admin/analytics/inventory", { params: { days: this.days } })).data;

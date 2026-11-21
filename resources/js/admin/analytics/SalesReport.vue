@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="Sales" subtitle="What you sold, what you earned and where it came from. Cancelled and returned orders are not counted.">
             <RangeTabs v-model="days" />
+            <ExportMenu :build="exportSpec" :disabled="!d" />
         </PageHeader>
 
         <MetricTiles :items="tiles" />
@@ -51,6 +52,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import RangeTabs from "@/components/analytics/RangeTabs.vue";
 import MetricTiles from "@/components/analytics/MetricTiles.vue";
 import ShareRows from "@/components/analytics/ShareRows.vue";
@@ -119,6 +121,43 @@ export default {
     watch: { days: { immediate: true, handler: "load" } },
     methods: {
         barHeight: (rows) => Math.max(140, (rows?.length || 0) * 42 + 40),
+        exportSpec() {
+            const t = this.d.totals;
+            const name = (r) => this.$t(r.name);
+            return {
+                title: "Sales report",
+                filename: "sales",
+                subtitle: periodLabel(this.d.period),
+                kpis: [
+                    { label: "Sales", value: t.revenue.value, type: "money" },
+                    { label: "Orders", value: t.orders.value, type: "number" },
+                    { label: "Average order", value: t.aov.value, type: "money" },
+                    { label: "Profit", value: t.profit.value, type: "money" },
+                    { label: "Units sold", value: t.units.value, type: "number" },
+                    { label: "Discounts given", value: t.discount.value, type: "money" },
+                    { label: "Delivery charges", value: t.shipping.value, type: "money" },
+                    { label: "Refunds", value: t.refunds.value, type: "money" },
+                    { label: "Cancelled", value: t.cancel_rate.value, type: "percent" },
+                ],
+                tables: [
+                    {
+                        title: this.d.period.bucket === "month" ? "By month" : "By day",
+                        columns: [
+                            { text: this.d.period.bucket === "month" ? "Month" : "Date", value: "key" },
+                            { text: "Sales", value: "revenue", type: "money" },
+                            { text: "Orders", value: "orders", type: "number" },
+                            { text: "Profit", value: "profit", type: "money" },
+                        ],
+                        rows: this.d.series,
+                    },
+                    { title: "By category", columns: [{ text: "Category", value: "name", get: name }, { text: "Sales", value: "revenue", type: "money" }, { text: "Units", value: "units", type: "number" }], rows: this.d.by_category },
+                    { title: "By traffic source", columns: [{ text: "Source", value: "name", get: (r) => this.$t(SOURCE[r.name] || r.name) }, { text: "Orders", value: "orders", type: "number" }, { text: "Sales", value: "revenue", type: "money" }], rows: this.d.by_traffic },
+                    { title: "By city", columns: [{ text: "City", value: "name" }, { text: "Orders", value: "orders", type: "number" }, { text: "Sales", value: "revenue", type: "money" }], rows: this.d.by_city },
+                    { title: "By payment method", columns: [{ text: "Method", value: "name", get: (r) => this.$t(this.methods[r.name] || r.name) }, { text: "Orders", value: "orders", type: "number" }, { text: "Sales", value: "revenue", type: "money" }], rows: this.d.by_payment },
+                    { title: "By status", columns: [{ text: "Status", value: "name", get: name }, { text: "Orders", value: "orders", type: "number" }, { text: "Value", value: "revenue", type: "money" }], rows: this.d.by_status },
+                ],
+            };
+        },
         async load() {
             this.$router.replace({ query: this.days !== 30 ? { days: this.days } : {} });
             this.d = (await api.get("/admin/analytics/sales", { params: { days: this.days } })).data;

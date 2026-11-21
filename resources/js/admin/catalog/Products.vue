@@ -1,6 +1,8 @@
 <template>
     <div>
         <PageHeader title="All Products" subtitle="Everything in your catalog. Click a product to edit it.">
+            <ExportMenu :build="exportSpec" />
+            <v-btn-secondary prepend-icon="mdi-file-upload-outline" to="/admin/products/import">{{ $t("Import") }}</v-btn-secondary>
             <v-btn-secondary prepend-icon="mdi-shape-outline" to="/admin/categories">{{ $t("Categories") }}</v-btn-secondary>
             <v-btn-primary prepend-icon="mdi-plus" to="/admin/products/new">{{ $t("Add product") }}</v-btn-primary>
         </PageHeader>
@@ -116,7 +118,7 @@
 </template>
 
 <script>
-import api, { fileUrl } from "@/api";
+import api, { fileUrl, fetchAll } from "@/api";
 
 const TABS = [
     { value: "all", label: "All" },
@@ -220,6 +222,32 @@ export default {
     },
     methods: {
         url: fileUrl,
+        async exportSpec() {
+            const rows = await fetchAll("/admin/products", { ...this.params, page: undefined, per_page: undefined });
+            return {
+                title: "Products",
+                filename: "products",
+                subtitle: this.$t(TABS.find((t) => t.value === this.tab)?.label || "All"),
+                kpis: [{ label: "Products", value: rows.length, type: "number" }],
+                tables: [
+                    {
+                        title: "Products",
+                        columns: [
+                            { text: "Product", value: "name" },
+                            { text: "SKU", value: "sku" },
+                            { text: "Category", value: "category", get: (r) => [this.parentName(r.category), r.category?.name].filter(Boolean).join(" › ") },
+                            { text: "Brand", value: "brand", get: (r) => r.brand?.name },
+                            { text: "Price", value: "price", type: "money" },
+                            { text: "Selling at", value: "final_price", type: "money" },
+                            { text: "Stock", value: "stock_qty", type: "number" },
+                            { text: "Status", value: "status", get: (r) => this.$t(r.status === "active" ? "Published" : "Draft") },
+                            { text: "Updated", value: "updated_at", type: "date" },
+                        ],
+                        rows,
+                    },
+                ],
+            };
+        },
         firstPage() {
             this.serverOptions = { ...this.serverOptions, page: 1 };
         },

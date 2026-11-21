@@ -62,6 +62,7 @@ const routes = [
     // Catalog
     admin("/products", () => import("@/admin/catalog/Products.vue"), "Products"),
     admin("/products/new", () => import("@/admin/catalog/ProductForm.vue"), "Add product"),
+    admin("/products/import", () => import("@/admin/catalog/ImportExport.vue"), "Import / Export"),
     admin("/products/:id(\\d+)", () => import("@/admin/catalog/ProductForm.vue"), "Edit product"),
     admin("/categories", () => import("@/admin/catalog/Categories.vue"), "Categories"),
     admin("/brands", () => import("@/admin/catalog/Brands.vue"), "Brands"),

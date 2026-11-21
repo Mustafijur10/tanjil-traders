@@ -1,6 +1,7 @@
 <template>
     <div>
         <PageHeader title="Stock Movements" subtitle="Every change in stock: sales, stock received, corrections, cancellations and returns, with who made it.">
+            <ExportMenu :build="exportSpec" />
             <v-btn-secondary prepend-icon="mdi-warehouse" to="/admin/inventory">{{ $t("Stock overview") }}</v-btn-secondary>
         </PageHeader>
 
@@ -54,7 +55,7 @@
 </template>
 
 <script>
-import api from "@/api";
+import api, { fetchAll } from "@/api";
 import { MOVEMENT_REASON } from "@/utils/orders";
 
 export default {
@@ -110,6 +111,31 @@ export default {
         mr: (r) => MOVEMENT_REASON[r] || { label: r, tone: "grey" },
         signed(n) {
             return (n > 0 ? "+" : n < 0 ? "−" : "") + this.$num(Math.abs(n));
+        },
+        async exportSpec() {
+            const rows = await fetchAll("/admin/inventory/movements", { ...this.params, page: undefined, per_page: undefined });
+            return {
+                title: "Stock movements",
+                filename: "stock-movements",
+                subtitle: [this.reason ? this.$t(this.mr(this.reason).label) : this.$t("All"), this.from && this.to ? `${this.$date(this.from)} – ${this.$date(this.to)}` : ""].filter(Boolean).join(" · "),
+                tables: [
+                    {
+                        title: "Stock movements",
+                        columns: [
+                            { text: "When", value: "created_at", type: "datetime" },
+                            { text: "Product", value: "product", get: (r) => [r.product?.name, r.variant_label].filter(Boolean).join(" · ") },
+                            { text: "SKU", value: "sku", get: (r) => r.product?.sku },
+                            { text: "Type", value: "reason", get: (r) => this.$t(this.mr(r.reason).label) },
+                            { text: "Change", value: "change", type: "number" },
+                            { text: "Left", value: "balance", type: "number" },
+                            { text: "Order", value: "order_number" },
+                            { text: "Note", value: "note" },
+                            { text: "By", value: "user", get: (r) => r.user?.name },
+                        ],
+                        rows,
+                    },
+                ],
+            };
         },
         setReason(v) {
             this.reason = v;

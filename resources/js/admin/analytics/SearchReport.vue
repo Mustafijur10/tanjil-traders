@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="Search & Wishlist" subtitle="What customers look for, what they could not find, and what they save for later.">
             <RangeTabs v-model="days" />
+            <ExportMenu :build="exportSpec" :disabled="!d" />
         </PageHeader>
 
         <MetricTiles :items="tiles" />
@@ -55,6 +56,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import RangeTabs from "@/components/analytics/RangeTabs.vue";
 import MetricTiles from "@/components/analytics/MetricTiles.vue";
 import { timeChart, fmt, palette } from "@/utils/charts";
@@ -113,6 +115,37 @@ export default {
     },
     watch: { days: { immediate: true, handler: "load" } },
     methods: {
+        exportSpec() {
+            const d = this.d;
+            const t = d.totals;
+            return {
+                title: "Search and wishlist",
+                filename: "search-wishlist",
+                subtitle: periodLabel(d.period),
+                kpis: [
+                    { label: "Searches", value: t.searches, type: "number" },
+                    { label: "Different words", value: t.terms, type: "number" },
+                    { label: "Found nothing", value: t.zero_share, type: "percent" },
+                    { label: "People searching", value: t.searchers, type: "number" },
+                    { label: "Saved to wishlists", value: t.saves, type: "number" },
+                ],
+                tables: [
+                    { title: "Top searches", columns: [{ text: "Search", value: "query" }, { text: "Times", value: "searches", type: "number" }, { text: "Results", value: "results", type: "number" }], rows: d.top },
+                    { title: "No results", columns: [{ text: "Search", value: "query" }, { text: "Times", value: "searches", type: "number" }, { text: "Last", value: "last_at", type: "date" }], rows: d.zero },
+                    {
+                        title: "Most saved to wishlists",
+                        columns: [
+                            { text: "Product", value: "name" },
+                            { text: "Saved (all time)", value: "saves", type: "number" },
+                            { text: "In this period", value: "recent", type: "number" },
+                            { text: "Stock", value: "stock", type: "number" },
+                        ],
+                        rows: d.wishlist,
+                    },
+                    { title: "Searches by day", columns: [{ text: "Date", value: "key" }, { text: "Searches", value: "searches", type: "number" }, { text: "Found nothing", value: "zero", type: "number" }], rows: d.series },
+                ],
+            };
+        },
         async load() {
             this.$router.replace({ query: this.days !== 30 ? { days: this.days } : {} });
             this.d = (await api.get("/admin/analytics/search", { params: { days: this.days } })).data;

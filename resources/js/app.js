@@ -22,6 +22,7 @@ import ImageUpload from "@/components/ui/ImageUpload.vue";
 import StatusChip from "@/components/ui/StatusChip.vue";
 import PrefToggles from "@/components/ui/PrefToggles.vue";
 import DataTable from "@/components/ui/DataTable.vue";
+import ExportMenu from "@/components/ui/ExportMenu.vue";
 // Rich text editor (Tiptap) is loaded only by pages that use it.
 const RichText = defineAsyncComponent(() => import("@/components/ui/RichText.vue"));
 import { VueDraggable } from "vue-draggable-plus";
@@ -43,6 +44,8 @@ app.component("StatusChip", StatusChip);
 app.component("PrefToggles", PrefToggles);
 // Every admin table: <DataTable> (vue3-easy-data-table with the store's look)
 app.component("DataTable", DataTable);
+// PDF / Excel download for reports and lists: <ExportMenu :build="() => spec" /> (see utils/exporter.js)
+app.component("ExportMenu", ExportMenu);
 app.component("RichText", RichText);
 // Drag and drop lists: <VueDraggable v-model="items" handle=".tt-drag"> <div v-for="item in items" :key="item.id">…</div> </VueDraggable>
 app.component("VueDraggable", VueDraggable);

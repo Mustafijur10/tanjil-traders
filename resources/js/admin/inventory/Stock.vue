@@ -1,6 +1,7 @@
 <template>
     <div>
         <PageHeader title="Stock Overview" subtitle="How much of everything you have, what it is worth, and what to reorder. Add new stock or correct a count here.">
+            <ExportMenu :build="exportSpec" />
             <v-btn-secondary prepend-icon="mdi-history" to="/admin/inventory/movements">{{ $t("Stock movements") }}</v-btn-secondary>
         </PageHeader>
 
@@ -95,7 +96,7 @@
 </template>
 
 <script>
-import api, { fileUrl, fieldErrors } from "@/api";
+import api, { fileUrl, fieldErrors, fetchAll } from "@/api";
 
 export default {
     name: "Stock",
@@ -179,6 +180,41 @@ export default {
         url: fileUrl,
         tone(q) {
             return q <= 0 ? "red" : q <= this.low ? "amber" : "green";
+        },
+        /** One row per product, and one per option for products with options. */
+        async exportSpec() {
+            const products = await fetchAll("/admin/inventory", { ...this.params, page: undefined, per_page: undefined });
+            const rows = products.flatMap((p) =>
+                p.variants.length
+                    ? p.variants.map((v) => ({ name: `${p.name} · ${v.label}`, sku: v.sku || p.sku, category: p.category, stock_qty: v.stock_qty, cost_price: p.cost_price, price: p.price, value: v.stock_qty * (p.cost_price ?? p.price ?? 0) }))
+                    : [{ name: p.name, sku: p.sku, category: p.category, stock_qty: p.stock_qty, cost_price: p.cost_price, price: p.price, value: p.value }]
+            );
+            const s = this.stats;
+            return {
+                title: "Stock report",
+                filename: "stock",
+                subtitle: this.$t(this.tabs.find((t) => t.value === this.tab)?.label || "All"),
+                kpis: [
+                    { label: "Units in stock", value: s.units, type: "number" },
+                    { label: "Stock value (cost)", value: s.cost_value, type: "money" },
+                    { label: "Sale value", value: s.retail_value, type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Stock",
+                        columns: [
+                            { text: "Product", value: "name" },
+                            { text: "SKU", value: "sku" },
+                            { text: "Category", value: "category" },
+                            { text: "In stock", value: "stock_qty", type: "number" },
+                            { text: "Cost price", value: "cost_price", type: "money" },
+                            { text: "Price", value: "price", type: "money" },
+                            { text: "Stock value", value: "value", type: "money" },
+                        ],
+                        rows,
+                    },
+                ],
+            };
         },
         setTab(v) {
             this.tab = v;

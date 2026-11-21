@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="Customer Insights" subtitle="New and returning buyers, your best customers and where they live. Buyers are counted by phone number, so guests are included.">
             <RangeTabs v-model="days" />
+            <ExportMenu :build="exportSpec" :disabled="!d" />
         </PageHeader>
 
         <MetricTiles :items="tiles" />
@@ -42,6 +43,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import RangeTabs from "@/components/analytics/RangeTabs.vue";
 import MetricTiles from "@/components/analytics/MetricTiles.vue";
 import ShareRows from "@/components/analytics/ShareRows.vue";
@@ -88,6 +90,39 @@ export default {
     },
     watch: { days: { immediate: true, handler: "load" } },
     methods: {
+        exportSpec() {
+            const d = this.d;
+            const t = d.totals;
+            return {
+                title: "Customer insights",
+                filename: "customers",
+                subtitle: periodLabel(d.period),
+                kpis: [
+                    { label: "Buyers", value: t.buyers, type: "number" },
+                    { label: "New buyers", value: t.new_buyers, type: "number" },
+                    { label: "Returning buyers", value: t.returning, type: "number" },
+                    { label: "New accounts", value: t.new_accounts, type: "number" },
+                    { label: "Ordered more than once (all time)", value: t.repeat_rate, type: "percent" },
+                    { label: "Guest orders", value: t.guest_share, type: "percent" },
+                    { label: "Value per buyer (all time)", value: t.avg_lifetime, type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Top customers",
+                        columns: [
+                            { text: "Customer", value: "name" },
+                            { text: "Phone", value: "phone" },
+                            { text: "City", value: "city" },
+                            { text: "Orders", value: "orders", type: "number" },
+                            { text: "Spent", value: "spent", type: "money" },
+                        ],
+                        rows: d.top,
+                    },
+                    { title: "New and returning", columns: [{ text: "Date", value: "key" }, { text: "New", value: "new", type: "number" }, { text: "Returning", value: "returning", type: "number" }], rows: d.series },
+                    { title: "By city", columns: [{ text: "City", value: "name" }, { text: "Buyers", value: "buyers", type: "number" }, { text: "Sales", value: "revenue", type: "money" }], rows: d.by_city },
+                ],
+            };
+        },
         async load() {
             this.$router.replace({ query: this.days !== 30 ? { days: this.days } : {} });
             this.d = (await api.get("/admin/analytics/customers", { params: { days: this.days } })).data;

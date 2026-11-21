@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="Traffic" subtitle="Visitors to your website, where they came from, and how many went on to order. Staff and search-engine robots are not counted.">
             <RangeTabs v-model="days" />
+            <ExportMenu :build="exportSpec" :disabled="!d" />
         </PageHeader>
 
         <MetricTiles :items="tiles" />
@@ -80,6 +81,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import RangeTabs from "@/components/analytics/RangeTabs.vue";
 import MetricTiles from "@/components/analytics/MetricTiles.vue";
 import ShareRows from "@/components/analytics/ShareRows.vue";
@@ -150,6 +152,46 @@ export default {
     watch: { days: { immediate: true, handler: "load" } },
     methods: {
         pctOf: (v, of) => (of ? Math.round((v / of) * 1000) / 10 : 0),
+        exportSpec() {
+            const d = this.d;
+            const t = d.totals;
+            const share = (rows) => ({ columns: [{ text: "Name", value: "name", get: (r) => this.$t(r.name) }, { text: "Visits", value: "sessions", type: "number" }], rows });
+            return {
+                title: "Traffic report",
+                filename: "traffic",
+                subtitle: periodLabel(d.period),
+                kpis: [
+                    { label: "Visitors", value: t.visitors.value, type: "number" },
+                    { label: "Visits", value: t.sessions.value, type: "number" },
+                    { label: "Page views", value: t.pageviews.value, type: "number" },
+                    { label: "Pages per visit", value: t.pages_per.value, type: "number" },
+                    { label: "Seconds per visit", value: t.avg_duration.value, type: "number" },
+                    { label: "Left after one page", value: t.bounce_rate.value, type: "percent" },
+                    { label: "Visits that ordered", value: t.conversion.value, type: "percent" },
+                ],
+                tables: [
+                    { title: "Visitors by day", columns: [{ text: "Date", value: "key" }, { text: "Visitors", value: "visitors", type: "number" }, { text: "Page views", value: "views", type: "number" }], rows: d.series },
+                    { title: "From visit to order", columns: [{ text: "Step", value: "step", get: (r) => this.$t(r.step) }, { text: "Visits", value: "sessions", type: "number" }], rows: d.funnel },
+                    {
+                        title: "Traffic sources",
+                        columns: [
+                            { text: "Source", value: "name", get: (r) => this.$t(SOURCES[r.name] || r.name) },
+                            { text: "Visits", value: "sessions", type: "number" },
+                            { text: "Orders", value: "orders", type: "number" },
+                            { text: "Sales", value: "revenue", type: "money" },
+                            { text: "Visits that ordered", value: "conversion", type: "percent" },
+                        ],
+                        rows: d.sources,
+                    },
+                    { title: "Top referrers", columns: [{ text: "Referrer", value: "name" }, { text: "Type", value: "source", get: (r) => this.$t(SOURCES[r.source] || r.source) }, { text: "Visits", value: "sessions", type: "number" }], rows: d.referrers },
+                    { title: "Devices", ...share(d.devices) },
+                    { title: "Browsers", ...share(d.browsers) },
+                    { title: "Operating systems", ...share(d.os) },
+                    { title: "Most viewed pages", columns: [{ text: "Page", value: "path" }, { text: "Views", value: "views", type: "number" }, { text: "Visitors", value: "visitors", type: "number" }], rows: d.pages },
+                    { title: "Landing pages", columns: [{ text: "Page", value: "path" }, { text: "Visits", value: "sessions", type: "number" }], rows: d.landing },
+                ],
+            };
+        },
         async load() {
             this.$router.replace({ query: this.days !== 30 ? { days: this.days } : {} });
             this.d = (await api.get("/admin/analytics/traffic", { params: { days: this.days } })).data;

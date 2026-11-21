@@ -34,6 +34,8 @@
         "@tiptap/vue-3": "^2.27.3",
         "@vee-validate/rules": "^4.12.6",
         "apexcharts": "^7.4.0",
+        "exceljs": "^4.4.0",
+        "html2pdf.js": "^0.10.2",
         "vee-validate": "^4.12.6",
         "vue-draggable-plus": "^0.6.0",
         "vue-marquee-text-component": "^2.0.1",

@@ -65,6 +65,21 @@ export function fieldErrors(error) {
     return Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v]));
 }
 
+/**
+ * Every row of a paged admin list, for downloads: fetchAll("/admin/orders", { status: "pending" }).
+ * pick(data) returns the paginator from the response (default: data.items). Stops at 10,000 rows.
+ */
+export async function fetchAll(url, params = {}, pick = (d) => d.items) {
+    const rows = [];
+    for (let page = 1; page <= 100; page++) {
+        const { data } = await api.get(url, { params: { ...params, page, per_page: 100 } });
+        const p = pick(data);
+        rows.push(...p.data);
+        if (page >= p.last_page) break;
+    }
+    return rows;
+}
+
 /** Full URL for a stored file path ("products/a.jpg" -> "/storage/products/a.jpg"). */
 export function fileUrl(path) {
     if (!path) return "";

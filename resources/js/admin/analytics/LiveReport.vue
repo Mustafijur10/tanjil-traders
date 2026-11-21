@@ -2,6 +2,7 @@
     <div>
         <PageHeader title="Live Performance" subtitle="Who is on the website right now, today so far, and how fast pages load for real visitors.">
             <span class="tt-live-pill"><span class="tt-live-dot"></span>{{ $t("Updates every 15 seconds") }}</span>
+            <ExportMenu :build="exportSpec" :disabled="!d" />
         </PageHeader>
 
         <div class="tt-an-grid">
@@ -120,6 +121,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import api from "@/api";
+import { periodLabel } from "@/utils/exporter";
 import { base, palette, TRAFFIC_SOURCES } from "@/utils/charts";
 
 
@@ -180,6 +182,47 @@ export default {
         clearInterval(this.timer);
     },
     methods: {
+        exportSpec() {
+            const d = this.d;
+            const ms = (k) => (v) => (v == null ? null : k === "cls" ? v : Math.round(v));
+            return {
+                title: "Live performance",
+                filename: "live-performance",
+                subtitle: this.$date(new Date(), { dateStyle: "medium", timeStyle: "short" }),
+                kpis: [
+                    { label: "On the website now", value: d.now, type: "number" },
+                    { label: "Visitors today", value: d.today.visitors, type: "number" },
+                    { label: "Page views today", value: d.today.pageviews, type: "number" },
+                    { label: "Orders today", value: d.today.orders, type: "number" },
+                    { label: "Sales today", value: d.today.revenue, type: "money" },
+                ],
+                tables: [
+                    {
+                        title: "Core Web Vitals (7 days, 75th percentile)",
+                        columns: [
+                            { text: "Measure", value: "label", get: (r) => this.$t(r.label) },
+                            { text: "Value", value: "display" },
+                            { text: "Rating", value: "rating", get: (r) => this.$t(this.ratingText[r.rating]) },
+                        ],
+                        rows: this.vitalList,
+                    },
+                    {
+                        title: "Page load by device",
+                        columns: [
+                            { text: "Device", value: "device" },
+                            { text: "Page loads", value: "samples", type: "number" },
+                            { text: "LCP (ms)", value: "lcp", get: (r) => ms("lcp")(r.lcp), type: "number" },
+                            { text: "INP (ms)", value: "inp", get: (r) => ms("inp")(r.inp), type: "number" },
+                            { text: "CLS", value: "cls", type: "number" },
+                        ],
+                        rows: Object.entries(d.vitals.devices).map(([device, s]) => ({ device, ...s })),
+                    },
+                    { title: "Slowest pages", columns: [{ text: "Page", value: "path" }, { text: "Loads", value: "samples", type: "number" }, { text: "LCP (ms)", value: "lcp", type: "number" }], rows: d.vitals.slowest },
+                    { title: "Pages being viewed", columns: [{ text: "Page", value: "path" }, { text: "Device", value: "device" }, { text: "Source", value: "source", get: (r) => this.$t(this.sources[r.source] || r.source) }, { text: "Last seen", value: "last_seen_at", type: "datetime" }], rows: d.pages },
+                    { title: "Recent orders", columns: [{ text: "Order", value: "order_number" }, { text: "Customer", value: "name" }, { text: "City", value: "city" }, { text: "Total", value: "total", type: "money" }, { text: "Placed", value: "created_at", type: "datetime" }], rows: d.recent_orders },
+                ],
+            };
+        },
         sec(ms) {
             return `${this.$num(Math.round(ms / 100) / 10)} s`;
         },
